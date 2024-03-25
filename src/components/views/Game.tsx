@@ -8,18 +8,6 @@ import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import { User } from "types";
 
-const Player = ({ user }: { user: User }) => (
-  <div className="player container">
-    <div className="player username">{user.username}</div>
-    <div className="player name">{user.name}</div>
-    <div className="player id">id: {user.id}</div>
-  </div>
-);
-
-Player.propTypes = {
-  user: PropTypes.object,
-};
-
 const Game = () => {
   // use react-router-dom's hook to access navigation, more info: https://reactrouter.com/en/main/hooks/use-navigate 
   const navigate = useNavigate();
@@ -31,9 +19,20 @@ const Game = () => {
   // more information can be found under https://react.dev/learn/state-a-components-memory and https://react.dev/reference/react/useState 
   const [users, setUsers] = useState<User[]>(null);
 
-  const logout = (): void => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const logout = async () => {
+    try {
+      const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+      
+      const response = await api.post("/users/logout", null, {headers: config});
+      localStorage.removeItem("username");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("token");
+      navigate("/login");
+    } catch (error) {
+      alert(
+        `Something went wrong during the logout: \n${handleError(error)}`
+      );
+    }
   };
 
   // the effect hook can be used to react to change in your component.
@@ -44,7 +43,13 @@ const Game = () => {
     // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
     async function fetchData() {
       try {
-        const response = await api.get("/users");
+        const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+        //console.log(config);
+        //const username = localStorage.getItem("username");
+        //const requestBody = JSON.stringify({});
+        //console.log(requestBody);
+        
+        const response = await api.get("/users", {headers: config});
 
         // delays continuous execution of an async operation for 1 second.
         // This is just a fake async call, so that the spinner can be displayed
@@ -79,6 +84,22 @@ const Game = () => {
     fetchData();
   }, []);
 
+  const enterProfile = (id) => {
+    navigate("/users/"+id);
+  }
+
+  const Player = ({ user }: { user: User }) => (
+    <div className="player container" onClick={() => enterProfile(user.id)}>
+      <div className="player username">{user.username}</div>
+      <div className="player id">
+      </div>
+    </div>
+  );
+  
+  Player.propTypes = {
+    user: PropTypes.object,
+  };
+
   let content = <Spinner />;
 
   if (users) {
@@ -99,13 +120,15 @@ const Game = () => {
   }
 
   return (
-    <BaseContainer className="game container">
-      <h2>Happy Coding!</h2>
-      <p className="game paragraph">
-        Get all users from secure endpoint:
-      </p>
-      {content}
-    </BaseContainer>
+    <div>
+      <BaseContainer className="game container">
+        <h2>Hello, {localStorage.username}!</h2>
+        <p className="game paragraph">
+          List of users:
+        </p>
+        {content}
+      </BaseContainer>
+    </div>
   );
 };
 

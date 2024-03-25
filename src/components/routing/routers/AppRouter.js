@@ -4,6 +4,10 @@ import {GameGuard} from "../routeProtectors/GameGuard";
 import GameRouter from "./GameRouter";
 import {LoginGuard} from "../routeProtectors/LoginGuard";
 import Login from "../../views/Login";
+import {RegistrationGuard} from "../routeProtectors/RegistrationGuard";
+import Registration from "../../views/Registration";
+import UserProfile from "../../views/UserProfile";
+
 
 /**
  * Main router of your application.
@@ -26,7 +30,15 @@ const AppRouter = () => {
         <Route path="/login" element={<LoginGuard />}>
           <Route path="/login" element={<Login/>} />
         </Route>
+        
+        <Route path="/registration" element={<RegistrationGuard />}>
+          <Route path="/registration" element={<Registration/>} />
+        </Route>
 
+        <Route path="/users/:id" element={<GameGuard />}>
+          <Route path="/users/:id" element={<UserProfile />} />
+        </Route>
+        
         <Route path="/" element={
           <Navigate to="/game" replace />
         }/>
