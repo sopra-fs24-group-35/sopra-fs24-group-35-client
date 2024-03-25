@@ -7,18 +7,16 @@ import PropTypes from "prop-types";
  * Another way to export directly your functional component is to write 'export const' 
  * instead of 'export default' at the end of the file.
  */
-
-export const LoginGuard = () => {
+export const RegistrationGuard = () => {
   if (!localStorage.getItem("token")) {
     
     return <Outlet />;
   }
   console.log("Token: "+localStorage.getItem("token"));
-  
+
   return <Navigate to="/game" replace />;
 };
 
-
-LoginGuard.propTypes = {
+RegistrationGuard.propTypes = {
   children: PropTypes.node
 }
