@@ -78,7 +78,7 @@ const Login = () => {
           <FormField
             label="Password"
             value={password}
-            onChange={(n) => setPassword(n)}
+            onChange = {(n) => setPassword(n)}
           />
           <div className="login button-container">
             <Button
