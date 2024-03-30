@@ -13,7 +13,7 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-image: url('Pictures/Original1.jpg');
+    background-image: url('Pictures/RiskMap.jpg.webp');
     background-size: cover;
     background-position: center;
     position: relative; /* To position buttons relative to title-screen */
@@ -29,10 +29,12 @@
  //   height: 20em;
     height: 100%;
     font-size: 16px;
-    font-weight: 300;
+    font-weight: 400;
+    padding-bottom: 40px;
+    padding-top: 40px;
     padding-left: 37px;
     padding-right: 37px;
-    border-radius: 0.75em;
+    border-radius: 3em;
     background-color: $background;
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
@@ -42,10 +44,10 @@
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Using a sans-serif font similar to the Risk logo */
     font-size: 4rem; /* Adjust size as needed */
     font-weight: bold;
-    color: #d32f2f; /* Red color similar to the Risk logo */
+    color: #c40505; /* Red color similar to the Risk logo */
     text-transform: uppercase; /* Making the text uppercase for consistency */
     letter-spacing: 2px; /* Adjust letter spacing as needed */
-    text-shadow: 4px 2px 0 #000; /* Adding a subtle shadow for depth */
+    text-shadow: 1.5px 1.5px 0 #d2d2d2; /* Adding a subtle shadow for depth */
   }
 
   &.subtitle {
@@ -71,6 +73,9 @@
     color: #b03838;
   }
 }
+
+
+
 
 
 
