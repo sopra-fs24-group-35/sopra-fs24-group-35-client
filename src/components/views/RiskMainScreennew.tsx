@@ -1,3 +1,5 @@
+//copy to switch back to not push the whole time
+
 import React from 'react';
 import "styles/views/TitleScreen.scss";
 import {Button} from "../ui/Button";
