@@ -7,7 +7,8 @@ import Login from "../../views/Login";
 import {RegistrationGuard} from "../routeProtectors/RegistrationGuard";
 import Registration from "../../views/Registration";
 import UserProfile from "../../views/UserProfile";
-
+import RiskMainScreen from "../../views/RiskMainScreen";
+import RiskMainScreennew from "../../views/RiskMainScreennew";
 
 /**
  * Main router of your application.
@@ -27,6 +28,10 @@ const AppRouter = () => {
           <Route path="/game/*" element={<GameRouter base="/game"/>} />
         </Route>
 
+        <Route path="/risk" element={<GameGuard />}>
+          <Route path="/risk" element={<RiskMainScreennew/>} />
+        </Route>
+
         <Route path="/login" element={<LoginGuard />}>
           <Route path="/login" element={<Login/>} />
         </Route>
@@ -38,6 +43,10 @@ const AppRouter = () => {
         <Route path="/users/:id" element={<GameGuard />}>
           <Route path="/users/:id" element={<UserProfile />} />
         </Route>
+  
+{/*        <Route path="/lobby" element={<GameGuard />}>
+          <Route path="/lobby" element={<LobbyErstellen />} />
+        </Route>*/}
         
         <Route path="/" element={
           <Navigate to="/game" replace />

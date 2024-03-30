@@ -6,7 +6,7 @@
   }
   &:disabled {
     cursor: default;
-    opacity: 0.4;
+    opacity: 0.6;
     &:hover {
       transform: none;
     }
@@ -21,8 +21,9 @@
   border-radius: $borderRadius;
   cursor: pointer;
   opacity: 1;
-  color: $background;
+//  color: $background;
+  color: #ff0202;
   background-color: $accentButton;
   transition: all 0.3s ease;
-  margin-top: 20px;
+  margin-top: 0px;
 }
