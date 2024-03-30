@@ -38,6 +38,10 @@ const AppRouter = () => {
         <Route path="/users/:id" element={<GameGuard />}>
           <Route path="/users/:id" element={<UserProfile />} />
         </Route>
+  
+        <Route path="/lobby" element={<GameGuard />}>
+          <Route path="/lobby" element={<LobbyErstellen />} />
+        </Route>
         
         <Route path="/" element={
           <Navigate to="/game" replace />
