@@ -35,6 +35,19 @@ const Game = () => {
     }
   };
 
+  const gotogame= async () => {
+    try {
+      //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+      //const response = await api.post("/users/logout", null, {headers: config});
+
+      navigate("/risk");
+    } catch (error) {
+      alert(
+          `Something went wrong during the logout: \n${handleError(error)}`
+      );
+    }
+  };
+
   // the effect hook can be used to react to change in your component.
   // in this case, the effect hook is only run once, the first time the component is mounted
   // this can be achieved by leaving the second argument an empty array.
@@ -114,6 +127,9 @@ const Game = () => {
         </ul>
         <Button width="100%" onClick={() => logout()}>
           Logout
+        </Button>
+        <Button width="100%" onClick={() => gotogame()}>
+          Game Main Screen
         </Button>
       </div>
     );

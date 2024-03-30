@@ -5,6 +5,8 @@ import {useNavigate} from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "styles/views/Registration.scss";
 import BaseContainer from "components/ui/BaseContainer";
+import FormField from "../ui/FormField";
+import FormFieldPassword from "../ui/FormFieldPassword";
 import PropTypes from "prop-types";
 
 /*
@@ -13,26 +15,6 @@ however be sure not to clutter your files with an endless amount!
 As a rule of thumb, use one file per component and only add small,
 specific components that belong to the main one in the same file.
  */
-const FormField = (props) => {
-  return (
-    <div className="registration field">
-      <label className="registration label">{props.label}</label>
-      <input
-        className="registration input"
-        placeholder="enter here.."
-        value={props.value}
-        onChange={(e) => props.onChange(e.target.value)}
-        type={props.value==="password" ? "password" : "text"}
-      />
-    </div>
-  );
-};
-
-FormField.propTypes = {
-  label: PropTypes.string,
-  value: PropTypes.string,
-  onChange: PropTypes.func,
-};
 
 const Registration = () => {
   const navigate = useNavigate();
@@ -74,7 +56,7 @@ const Registration = () => {
             value={username}
             onChange={(un: string) => setUsername(un)}
           />
-          <FormField
+          <FormFieldPassword
             label="Enter your password:"
             value={password}
             onChange={(n) => setPassword(n)}
