@@ -1,0 +1,122 @@
+@import "../theme";
+
+.lobby {
+  &.container {
+    margin-top: 2em;
+    min-height: 300px;
+    /* we include the center mixin defined in _theme.scss and save three duplicate lines :) */
+    @include center;
+    flex-direction: column;
+  }
+
+  &.base-container {
+    margin-left: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    padding-right: 40em;
+    min-height: 75.5px;
+    height: auto;
+    max-width: $DESKTOP_WIDTH;
+    color: $textColor;
+  }
+
+  &.background {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;  
+    height: 100vh;
+    //background: #ddbb5f;
+    //background: linear-gradient(180deg, rgba(221, 187, 95, 1) 7%, rgba(119, 60, 72, 1) 100%);
+    background-image: url('Pictures/Original1.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative; /* To position buttons relative to title-screen */
+  }
+
+  &.form {
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: 50em;
+    //   height: 20em;
+    height: 100%;
+    font-size: 16px;
+    font-weight: 300;
+    padding-left: 37px;
+    padding-right: 37px;
+    border-radius: 0.75em;
+    background-color: $background;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: $dropShadow;
+  }
+
+  &.title {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Using a sans-serif font similar to the Risk logo */
+    font-size: 4rem; /* Adjust size as needed */
+    font-weight: bold;
+    color: #d32f2f; /* Red color similar to the Risk logo */
+    text-transform: uppercase; /* Making the text uppercase for consistency */
+    letter-spacing: 2px; /* Adjust letter spacing as needed */
+    text-shadow: 4px 2px 0 #000; /* Adding a subtle shadow for depth */
+  }
+
+  &.subtitle {
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+    font-family: Avenir-Next, Futura; /* Change to your war-themed font */
+    color: #ff4343; /* White text color */
+  }
+
+  &.title-container,
+  &.subtitle-container, &.buttons-container {
+    margin-bottom: 20px; /* Add some space between sections */
+    margin-top: 20px;
+    border: 2px solid #ff4444; /* Red border */
+    border-radius: 20px; /* Rounded corners */
+    padding: 10px; /* Add padding */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    //background-color: rgb(98, 98, 98); /* Darker and semi-transparent overlay */
+    //background-color: #504536;
+    color: #b03838;
+  }
+}
+
+.player {
+  &.container {
+    margin: 0.5em 0;
+    width: 20em;
+    padding: 10px;
+    border-radius: $borderRadius;
+    display: flex;
+    align-items: center;
+    background: lighten($background, 5);
+    cursor: pointer;
+    &:hover {
+      transform: translateY(-2px);
+      background: lighten($background, 10);
+    }
+  }
+  &.name {
+    font-weight: 300;
+    margin-left: 5px;
+  }
+  &.username {
+    font-weight: 500;
+    color: $accent;
+  }
+  &.id {
+    margin-left: auto;
+    margin-right: 10px;
+    font-family: $fontMono;
+    font-weight: 300;
+  }
+}
+
+
+

@@ -8,6 +8,7 @@ import {RegistrationGuard} from "../routeProtectors/RegistrationGuard";
 import Registration from "../../views/Registration";
 import UserProfile from "../../views/UserProfile";
 import RiskMainScreen from "../../views/RiskMainScreen";
+import LobbyScreen from "../../views/LobbyScreen";
 import RiskMainScreennew from "../../views/RiskMainScreennew";
 
 /**
@@ -42,6 +43,10 @@ const AppRouter = () => {
 
         <Route path="/users/:id" element={<GameGuard />}>
           <Route path="/users/:id" element={<UserProfile />} />
+        </Route>
+
+        <Route path="/lobby/:lobbyId" element={<GameGuard />}>
+          <Route path="/lobby/:lobbyId" element={<LobbyScreen />} />
         </Route>
         
         <Route path="/" element={
