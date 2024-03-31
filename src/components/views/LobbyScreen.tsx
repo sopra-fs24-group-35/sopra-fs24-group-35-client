@@ -3,23 +3,30 @@ import { api, handleError } from "helpers/api";
 import { Spinner } from "components/ui/Spinner";
 import "styles/views/LobbyScreen.scss";
 import {Button} from "../ui/Button";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import PropTypes from "prop-types";
 import { User } from "types";
+import Lobby from "models/Lobby";
 
 const LobbyScreen = () => {
 
     const navigate = useNavigate();
 
     const [users, setUsers] = useState<User[]>(null);
+
+    const [lobby, setLobby] = useState<Lobby>(null);
+
+    const { lobbyId } = useParams();
+
+    console.log("lobbyId is:", lobbyId);
    
     useEffect(() => {
         // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
-        async function fetchData() {
+        async function fetchData(id) {
           try {
-            const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+            //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
             
-            const response = await api.get("/users", {headers: config});
+            const response = await api.get(`/lobbies/${id}`);
     
             // delays continuous execution of an async operation for 1 second.
             // This is just a fake async call, so that the spinner can be displayed
@@ -27,8 +34,8 @@ const LobbyScreen = () => {
             await new Promise((resolve) => setTimeout(resolve, 2000));
     
             // Get the returned users and update the state.
-            setUsers(response.data);
-    
+            setLobby(response.data);
+            
             // This is just some data for you to see what is available.
             // Feel free to remove it.
             console.log("request to:", response.request.responseURL);
@@ -51,7 +58,7 @@ const LobbyScreen = () => {
           }
         }
     
-        fetchData();
+        fetchData(lobbyId);
     });
 
     const enterProfile = (id) => {
@@ -74,8 +81,8 @@ const LobbyScreen = () => {
 
     if (users) {
         content = (
-          <div className="game">
-            <ul className="game user-list">
+          <div className="lobby">
+            <ul className="lobby user-list">
               {users.map((user: User) => (
                 <li key={user.id}>
                   <Player user={user} />

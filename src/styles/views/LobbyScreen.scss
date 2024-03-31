@@ -85,6 +85,11 @@
     //background-color: #504536;
     color: #b03838;
   }
+
+  &.user-list {
+    list-style: none;
+    padding-left: 0;
+  }
 }
 
 .player {
