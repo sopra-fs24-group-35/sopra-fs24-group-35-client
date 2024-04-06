@@ -7,6 +7,7 @@ import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import { User } from "types";
+import FormFieldID from "../ui/FormField";
 
 const Game = () => {
   // use react-router-dom's hook to access navigation, more info: https://reactrouter.com/en/main/hooks/use-navigate 
@@ -125,18 +126,22 @@ const Game = () => {
             </li>
           ))}
         </ul>
-        <Button width="100%" onClick={() => logout()}>
-          Logout
-        </Button>
-        <Button width="100%" onClick={() => gotogame()}>
+        <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => gotogame()}>
           Game Main Screen
+        </Button>
+        <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => navigate("/lobby")}>
+          Lobby Options
+        </Button>
+        <Button width="100%" style={{ marginBottom: '10px' }} onClick={() => logout()}>
+          Logout
         </Button>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="basescreen title-screen">
+      <div className="basescreen overlay"></div>
       <BaseContainer className="game container">
         <h2>Hello, {localStorage.username}!</h2>
         <p className="game paragraph">
