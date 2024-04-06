@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { api, handleError } from "helpers/api";
 import "styles/views/TitleScreen.scss";
 import {Button} from "../ui/Button";
 import BaseContainer from "../ui/BaseContainer";
@@ -7,10 +8,26 @@ import { useNavigate } from "react-router-dom";
 
 
 
-const joinScreen: React.FC = () => {
+const joinScreen = () => {
   const navigate = useNavigate();
-  const [id, setId] = useState<string>(null);
+  const [code, setCode] = useState<string>(null);
 
+  // update lobby and go to lobby screen
+  const goToLobby = async (code) => {
+    try {
+      //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+      const players = [localStorage.getItem("user_id")];
+      const requestBody = JSON.stringify({ code, players });
+      const response = await api.post("/lobbies/update", requestBody);
+      const lobbyId = response.data.id;
+      navigate("/lobby/" + lobbyId);
+
+    } catch (error) {
+      alert(
+        `Something went wrong while joining the lobby: \n${handleError(error)}`
+      );
+    }
+  };
 
   return (
     <div className="basescreen title-screen">
@@ -20,13 +37,13 @@ const joinScreen: React.FC = () => {
           <div className="basescreen buttons-container" style={{ gap: '30px' }}>
             <FormFieldID
               label="Lobby ID"
-              value={id}
-              onChange={(un: string) => setId(un)}
+              value={code}
+              onChange={(un: string) => setCode(un)}
             />
             <Button
               width="100%"
-              key = {id}
-              onClick={() => navigate("/lobby/" +id)}
+              key = {code}
+              onClick={() => goToLobby(code)}
               >
               Confirm
             </Button>
