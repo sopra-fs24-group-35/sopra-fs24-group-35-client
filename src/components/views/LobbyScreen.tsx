@@ -24,6 +24,9 @@ const LobbyScreen = () => {
     console.log("lobbyId is:", lobbyId);
    
     useEffect(() => {
+
+        let timeoutId;
+
         // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
         async function fetchData(id) {
 
@@ -35,7 +38,7 @@ const LobbyScreen = () => {
 
                 setLobby(lobbyData);
 
-                console.log("players ", lobbyData.players);
+                console.log("lobby ", lobby);
 
                 let userIdList = lobbyData.players;
 
@@ -52,7 +55,6 @@ const LobbyScreen = () => {
 
                 setLobbyOwnerName(userData.username);
 
-
                 console.log("owner name: ", lobbyOwnerName) //this shows null, but it isn't null
 
             } catch (error) {
@@ -68,28 +70,42 @@ const LobbyScreen = () => {
             }
         }
             
-        if (lobbyId){
-            fetchData(lobbyId);
+        function debouncedFetchData(id) {
+            // Clear the previous timeout
+            clearTimeout(timeoutId);
+            // Set a new timeout to call fetchData after 500 milliseconds
+            timeoutId = setTimeout(() => {
+                fetchData(id);
+            }, 2000);
         }
+    
+        // Initial fetch
+        if (lobbyId) {
+            debouncedFetchData(lobbyId);
+        }
+    
+        // Cleanup function to clear the timeout when the component unmounts
+        return () => clearTimeout(timeoutId);
+    
 
-        const interval = setInterval(() => {
-            if (lobbyId) {
-                fetchData(lobbyId);
-            }
-        }, 5000);
-        
-        return () => clearInterval(interval);
-
-    }, []);
+    }, [lobby, lobbyOwnerName]);
     
     const enterProfile = (id) => {
         navigate("/users/"+id);
     }
 
-    const leaveLobby = () => {
-        const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
-        api.post("/lobbies/" + lobbyId + "/remove", requestBody);
-        navigate("/game");
+    const leaveLobby = async () => {
+        try {
+            //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+            const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
+            const response = await api.post("/lobbies/" + lobbyId + "/remove", requestBody);
+            navigate("/game");
+      
+        } catch (error) {
+            alert(
+              `Something went wrong while leaving the lobby! \n${handleError(error)}`
+            );
+          }
     }
 
     const Player = ({ user }: { user: User }) => (
@@ -130,7 +146,8 @@ const LobbyScreen = () => {
         <div className="basescreen title-screen">
         <div className="basescreen overlay"></div>
         <BaseContainer className="lobby container">
-          <h2>Welcome to {(lobbyOwnerName !== null) ? (lobbyOwnerName + "'s") : ("the")} lobby!</h2>
+          <h2>{(lobbyOwnerName !== null) ? ("Welcome to " + lobbyOwnerName + "'s lobby!") : ("The lobby is loading.")}</h2>
+          <h3>The lobby code is { (lobby !== null) ? (lobby.code) : ("loading :)") }</h3>
           <p className="lobby paragraph">
             Joined users:
           </p>
