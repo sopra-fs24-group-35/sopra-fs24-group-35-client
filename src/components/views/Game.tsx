@@ -105,8 +105,6 @@ const Game = () => {
   const Player = ({ user }: { user: User }) => (
     <div className="player container" onClick={() => enterProfile(user.id)}>
       <div className="player username">{user.username}</div>
-      <div className="player id">
-      </div>
     </div>
   );
   
@@ -126,15 +124,15 @@ const Game = () => {
             </li>
           ))}
         </ul>
-        <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => gotogame()}>
-          Game Main Screen
-        </Button>
-        <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => navigate("/lobby")}>
-          Lobby Options
-        </Button>
-        <Button width="100%" style={{ marginBottom: '10px' }} onClick={() => logout()}>
-          Logout
-        </Button>
+          <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => gotogame()}>
+            Game Main Screen
+          </Button>
+          <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => navigate("/lobby")}>
+            Lobby Options
+          </Button>
+          <Button width="100%" style={{ marginBottom: '10px' }} onClick={() => logout()}>
+            Logout
+          </Button>
       </div>
     );
   }
