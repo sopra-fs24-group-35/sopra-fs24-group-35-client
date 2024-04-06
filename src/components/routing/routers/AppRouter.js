@@ -10,9 +10,7 @@ import UserProfile from "../../views/UserProfile";
 import LobbyErstellen from "../../views/LobbyErstellen";
 import RiskMainScreen from "../../views/RiskMainScreen";
 import JoinScreen from "../../views/joinScreen";
-
 import LobbyScreen from "../../views/LobbyScreen";
-import RiskMainScreennew from "../../views/RiskMainScreennew";
 
 /**
  * Main router of your application.

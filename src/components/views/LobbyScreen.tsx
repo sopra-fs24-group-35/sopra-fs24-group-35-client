@@ -4,6 +4,7 @@ import { Spinner } from "components/ui/Spinner";
 import "styles/views/LobbyScreen.scss";
 import {Button} from "../ui/Button";
 import {useNavigate, useParams} from "react-router-dom";
+import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import { User } from "types";
 import Lobby from "models/Lobby";
@@ -16,6 +17,8 @@ const LobbyScreen = () => {
 
     const [lobby, setLobby] = useState<Lobby[]>(null);
 
+    const [lobbyOwnerName, setLobbyOwnerName] = useState(null);
+
     const { lobbyId } = useParams();
 
     console.log("lobbyId is:", lobbyId);
@@ -23,58 +26,61 @@ const LobbyScreen = () => {
     useEffect(() => {
         // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
         async function fetchData(id) {
-          try {
 
-            const response1 = await api.get(`/lobbies/${id}`);
-            const lobbyData = response1.data;
+            try {
+                const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
 
-            await new Promise((resolve) => setTimeout(resolve, 2000));  
+                const getLobbyResponse = await api.get(`/lobbies/${id}`);
+                const lobbyData = getLobbyResponse.data;
 
-            setLobby(lobbyData);
+                setLobby(lobbyData);
 
-            console.log("players ", lobbyData.players);
+                console.log("players ", lobbyData.players);
 
-            let userIdList = lobbyData.players;
+                let userIdList = lobbyData.players;
 
-            const requestBody = JSON.stringify({ userIdList });
+                const requestBody = JSON.stringify({ userIdList });
 
-            const response2 = await api.post("/users/lobbies", requestBody);
+                const getUsersResponse = await api.post("/users/lobbies", requestBody);
 
-            setUsers(response2.data);
+                setUsers(getUsersResponse.data);
 
-            // This is just some data for you to see what is available.
-            // Feel free to remove it.
-            /*console.log("request to:", response1.request.responseURL);
-            console.log("status code:", response1.status);
-            console.log("status text:", response1.statusText);
-            console.log("requested data:", response1.data);
+                console.log("first userId", userIdList[0]);
+                const getOwnerResponse = await api.get("/users/" + userIdList[0], {headers: config})
+                const userData = getOwnerResponse.data;
+                console.log("response: ", userData);
 
-            console.log("request to:", response2.request.responseURL);
-            console.log("status code:", response2.status);
-            console.log("status text:", response2.statusText);
-            console.log("requested data:", response2.data);
-    
-            // See here to get more data.
-            console.log(response1);
-            console.log(response2);*/
+                setLobbyOwnerName(userData.username);
 
-          } catch (error) {
-            console.error(
-              `Something went wrong while fetching the users: \n${handleError(
-                error
-              )}`
-            );
-            console.error("Details:", error);
-            alert(
-              "Something went wrong while fetching the users! See the console for details."
-            );
-          }
+
+                console.log("owner name: ", lobbyOwnerName) //this shows null, but it isn't null
+
+            } catch (error) {
+                console.error(
+                `Something went wrong while fetching the users: \n${handleError(
+                    error
+                )}`
+                );
+                console.error("Details:", error);
+                alert(
+                "Something went wrong while fetching the users! See the console for details."
+                );
+            }
         }
-        
+            
         if (lobbyId){
             fetchData(lobbyId);
         }
-    } );
+
+        const interval = setInterval(() => {
+            if (lobbyId) {
+                fetchData(lobbyId);
+            }
+        }, 5000);
+        
+        return () => clearInterval(interval);
+
+    }, []);
     
     const enterProfile = (id) => {
         navigate("/users/"+id);
@@ -104,18 +110,27 @@ const LobbyScreen = () => {
                 </li>
               ))}
             </ul>
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => null}>
+                    Start Game
+                </Button>
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => navigate("/game")}>
+                    Leave Lobby
+                </Button>
             </div>
         );
     };
 
     return (
-        <div className="lobby background">
-                <div className="lobby base-container">
-                    <div className="lobby form">
-                       {content}
-                    </div>
-                </div>
-        </div>
+        <div className="basescreen title-screen">
+        <div className="basescreen overlay"></div>
+        <BaseContainer className="lobby container">
+          <h2>Welcome to {(lobbyOwnerName !== null) ? (lobbyOwnerName + "'s") : ("the")} lobby!</h2>
+          <p className="lobby paragraph">
+            Joined users:
+          </p>
+          {content}
+        </BaseContainer>
+      </div>
     );
 };
 
