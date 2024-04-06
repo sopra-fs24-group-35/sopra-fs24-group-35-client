@@ -24,7 +24,7 @@ const joinScreen = () => {
 
     } catch (error) {
       alert(
-        `Something went wrong while joining the lobby: \n${handleError(error)}`
+        `Something went wrong while joining the lobby, did you enter the correct code? \n${handleError(error)}`
       );
     }
   };
