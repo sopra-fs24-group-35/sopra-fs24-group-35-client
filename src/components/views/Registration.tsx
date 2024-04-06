@@ -47,33 +47,36 @@ const Registration = () => {
   };
 
   return (
-    <BaseContainer>
-      <div className="registration container">
-        <div className="registration form">
-          <h3> Registration </h3>
-          <FormField
-            label="Enter your username:"
-            value={username}
-            onChange={(un: string) => setUsername(un)}
-          />
-          <FormFieldPassword
-            label="Enter your password:"
-            value={password}
-            onChange={(n) => setPassword(n)}
-          />
-          <label style={{fontSize: "0.75em"}}> (Your password needs to be at least 8 characters long.) </label>
-          <div className="login button-container">
-            <Button
-              disabled={!username || (!password || password.length < 8)}
-              width="100%"
-              onClick={() => doRegistration()}
-            >
-              Register now!
-            </Button>
+    <div className="basescreen title-screen">
+      <div className="basescreen overlay"></div>
+      <BaseContainer>
+        <div className="registration container">
+          <div className="registration form">
+            <h3> Registration </h3>
+            <FormField
+              label="Enter your username:"
+              value={username}
+              onChange={(un: string) => setUsername(un)}
+            />
+            <FormFieldPassword
+              label="Enter your password:"
+              value={password}
+              onChange={(n) => setPassword(n)}
+            />
+            <label style={{fontSize: "0.75em"}}> (Your password needs to be at least 8 characters long.) </label>
+            <div className="login button-container">
+              <Button
+                disabled={!username || (!password || password.length < 8)}
+                width="100%"
+                onClick={() => doRegistration()}
+              >
+                Register now!
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    </BaseContainer>
+      </BaseContainer>
+    </div>
   );
 };
 
