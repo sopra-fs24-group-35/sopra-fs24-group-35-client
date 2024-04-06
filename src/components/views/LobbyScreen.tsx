@@ -14,7 +14,7 @@ const LobbyScreen = () => {
 
     const [users, setUsers] = useState<User[]>(null);
 
-    const [lobby, setLobby] = useState<Lobby>(null);
+    const [lobby, setLobby] = useState<Lobby[]>(null);
 
     const { lobbyId } = useParams();
 
@@ -24,27 +24,40 @@ const LobbyScreen = () => {
         // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
         async function fetchData(id) {
           try {
-            //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
-            
-            const response = await api.get(`/lobbies/${id}`);
-    
-            // delays continuous execution of an async operation for 1 second.
-            // This is just a fake async call, so that the spinner can be displayed
-            // feel free to remove it :)
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-            // Get the returned users and update the state.
-            setLobby(response.data);
-            
+
+            const response1 = await api.get(`/lobbies/${id}`);
+            const lobbyData = response1.data;
+
+            await new Promise((resolve) => setTimeout(resolve, 2000));  
+
+            setLobby(lobbyData);
+
+            console.log("players ", lobbyData.players);
+
+            let userIdList = lobbyData.players;
+
+            const requestBody = JSON.stringify({ userIdList });
+
+            const response2 = await api.post("/users/lobbies", requestBody);
+
+            setUsers(response2.data);
+
             // This is just some data for you to see what is available.
             // Feel free to remove it.
-            console.log("request to:", response.request.responseURL);
-            console.log("status code:", response.status);
-            console.log("status text:", response.statusText);
-            console.log("requested data:", response.data);
+            /*console.log("request to:", response1.request.responseURL);
+            console.log("status code:", response1.status);
+            console.log("status text:", response1.statusText);
+            console.log("requested data:", response1.data);
+
+            console.log("request to:", response2.request.responseURL);
+            console.log("status code:", response2.status);
+            console.log("status text:", response2.statusText);
+            console.log("requested data:", response2.data);
     
             // See here to get more data.
-            console.log(response);
+            console.log(response1);
+            console.log(response2);*/
+
           } catch (error) {
             console.error(
               `Something went wrong while fetching the users: \n${handleError(
@@ -57,10 +70,12 @@ const LobbyScreen = () => {
             );
           }
         }
+        
+        if (lobbyId){
+            fetchData(lobbyId);
+        }
+    } );
     
-        fetchData(lobbyId);
-    });
-
     const enterProfile = (id) => {
         navigate("/users/"+id);
       }
