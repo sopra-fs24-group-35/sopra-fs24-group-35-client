@@ -84,7 +84,13 @@ const LobbyScreen = () => {
     
     const enterProfile = (id) => {
         navigate("/users/"+id);
-      }
+    }
+
+    const leaveLobby = () => {
+        const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
+        api.post("/lobbies/" + lobbyId + "/remove", requestBody);
+        navigate("/game");
+    }
 
     const Player = ({ user }: { user: User }) => (
     <div className="player container" onClick={() => enterProfile(user.id)}>
@@ -113,7 +119,7 @@ const LobbyScreen = () => {
                 <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => null}>
                     Start Game
                 </Button>
-                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => navigate("/game")}>
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => leaveLobby()}>
                     Leave Lobby
                 </Button>
             </div>
