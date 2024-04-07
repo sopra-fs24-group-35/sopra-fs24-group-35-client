@@ -63,7 +63,7 @@ const Game = () => {
         //const requestBody = JSON.stringify({});
         //console.log(requestBody);
         
-        const response = await api.get("/users", {headers: config});
+        //const response = await api.get("/users", {headers: config});
 
         // delays continuous execution of an async operation for 1 second.
         // This is just a fake async call, so that the spinner can be displayed
@@ -71,17 +71,17 @@ const Game = () => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Get the returned users and update the state.
-        setUsers(response.data);
+        //setUsers(response.data);
 
         // This is just some data for you to see what is available.
         // Feel free to remove it.
-        console.log("request to:", response.request.responseURL);
+        /*console.log("request to:", response.request.responseURL);
         console.log("status code:", response.status);
         console.log("status text:", response.statusText);
         console.log("requested data:", response.data);
 
         // See here to get more data.
-        console.log(response);
+        console.log(response);*/
       } catch (error) {
         console.error(
           `Something went wrong while fetching the users: \n${handleError(
@@ -114,16 +114,17 @@ const Game = () => {
 
   let content = <Spinner />;
 
-  if (users) {
+  if (true) {
     content = (
       <div className="game">
+        {/*
         <ul className="game user-list">
           {users.map((user: User) => (
             <li key={user.id}>
               <Player user={user} />
             </li>
           ))}
-        </ul>
+          </ul>*/}
           <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => gotogame()}>
             Game Main Screen
           </Button>
@@ -143,7 +144,7 @@ const Game = () => {
       <BaseContainer className="game container">
         <h2>Hello, {localStorage.username}!</h2>
         <p className="game paragraph">
-          List of users:
+          {/*List of users:*/}
         </p>
         {content}
       </BaseContainer>
