@@ -143,16 +143,16 @@ const LobbyScreen = () => {
     };
 
     return (
-        <div className="basescreen title-screen">
-        <div className="basescreen overlay"></div>
-        <BaseContainer className="lobby container">
-          <h2>{(lobbyOwnerName !== null) ? ("Welcome to " + lobbyOwnerName + "'s lobby!") : ("The lobby is loading.")}</h2>
-          <h3>The lobby code is { (lobby !== null) ? (lobby.code) : ("loading :)") }</h3>
-          <p className="lobby paragraph">
-            Joined users:
-          </p>
-          {content}
-        </BaseContainer>
+      <div className="basescreen title-screen">
+          <div className="basescreen overlay"></div>
+          <BaseContainer className="lobby container">
+              <h2>{(lobbyOwnerName !== null) ? ("Welcome to " + lobbyOwnerName + "'s lobby!") : ("The lobby is loading.")}</h2>
+              <h3>The lobby code is {(lobby !== null) ? (lobby.code) : ("loading :)")}</h3>
+              <p className="lobby paragraph">
+                  Joined users:
+              </p>
+              {content}
+          </BaseContainer>
       </div>
     );
 };
