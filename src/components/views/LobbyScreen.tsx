@@ -33,6 +33,7 @@ const LobbyScreen = () => {
             try {
                 const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
 
+                // get lobby info
                 const getLobbyResponse = await api.get(`/lobbies/${id}`);
                 const lobbyData = getLobbyResponse.data;
 
@@ -40,22 +41,26 @@ const LobbyScreen = () => {
 
                 console.log("lobby ", lobby);
 
+                // set the userIdList to an array of longs consisting of all the user IDs in the lobby
                 let userIdList = lobbyData.players;
 
                 const requestBody = JSON.stringify({ userIdList });
 
+                // get a list of the users according to the userIdList
                 const getUsersResponse = await api.post("/users/lobbies", requestBody);
 
                 setUsers(getUsersResponse.data);
 
                 console.log("first userId", userIdList[0]);
-                const getOwnerResponse = await api.get("/users/" + userIdList[0], {headers: config})
-                const userData = getOwnerResponse.data;
-                console.log("response: ", userData);
 
-                setLobbyOwnerName(userData.username);
+                //const getOwnerResponse = await api.get("/users/" + userIdList[0], {headers: config})
+                //const userData = getOwnerResponse.data;
 
-                console.log("owner name: ", lobbyOwnerName) //this shows null, but it isn't null
+                //console.log("response: ", userData);
+
+                //setLobbyOwnerName(userData.username);
+
+                //console.log("owner name: ", lobbyOwnerName) //this shows null, but it isn't null
 
             } catch (error) {
                 console.error(
@@ -98,9 +103,12 @@ const LobbyScreen = () => {
         try {
             //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
             const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
-            const response = await api.post("/lobbies/" + lobbyId + "/remove", requestBody);
+            const response1 = await api.post("/lobbies/" + lobbyId + "/remove", requestBody);
             navigate("/game");
-      
+            /*if (!users){
+                const response2 = await api.
+            }*/
+
         } catch (error) {
             alert(
               `Something went wrong while leaving the lobby! \n${handleError(error)}`
@@ -108,8 +116,9 @@ const LobbyScreen = () => {
           }
     }
 
+    //TODO
     const Player = ({ user }: { user: User }) => (
-    <div className="player container" onClick={() => enterProfile(user.id)}>
+    <div className="player container" > {/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
         <div className="player username">{user.username}</div>
         <div className="player id">
         </div>
@@ -143,16 +152,16 @@ const LobbyScreen = () => {
     };
 
     return (
-      <div className="basescreen title-screen">
-          <div className="basescreen overlay"></div>
-          <BaseContainer className="lobby container">
-              <h2>{(lobbyOwnerName !== null) ? ("Welcome to " + lobbyOwnerName + "'s lobby!") : ("The lobby is loading.")}</h2>
-              <h3>The lobby code is {(lobby !== null) ? (lobby.code) : ("loading :)")}</h3>
-              <p className="lobby paragraph">
-                  Joined users:
-              </p>
-              {content}
-          </BaseContainer>
+        <div className="basescreen title-screen">
+        <div className="basescreen overlay"></div>
+        <BaseContainer className="lobby container">
+          <h2>{(users !== null) ? ("Welcome to " + users[0].username + "'s lobby!") : ("The lobby is loading.")}</h2>
+          <h3>The lobby code is { (lobby !== null) ? (lobby.code) : ("loading :)") }</h3>
+          <p className="lobby paragraph">
+            Joined users:
+          </p>
+          {content}
+        </BaseContainer>
       </div>
     );
 };
