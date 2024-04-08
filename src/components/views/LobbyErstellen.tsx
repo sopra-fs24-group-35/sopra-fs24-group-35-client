@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { loginapi, handleError } from "helpers/api";
+import { api, handleError } from "helpers/api";
 import User from "models/User";
 import {useNavigate} from "react-router-dom";
 import { Button } from "components/ui/Button";
@@ -35,35 +35,29 @@ FormField.propTypes = {
 
 const LobbyErstellen = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState<string>(null);
+  let [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
 
+  let user_id = localStorage.getItem("user_id")
+  let temp_sol:number = +user_id
+  let players = [temp_sol];
 
-  const doLogin = async () => {
+
+  const doLobbyCreate = async () => {
     try {
-      const requestBody = JSON.stringify({ username, password });
-      const response = await loginapi.post("/users/login", requestBody);
-      // Get the returned user and update a new object.
-      const user = new User(response.data);
+      const requestBody = JSON.stringify({ players });
+      console.log(requestBody)
+      const response = await api.post("/lobbies",requestBody);
+
       // for some technical reasons, "authorization must be written lowercase"
       const token = response.headers["authorization"];
-      // Store the username, user ID and the token into the local storage.
-      localStorage.setItem("username", user.username);
-      localStorage.setItem("user_id", user.id);
-      localStorage.setItem("token", token);
-      navigate("/game");
-
-
+      navigate("/lobby/" + response.data.id)
     } catch (error) {
       alert(
         "Something went wrong during the login: \n"+handleError(error)
       );
     }
-  };
-
-  const gotoRegistration = async () => {
-    navigate("/registration");
-  };
+  }
 
   return (
     <div className="basescreen title-screen">
@@ -71,14 +65,16 @@ const LobbyErstellen = () => {
       <BaseContainer>
         <div className="basescreen form">
           <div className="basescreen title">Risk: Global Domination</div>
-          <div className="basescreen buttons-container" style={{gap: '30px'}}>
+          <div className="basescreen buttons-container" style={{ gap: '30px' }}>
             <Button
               width="100%"
-              onClick ={() => navigate("/join")}>
+              onClick={() => navigate("/join")}>
               Join Lobby
             </Button>
             <Button
-              width="100%">
+              width="100%"
+              onClick={() => doLobbyCreate()}>
+
               Crate Lobby
             </Button>
           </div>
