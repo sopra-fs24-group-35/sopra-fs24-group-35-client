@@ -131,6 +131,9 @@ const Game = () => {
           <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => navigate("/lobby")}>
             Lobby Options
           </Button>
+          <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => navigate("/avatar")}>
+            Avatar Screen
+          </Button>
           <Button width="100%" style={{ marginBottom: '10px' }} onClick={() => logout()}>
             Logout
           </Button>

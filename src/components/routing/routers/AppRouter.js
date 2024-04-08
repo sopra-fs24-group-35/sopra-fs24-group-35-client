@@ -11,6 +11,8 @@ import LobbyErstellen from "../../views/LobbyErstellen";
 import RiskMainScreen from "../../views/RiskMainScreen";
 import JoinScreen from "../../views/joinScreen";
 import LobbyScreen from "../../views/LobbyScreen";
+import AvatarPage from "../../views/AvatarPage";
+
 
 /**
  * Main router of your application.
@@ -32,6 +34,10 @@ const AppRouter = () => {
 
         <Route path="/risk" element={<GameGuard />}>
           <Route path="/risk" element={<RiskMainScreen/>} />
+        </Route>
+
+        <Route path="/avatar" element={<GameGuard />}>
+          <Route path="/avatar" element={<AvatarPage/>} />
         </Route>
 
         <Route path="/login" element={<LoginGuard />}>
