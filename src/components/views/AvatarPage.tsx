@@ -3,10 +3,10 @@ import { api, handleError } from "helpers/api";
 import "styles/views/TitleScreen.scss";
 import {Button} from "../ui/Button";
 import BaseContainer from "../ui/BaseContainer";
-import FormFieldID from "../ui/FormField";
+//import FormFieldID from "../ui/FormField";
 import { useNavigate } from "react-router-dom";
-import { createAvatar } from '@dicebear/core';
-import { lorelei } from '@dicebear/collection';
+//import { createAvatar } from '@dicebear/core';
+//import { lorelei } from '@dicebear/collection';
 import * as Console from "console";
 
 
