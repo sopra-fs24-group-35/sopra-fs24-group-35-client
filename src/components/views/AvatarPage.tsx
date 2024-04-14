@@ -5,51 +5,43 @@ import {Button} from "../ui/Button";
 import BaseContainer from "../ui/BaseContainer";
 //import FormFieldID from "../ui/FormField";
 import { useNavigate } from "react-router-dom";
-//import { createAvatar } from '@dicebear/core';
-//import { lorelei } from '@dicebear/collection';
 import * as Console from "console";
 
 
 
 const AvatarPage = () => {
   const navigate = useNavigate();
-  const styles = [];
-  styles.push("Buddy", "Tinkerbell", "Leo", "Kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker");
-  let num = 0;
-  let gesamt = "https://api.dicebear.com/8.x/thumbs/svg?seed=Buddy}"
-  let style = styles[num]
-  // update lobby and go to lobby screen
-  const AvatarCreation = async () => {
-      num++
-      if (num > styles.length-1){
-        num = 0
-      }
-      style = styles[num]
-      let begin = "https://api.dicebear.com/8.x/thumbs/svg?seed="
-      let gesamt = begin.concat(style)
-      console.log(gesamt)
+  const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
+  const [num, setNum] = useState(0);
+  const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
+
+  // Update lobby and go to lobby screen
+  const AvatarCreation = () => {
+    let newNum = num + 1;
+    if (newNum >= styles.length) {
+      newNum = 0;
+    }
+    setNum(newNum);
+    setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
+  }
+  const safeAvatar = () => {
+    localStorage.setItem("avatar", gesamt)
+    console.log(localStorage.getItem("avatar"))
   };
+
 
   return (
     <div className="basescreen title-screen">
       <div className="basescreen overlay"></div>
       <BaseContainer>
         <div className="basescreen form">
-          <div className="basescreen buttons-container" style={{ gap: "30px" }}>
-            <Button
-              onClick={() => AvatarCreation()}
-            >
-              Confirm
-            </Button>
-
-            <img
-              src= {gesamt}
-              alt="avatar" />
-          </div>
+          <img style={{ marginBottom: '10px' }} src={gesamt} alt="avatar" />
+          <Button style={{ marginBottom: '10px' }} onClick={AvatarCreation}>Switch</Button>
+          <Button style={{ marginBottom: '10px' }} onClick= {() => safeAvatar()}>Save</Button>
         </div>
       </BaseContainer>
     </div>
   );
-}
+};
 
 export default AvatarPage;
