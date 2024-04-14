@@ -42,7 +42,7 @@ class AdjDict {
             "Siam" : ["India", "China", "Indonesia"],
             "Indonesia" : ["Siam", "New Guniea", "Western Australia"],
             "New Guniea" : ["Indonesia", "Western Australia", "Eastern Australia"],
-            "Wester Australia" : ["Indonesia", "Eastern Australia", "New Guniea"],
+            "Western Australia" : ["Indonesia", "Eastern Australia", "New Guniea"],
             "Eastern Australia" : ["Western Australia", "New Guniea"]
 
         }
