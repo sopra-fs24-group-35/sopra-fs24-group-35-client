@@ -31,10 +31,10 @@ const LobbyScreen = () => {
         async function fetchData(id) {
 
             try {
-                const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+                const config = {Authorization: localStorage.getItem("lobbyToken")};
 
                 // get lobby info
-                const getLobbyResponse = await api.get(`/lobbies/${id}`);
+                const getLobbyResponse = await api.get(`/lobbies/${id}`, {headers: config});
                 const lobbyData = getLobbyResponse.data;
 
                 setLobby(lobbyData);
@@ -93,7 +93,7 @@ const LobbyScreen = () => {
         return () => clearTimeout(timeoutId);
     
 
-    }, [lobby, lobbyOwnerName]);
+    }, [lobby]); // <-- add lobbyOwnerName again if needed as dependency
     
     const enterProfile = (id) => {
         navigate("/users/"+id);
