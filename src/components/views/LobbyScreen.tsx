@@ -103,7 +103,7 @@ const LobbyScreen = () => {
         try {
             //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
             const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
-            const response1 = await api.post("/lobbies/" + lobbyId + "/remove", requestBody);
+            const response1 = await api.put("/lobbies/" + lobbyId + "/remove", requestBody);
             navigate("/game");
             /*if (!users){
                 const response2 = await api.
