@@ -20,6 +20,8 @@ const joinScreen = () => {
       const requestBody = JSON.stringify({ code, players });
       const response = await api.put("/lobbies/update", requestBody);
       const lobbyId = response.data.id;
+      const token = response.headers["authorization"];
+      localStorage.setItem("lobbytoken", token);
       navigate("/lobby/" + lobbyId);
 
     } catch (error) {
