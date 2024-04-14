@@ -5,8 +5,6 @@ import {Button} from "../ui/Button";
 import BaseContainer from "../ui/BaseContainer";
 import FormFieldID from "../ui/FormField";
 import { useNavigate } from "react-router-dom";
-import { createAvatar } from '@dicebear/core';
-import { lorelei } from '@dicebear/collection';
 import * as Console from "console";
 
 
@@ -25,17 +23,21 @@ const AvatarPage = () => {
     }
     setNum(newNum);
     setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
+  }
+  const safeAvatar = () => {
+    localStorage.setItem("avatar", gesamt)
+    console.log(localStorage.getItem("avatar"))
   };
+
 
   return (
     <div className="basescreen title-screen">
       <div className="basescreen overlay"></div>
       <BaseContainer>
         <div className="basescreen form">
-          <div className="basescreen buttons-container" style={{ gap: "30px" }}>
-            <Button onClick={AvatarCreation}>Confirm</Button>
-            <img src={gesamt} alt="avatar" />
-          </div>
+          <img style={{ marginBottom: '10px' }} src={gesamt} alt="avatar" />
+          <Button style={{ marginBottom: '10px' }} onClick={AvatarCreation}>Switch</Button>
+          <Button style={{ marginBottom: '10px' }} onClick= {() => safeAvatar()}>Save</Button>
         </div>
       </BaseContainer>
     </div>
