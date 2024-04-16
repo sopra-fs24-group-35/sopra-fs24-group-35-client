@@ -20,10 +20,25 @@ const Registration = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
+  const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
+  const [num, setNum] = useState(0);
+  const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
+  const [avatarId, setAvatar] = useState(0);
+
+
+  const AvatarCreation = () => {
+    let newNum = num + 1;
+    if (newNum >= styles.length) {
+      newNum = 0;
+    }
+    setNum(newNum);
+    setAvatar(newNum);
+    setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
+  }
 
   const doRegistration = async () => {
     try {
-      const requestBody = JSON.stringify({ username, password });
+      const requestBody = JSON.stringify({ username, password, avatarId });
       const response = await loginapi.post("/users/registration", requestBody);
       console.log("response: " + JSON.stringify(response));
       // for some technical reasons, "authorization must be written lowercase"
@@ -63,7 +78,9 @@ const Registration = () => {
               value={password}
               onChange={(n) => setPassword(n)}
             />
-            <label style={{fontSize: "0.75em"}}> (Your password needs to be at least 8 characters long.) </label>
+            <img style={{ marginBottom: '10px' }} width="50%" src={gesamt} alt="avatar" />
+            <Button style={{ marginBottom: '10px' }} width="50%" onClick={AvatarCreation}>Switch</Button>
+            <label style={{ fontSize: "0.75em" }}> (Your password needs to be at least 8 characters long.) </label>
             <div className="login button-container">
               <Button
                 disabled={!username || (!password || password.length < 8)}
