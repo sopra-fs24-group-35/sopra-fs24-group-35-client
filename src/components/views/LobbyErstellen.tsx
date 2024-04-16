@@ -46,13 +46,13 @@ const LobbyErstellen = () => {
   const doLobbyCreate = async () => {
     try {
       const requestBody = JSON.stringify({ players });
-      console.log(requestBody)
+      //console.log(requestBody)
       const response = await api.post("/lobbies", requestBody);
 
       // for some technical reasons, "authorization must be written lowercase"
       const token = response.headers["authorization"];
 
-      console.log("lobbytoken: ", token);
+      //console.log("lobbytoken: ", token);
 
       localStorage.setItem("lobbyToken", token);
 

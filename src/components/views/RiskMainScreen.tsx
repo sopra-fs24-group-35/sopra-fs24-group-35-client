@@ -13,8 +13,17 @@ const TitleScreen: React.FC = () => {
                     <div className="basescreen buttons-container" style={{gap: '30px'}}>
                         <Button
                             width="100%">
-                            Login
+                            Cards
                         </Button>
+                        {/* <div id="id01" className="modal">
+                            <span onClick="document.getElementById('id01').style.display='none'"
+                            className="close" title="Close Modal">&times;</span>
+                            <form className="modal-content animate" action="/action_page.php">
+                                <div className="container" style="background-color:#f1f1f1">
+                                    <button type="button" onClick="document.getElementById('id01').style.display='none'" className="cancelbtn">Cancel</button>
+                                </div>
+                            </form>
+                        </div> */}
                         <Button
                             width="100%">
                             Login
