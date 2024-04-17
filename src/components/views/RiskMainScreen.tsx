@@ -1,28 +1,38 @@
-//import React from 'react';
-import React, { useEffect } from 'react';
+import React from 'react';
+//import React, { useEffect } from 'react';
 import "styles/views/GameScreen.scss";
 import {Button} from "../ui/Button";
 import {RoundButton} from "../ui/RoundButton";
 import BaseContainer from "../ui/BaseContainer";
 
 const TitleScreen: React.FC = () => {
-    useEffect(() => {
+    const redButtonRef = React.useRef<HTMLButtonElement>(null);
+    //const redButton = document.getElementById('redButton');
+
+
+    const nextSate = document.getElementById('nextState');
+    React.useEffect(() => {
         // Canvas setup
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
+        const imageSrc = require('./RiskMap21.png');
 
         const resizeCanvas = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            /*            canvas.width = window.innerWidth;
+                        canvas.height = window.innerHeight;*/
 
-            const image1 = new Image();
-            image1.src = 'Original5.jpg';
-            image1.onload = function(){
-                ctx.drawImage(image1, 0, 0, canvas.width, canvas.height);
-            }
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            const image = new Image();
+            image.src = imageSrc;
+            /*            image1.onload = function(){
+                            ctx.drawImage(image1, 0, 0, canvas.width, canvas.height*0.8);
+
+                        }*/
 
 
-/*            image.onload = () => {
+            image.onload = () => {
                 const aspectRatio = image.width / image.height;
                 let drawWidth = canvas.width;
                 let drawHeight = canvas.height;
@@ -41,7 +51,17 @@ const TitleScreen: React.FC = () => {
                 // Clear the canvas and draw the image
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(image, x, y, drawWidth, drawHeight);
-            };*/
+
+                const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
+                const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
+                if (redButtonRef.current) {
+                    const redButton = redButtonRef.current;
+                    redButton.style.left = `${x + drawWidth * 0.3}px`; // Adjust 30% of draw width from the left edge
+                    redButton.style.top = `${y + drawHeight * 0.5}px`; // Adjust 5% of draw height from the top edge
+                    redButton.style.width = `${buttonWidth}px`;
+                    redButton.style.height = `${buttonHeight}px`;
+                }
+            };
         };
 
         // Initial setup
@@ -50,25 +70,26 @@ const TitleScreen: React.FC = () => {
         // Handle resize event
         window.addEventListener('resize', resizeCanvas);
 
-        // Button click event listeners
-        const greenButton = document.getElementById('greenButton');
-        const redButton = document.getElementById('redButton');
-        const nextSate = document.getElementById('nextState');
         const handleGreenButtonClick = () => {
             alert('Green Button Clicked!');
         };
         const handleRedButtonClick = () => {
             alert('Red Button Clicked!');
         };
+        const handleBlueButtonClick = () => {
+            alert('Blue Button Clicked!');
+        };
+        const redButton = redButtonRef.current;
 
-        greenButton?.addEventListener('click', handleGreenButtonClick);
+        if (redButton) {
         redButton?.addEventListener('click', handleRedButtonClick);
-
+        }
         // Clean up event listeners when component unmounts
         return () => {
             window.removeEventListener('resize', resizeCanvas);
-            greenButton?.removeEventListener('click', handleGreenButtonClick);
+            if (redButton) {
             redButton?.removeEventListener('click', handleRedButtonClick);
+            }
         };
     }, []);
 
@@ -77,29 +98,15 @@ const TitleScreen: React.FC = () => {
             <div className="gamescreen-innerupper-container">
                 <canvas id="myCanvas"></canvas>
                 <button
-                    id="greenButton"
-                    className="button"
-                    style={{
-                        left: '3%',
-                        top: '5%',
-                        backgroundColor: 'blue',
-
-                    }}
-                >
-                    Green
-                </button>
-                <button
                     id="redButton"
+                    ref={redButtonRef}
                     className="button"
                     style={{
-                        left: '30%',
-                        top: '5%',
                         backgroundColor: 'red',
                     }}
                 >
                     Red
                 </button>
-
             </div>
             <div className="gamescreen-innerlower-container">
                 <button
