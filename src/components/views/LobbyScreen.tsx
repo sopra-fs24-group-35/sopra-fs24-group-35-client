@@ -23,6 +23,10 @@ const LobbyScreen = () => {
 
     const { lobbyId } = useParams();
 
+    const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
+
+    let avatarId = null
+
     //console.log("lobbyId is:", lobbyId);
 
     useEffect(() => {
@@ -39,6 +43,8 @@ const LobbyScreen = () => {
                 const getLobbyResponse = await api.get(`/lobbies/${id}`, {headers: config});
                 const lobbyData = getLobbyResponse.data;
 
+                console.log(lobbyData)
+                console.log(lobbyData.players)
                 setLobby(lobbyData);
 
                 //console.log("lobby ", lobby);
@@ -55,8 +61,11 @@ const LobbyScreen = () => {
 
                 // get a list of the users according to the userIdList
                 const getUsersResponse = await api.post("/users/lobbies", requestBody);
+                console.log("DATA:", getUsersResponse.data)
 
                 setUsers(getUsersResponse.data);
+
+                console.log("USERS", users)
 
                 //const getOwnerResponse = await api.get("/users/" + userIdList[0], {headers: config})
                 //const userData = getOwnerResponse.data;
@@ -197,20 +206,24 @@ const LobbyScreen = () => {
     if (users) {
         content = (
           <div className="lobby">
-              <ul className="lobby user-list">
+              <ul>
                   {users.map((user: User) => (
-                    <li key={user.id}>
-                        <Player user={user} />
+                    <li key={user.id} style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            <span style={{ marginRight: "10px" }}>{user.username}</span>
+                            <img src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`} alt="Avatar"
+                                 style={{ width: "40px", height: "40px", borderRadius: "50%" }} />
+                        </div>
                     </li>
                   ))}
               </ul>
               {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ?
                 (
-                  <Button width="100%" style={{ marginBottom: '10px' }}  onClick={gameStart}>
+                  <Button width="100%" style={{ marginBottom: "10px" }} onClick={gameStart}>
                       Start Game
                   </Button>
                 ) : (
-                  <Button width="100%" style={{ marginBottom: '10px' }}  onClick={cancelGameStart}>
+                  <Button width="100%" style={{ marginBottom: "10px" }} onClick={cancelGameStart}>
                       Cancel Game
                   </Button>
                 )
