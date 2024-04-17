@@ -18,15 +18,12 @@ const AvatarPage = () => {
   const id = localStorage.getItem("user_id")
   let avatarId
   const [anzeige, setAnzeige] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
-  const [user, setUser] = useState<User>(null);
-  let tempId = null
 
   useEffect(() => {
     async function gettheUser(id) {
       try {
         const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
         const response = await api.get("/users/"+id, {headers: config});
-        setUser(new User(response.data))
         avatarId = response.data.avatarId
         setAnzeige(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[avatarId]}`);
       } catch (error) {
