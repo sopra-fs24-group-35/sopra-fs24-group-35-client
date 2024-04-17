@@ -31,13 +31,17 @@
 
 .button {
   position: absolute;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: none;
-  color: white;
+  width: 100px; /* Adjust the width of the button */
+  height: 100px; /* Adjust the height of the button */
+  border-radius: 50%; /* Make the button circular */
+  border: 2px solid black; /* Add a black border around the button */
+  color: #ffffff;
   font-size: 16px;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 }
 
 .gamescreen-container {
@@ -58,7 +62,7 @@
   height: 80%; /* Use viewport height to fill the entire screen */
   width: 100vw; /* Use viewport width to fill the entire screen */
   background-color: #d2d2d2;
-  background-image: url('Pictures/RiskMap2.png');
+  //background-image: url('Pictures/RiskMap2.png');
   background-size: contain; /* Scale the background image to fit entirely within the container */
   background-position: center; /* Center the background image within the container */
   background-repeat: no-repeat; /* Prevent the background image from repeating */
