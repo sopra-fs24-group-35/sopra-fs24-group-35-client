@@ -21,6 +21,8 @@ const LobbyScreen = () => {
 
     const [startingGame, setStartingGame] = useState(false);
 
+    const [startingTimer, setStartingTimer] = useState(5);
+
     const { lobbyId } = useParams();
 
     //console.log("lobbyId is:", lobbyId);
@@ -122,65 +124,48 @@ const LobbyScreen = () => {
     }
 
     let timer = null;
-    var starting = false;
-
-    // Function to start the countdown timer
-    const startCountdown = () => {
-        timer = 5; // Set initial timer value
-        var startGame = setInterval(function() {
-            console.log("Countdown: ", timer);
-            console.log("starting2: ", startingGame);
-            starting = checkStarting();
-            if (timer <= 0) {
-                clearInterval(startGame);
-                if (starting) {
-                    navigate("/game");
-                }
-            } else if (!starting || !timer) {
-                console.log("Countdown Stopped!")
-                clearInterval(startGame);
-                return;
-            }
-            timer -= 1; // Decrease the timer value
-        }, 1000);
-
-        function checkStarting(){
-            starting = startingGame;
-            return starting;
-        }
-    }
-    
-    // Function to stop the countdown timer
-    function stopCountdown() {
-        starting = false;
-        clearInterval(timer); // Stop the interval
-        timer = null; // Reset the timer variable
-        console.log("timer: ", timer);
-    }
     
     const gameStart = () => {
-        starting = true;
         setStartingGame(true);
-        console.log("starting: ", startingGame)
-        //startCountdown();
     } 
 
     const cancelGameStart = () => {
-        starting = false;
         setStartingGame(false);
-        console.log("starting: ", startingGame)
-        //stopCountdown();
     }
 
+    var startGame = null;
+
     useEffect(() => {
+        
+        
         if (startingGame){
-            startCountdown(); // Start the countdown for the new game
+            timer = 5;
+            startGame = setInterval(() => {
+                if (timer <= 0) {
+                    clearInterval(startGame);
+                    if (startingGame) {
+                        navigate("/game");
+                    }
+                } else if (!startingGame || !timer) {
+                    clearInterval(startGame);
+                }
+                timer -= 1; // Decrease the timer value
+                setStartingTimer(timer);
+            }, 1000)
         }
         else {
-            stopCountdown();
+            clearInterval(startGame); // Stop the interval
+            timer = null; // Reset the timer variable
+            setStartingTimer(5);
         }
-        console.log("starting: ", startingGame);
     }, [startingGame]);
+
+    useEffect(() => {
+        const interval = startGame;
+        return () => {
+            clearInterval(interval);
+        }
+    }, [startingGame])
 
     const Player = ({ user }: { user: User }) => (
     <div className="lobby-player container" > {/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
@@ -196,14 +181,14 @@ const LobbyScreen = () => {
 
     if (users) {
         content = (
-          <div className="lobby">
-            <ul className="lobby user-list">
-              {users.map((user: User) => (
-                <li key={user.id}>
-                  <Player user={user} />
-                </li>
-              ))}
-            </ul>
+            <div className="lobby">
+                <ul className="lobby user-list">
+                {users.map((user: User) => (
+                    <li key={user.id}>
+                    <Player user={user} />
+                    </li>
+                ))}
+                </ul>
                 {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ? 
                 (
                 <Button width="100%" style={{ marginBottom: '10px' }}  onClick={gameStart}>
@@ -228,8 +213,9 @@ const LobbyScreen = () => {
         <BaseContainer className="lobby container">
           <h2>{(users !== null) ? ("Welcome to " + users[0].username + "'s lobby!") : ("The lobby is loading.")}</h2>
           <h3>The lobby code is { (lobby !== null) ? (lobby.code) : ("loading :)") }</h3>
+          {startingGame && (<h4 className="countdown">Game starts in: {startingTimer}</h4>)}
           <p className="lobby paragraph">
-            Joined users:
+            Joined players:
           </p>
           {content}
         </BaseContainer>
