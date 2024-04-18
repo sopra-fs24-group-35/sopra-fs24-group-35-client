@@ -26,7 +26,6 @@ class AdjDict {
             "Iceland" : ["Greenland", "Scandinavia", "Great Britain"],
             "Scandinavia" : ["Ukraine", "Northern Europe", "Great Britain", "Iceland"],
             "Northern Europe" : ["Great Britain", "Scandinavia", "Ukraine", "Southern Europe", "Western Europe"],
-            "Scandinavia" : ["Ukraine", "Northern Europe", "Great Britain", "Iceland"],
             "Ukraine" : ["Scandinavia", "Northern Europe", "Southern Europe", "Middle East", "Afghanistan", "Ural"],
             "Ural" : ["Ukraine", "Siberia", "China", "Afghanistan"],
             "Siberia" : ["Ural", "Yakutsk", "Irkutsk", "Mongolia", "China"],
