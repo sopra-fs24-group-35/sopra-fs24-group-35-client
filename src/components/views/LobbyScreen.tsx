@@ -8,10 +8,13 @@ import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import { User } from "types";
 import Lobby from "models/Lobby";
+import ApiStyles from "/Users/michaelebling/Documents/UZH/Sem_4/SoPra/Group_Project/sopra-fs24-template-client/src/helpers/avatarApiStyles.js"
 
 const LobbyScreen = () => {
 
     const navigate = useNavigate();
+
+    const apiStyles = new ApiStyles;
 
     const [users, setUsers] = useState<User[]>(null);
 
@@ -35,6 +38,7 @@ const LobbyScreen = () => {
         async function fetchData(id) {
 
             try {
+                
                 const config = {Authorization: localStorage.getItem("lobbyToken")};
 
                 // get lobby info
@@ -154,8 +158,9 @@ const LobbyScreen = () => {
     }, [startingGame])
 
     const Player = ({ user }: { user: User }) => (
-    <div className="lobby-player container" > {/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
+    <div className="lobby-player container" >{/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
         <div className="lobby-player username">{user.username}</div>
+        <img className="lobby-player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
     </div>
     );
     
@@ -180,7 +185,7 @@ const LobbyScreen = () => {
                 <Button width="100%" style={{ marginBottom: '10px' }}  onClick={gameStart}>
                     Start Game
                 </Button>
-                ) : (
+                ) : ((lobbyOwnerId === parseInt(localStorage.getItem("user_id"))) &&
                 <Button width="100%" style={{ marginBottom: '10px' }}  onClick={cancelGameStart}>
                     Cancel Game
                 </Button>
