@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import { User } from "types";
 import Lobby from "models/Lobby";
 import game from "./Game";
+import { compileString } from "sass";
 
 const LobbyScreen = () => {
 
@@ -32,10 +33,12 @@ const LobbyScreen = () => {
 
     const [gameId, setGameId] = useState(null);
 
+
+
     //console.log("lobbyId is:", lobbyId);
 
     useEffect(() => {
-
+        localStorage.setItem("lobbyId", lobbyId)
         let timeoutId;
 
         // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
@@ -104,6 +107,7 @@ const LobbyScreen = () => {
             //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
             const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
             const response1 = await api.put("/lobbies/" + lobbyId + "/remove", requestBody);
+            localStorage.removeItem("lobby_id")
             navigate("/game");
             /*if (!users){
                 const response2 = await api.
@@ -118,11 +122,11 @@ const LobbyScreen = () => {
     const getGame = async () => {
         const requestBody = JSON.stringify({lobbyId,users});
         const config = { Authorization: localStorage.getItem("lobbyToken") };
-
         // get lobby info
 
         const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody);
         let gameID = getLobbyResponse.data.gameId;
+        console.log(getLobbyResponse)
         navigate(`/risk/${gameID}`);
     }
 
@@ -147,7 +151,7 @@ const LobbyScreen = () => {
                 if (timer <= 0) {
                     clearInterval(startGame);
                     if (startingGame) {
-                        navigate("/game");
+                        getGame()
                     }
                 } else if (!startingGame || !timer) {
                     clearInterval(startGame);
