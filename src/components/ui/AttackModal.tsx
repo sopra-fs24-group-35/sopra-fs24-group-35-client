@@ -1,24 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "styles/ui/Modal.scss";
 import PropTypes from "prop-types";
+import { api, handleError } from "helpers/api";
+import { User } from "types";
 
 const AttackModal = ({ isModalOpen, modalContent, onClose }) => {
   if (!isModalOpen) {
     return null;
   }
+
+  const [attacker, setAttacker] = useState<User>(null);
+  const [defender, setDefender] = useState<User>(null);
+
+  
+
   return (
     <div className="modal" onClick={onClose}>
       <div className="modal-content p-lg-4" onClick={e => e.stopPropagation()}>
-        <button className="close" onClick={onClose}>&times;</button>
+        <button className="close" onClick={onClose}>
+          &times;
+        </button>
         <main className="modal-mainContents">
-          <h5 className="modal-title">{modalContent.title}</h5>
+          <div className="modal-info-container">
+            <div className="defender-info">
+              <h5 className="modal-title">{modalContent.territory_def}</h5>
+            </div>
+            <div className="attacker-info">
+              <h5 className="modal-title">{modalContent.territory_atk}</h5>
+            </div>
+          </div>
           <hr />
           <div className="modal-image text-center mt-lg-2">
-            <img src={modalContent.image} alt="image" />
+            <img alt="image" />
           </div>
-          <p className="mt-lg-3 modalText">{modalContent.content}</p>
+          <p className="mt-lg-3 modalText">{modalContent.territory_atk}</p>
           <div className="modal-button text-end">
-            <button>{modalContent.buttonText}</button>
+            <button>Attack</button>
           </div>
         </main>
       </div>
@@ -29,10 +46,8 @@ const AttackModal = ({ isModalOpen, modalContent, onClose }) => {
 AttackModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   modalContent: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    buttonText: PropTypes.string.isRequired
+    territory_def: PropTypes.string.isRequired,
+    territory_atk: PropTypes.string.isRequired,
   }).isRequired,
   onClose: PropTypes.func.isRequired
 };
