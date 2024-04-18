@@ -1,0 +1,79 @@
+.button:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+.gamescreen-buttons-container {
+  border: 5px solid #ff4444;
+  border-radius: 20px;
+  padding: 10px;
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: rgb(98, 98, 98);
+  background-color: #504536;
+  color: #b03838;
+
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Using a sans-serif font similar to the Risk logo */
+  font-size: 2rem; /* Adjust size as needed */
+  font-weight: bold;
+  color: #c40505; /* Red color similar to the Risk logo */
+  text-transform: uppercase; /* Making the text uppercase for consistency */
+  letter-spacing: 2px; /* Adjust letter spacing as needed */
+  text-shadow: 1.5px 1.5px 0 #d2d2d2; /* Adding a subtle shadow for depth */
+}
+.gamescreen-buttons-container:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+.button {
+  position: absolute;
+  width: 100px; /* Adjust the width of the button */
+  height: 100px; /* Adjust the height of the button */
+  border-radius: 50%; /* Make the button circular */
+  border: 2px solid black; /* Add a black border around the button */
+  color: #000000;
+  background-color: #1373c2;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.gamescreen-container {
+  height: 100vh; /* Use viewport height to fill the entire screen */
+  width: 100vw; /* Use viewport width to fill the entire screen */
+  position: relative;
+  margin: 0 auto;
+  /*  background-image: url('Pictures/RiskMap2.png');
+    background-size: contain; !* Scale the background image to fit entirely within the container *!
+    background-position: center; !* Center the background image within the container *!
+    background-repeat: no-repeat; !* Prevent the background image from repeating *!
+    background-color: beige;*/
+
+}
+
+.gamescreen-innerupper-container{
+  position: relative;
+  height: 80%; /* Use viewport height to fill the entire screen */
+  width: 100vw; /* Use viewport width to fill the entire screen */
+  background-color: #d2d2d2;
+  //background-image: url('Pictures/RiskMap2.png');
+  background-size: contain; /* Scale the background image to fit entirely within the container */
+  background-position: center; /* Center the background image within the container */
+  background-repeat: no-repeat; /* Prevent the background image from repeating */
+  background-color: beige;
+}
+.gamescreen-innerlower-container{
+  position: relative;
+  height: 20%; /* Use viewport height to fill the entire screen */
+  width: 100vw; /* Use viewport width to fill the entire screen */
+  background-color: aqua;
+}
+
+
