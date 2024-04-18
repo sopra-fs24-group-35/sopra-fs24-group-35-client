@@ -43,13 +43,8 @@ const LobbyScreen = () => {
 
                 setLobby(lobbyData);
 
-                //console.log("lobby ", lobby);
-
                 // set the userIdList to an array of longs consisting of all the user IDs in the lobby
                 let userIdList = lobbyData.players;
-
-                //console.log("owner id: ", userIdList[0]);
-                //console.log("local u_id: ", localStorage.getItem("user_id"));
 
                 setLobbyOwnerId(userIdList[0]);
 
@@ -59,15 +54,6 @@ const LobbyScreen = () => {
                 const getUsersResponse = await api.post("/users/lobbies", requestBody);
 
                 setUsers(getUsersResponse.data);
-
-                //const getOwnerResponse = await api.get("/users/" + userIdList[0], {headers: config})
-                //const userData = getOwnerResponse.data;
-
-                //console.log("response: ", userData);
-
-                //setLobbyOwnerName(userData.username);
-
-                //console.log("owner name: ", lobbyOwnerName) //this shows null, but it isn't null
 
             } catch (error) {
                 console.error(
