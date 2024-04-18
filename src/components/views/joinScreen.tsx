@@ -18,8 +18,10 @@ const joinScreen = () => {
       //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
       const players = [localStorage.getItem("user_id")];
       const requestBody = JSON.stringify({ code, players });
-      const response = await api.post("/lobbies/update", requestBody);
+      const response = await api.put("/lobbies/update", requestBody);
       const lobbyId = response.data.id;
+      const token = response.headers["authorization"];
+      localStorage.setItem("lobbytoken", token);
       navigate("/lobby/" + lobbyId);
 
     } catch (error) {

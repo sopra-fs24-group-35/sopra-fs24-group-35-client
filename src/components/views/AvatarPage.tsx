@@ -4,7 +4,7 @@ import "styles/views/TitleScreen.scss";
 import {Button} from "../ui/Button";
 import BaseContainer from "../ui/BaseContainer";
 import FormFieldID from "../ui/FormField";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Console from "console";
 import User from "models/User";
 

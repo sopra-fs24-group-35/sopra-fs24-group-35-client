@@ -1,39 +1,48 @@
-// copy to go back and not push all the time
 @import "../theme";
 .basescreen {
   &.container {
-    margin-top: 2em;
+    margin-top: 0em;
+    width: 100%;
+    height: 100%;
     min-height: 300px;
     /* we include the center mixin defined in _theme.scss and save three duplicate lines :) */
-    @include center;
-    flex-direction: column;
-  }
-  &.title-screen {
+    //@include center;
+    //flex-direction: column;
+    background-color: #d56161;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start; /* Align items to the start of the flex container */
+    align-items: flex-start; /* Align items to the start of the flex container */
+    position: relative; /* To position buttons relative to title-screen */
+  }
+  &.title-screen {
+/*    display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: center;*/
     height: 100vh;
-    background-image: url('Pictures/Original1.jpg');
+    //background-image: url('Pictures/RiskMap2.png');
+    background-color: #914747;
     background-size: cover;
     background-position: center;
     position: relative; /* To position buttons relative to title-screen */
   }
-
   &.form {
     display: flex;
     text-align: center;
     flex-direction: column;
     justify-content: center;
     width: 100%;
-    max-width: 50em;
+    //max-width: 100em;
     //   height: 20em;
     height: 100%;
     font-size: 16px;
-    font-weight: 300;
+    font-weight: 100;
+    padding-bottom: 40px;
+    padding-top: 40px;
     padding-left: 37px;
     padding-right: 37px;
-    border-radius: 0.75em;
+    border-radius: 0em;
     background-color: $background;
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
@@ -41,12 +50,12 @@
 
   &.title {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Using a sans-serif font similar to the Risk logo */
-    font-size: 4rem; /* Adjust size as needed */
+    font-size: 2rem; /* Adjust size as needed */
     font-weight: bold;
-    color: #d32f2f; /* Red color similar to the Risk logo */
+    color: #c40505; /* Red color similar to the Risk logo */
     text-transform: uppercase; /* Making the text uppercase for consistency */
     letter-spacing: 2px; /* Adjust letter spacing as needed */
-    text-shadow: 4px 2px 0 #000; /* Adding a subtle shadow for depth */
+    text-shadow: 1.5px 1.5px 0 #d2d2d2; /* Adding a subtle shadow for depth */
   }
 
   &.subtitle {
@@ -58,10 +67,11 @@
 
   &.title-container,
   &.subtitle-container, &.buttons-container {
+    width: 30%;
     margin-bottom: 20px; /* Add some space between sections */
     margin-top: 20px;
     border: 2px solid #ff4444; /* Red border */
-    border-radius: 20px; /* Rounded corners */
+    border-radius: 10px; /* Rounded corners */
     padding: 10px; /* Add padding */
     display: flex;
     justify-content: center;
