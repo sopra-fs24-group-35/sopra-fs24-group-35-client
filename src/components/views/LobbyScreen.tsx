@@ -185,30 +185,36 @@ const LobbyScreen = () => {
     if (users) {
         content = (
             <div className="lobby">
-                <ul className="lobby user-list">
-                {users.map((user: User) => (
-                    <li key={user.id}>
-                    <Player user={user} />
-                    </li>
-                ))}
+                <ul>
+                    {users.map((user: User) => (
+                      <li key={user.id} style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                          <div style={{ display: "flex", alignItems: "center" }}>
+                              <span style={{ marginRight: "10px" }}>{user.username}</span>
+                              <img src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`}
+                                   alt="Avatar"
+                                   style={{ width: "40px", height: "40px", borderRadius: "50%" }} />
+                          </div>
+                      </li>
+                    ))}
                 </ul>
-                {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ? 
-                (
-                  <Button width="100%" style={{ marginBottom: "10px" }} onClick={gameStart}>
-                      Start Game
-                  </Button>
-                ) : (
-                  <Button width="100%" style={{ marginBottom: "10px" }} onClick={cancelGameStart}>
-                      Cancel Game
-                  </Button>
-                )
-              }
-              <Button width="100%" style={{ marginBottom: "10px" }} onClick={() => leaveLobby()}>
-                  Leave Lobby
-              </Button>
-          </div>
+                {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ?
+                  (
+                    <Button width="100%" style={{ marginBottom: "10px" }} onClick={gameStart}>
+                        Start Game
+                    </Button>
+                  ) : (
+                    <Button width="100%" style={{ marginBottom: "10px" }} onClick={cancelGameStart}>
+                        Cancel Game
+                    </Button>
+                  )
+                }
+                <Button width="100%" style={{ marginBottom: "10px" }} onClick={() => leaveLobby()}>
+                    Leave Lobby
+                </Button>
+            </div>
         );
-    };
+    }
+    ;
 
     return (
         <div className="basescreen title-screen">
