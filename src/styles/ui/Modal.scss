@@ -31,7 +31,7 @@
     width: 500px;
     background-color: #fff;
     border-radius: 15px;
-    position: relative; 
+    position: relative;
 }
 .close {
     cursor: pointer;
@@ -45,9 +45,9 @@
     background: none;
     text-align: match-parent;
     padding: 1px;
-    width: 30px; /* Set the width to 35px */
-    height: 30px; /* Set the height to 35px */
-    line-height: 0px; /* Vertically center the content */
+    width: 30px; 
+    height: 30px; 
+    line-height: 0px; 
 }
 .close:hover,
 .close:focus {
@@ -56,7 +56,7 @@
 .modal-title {
     color: #6821c3;
     font-weight: 700;
-    font-size: 30px;
+    font-size: 15px;
     line-height: 28px;
 }
 .modal-image img {
@@ -73,3 +73,23 @@
     color: white;
     border-radius: 7px;
 }
+.modal-info-container {
+    display: flex;
+}
+.defender-info,
+.attacker-info {
+  flex: 1;
+  border: 2px solid black;
+  padding: 5px;
+  margin: 30px;
+}
+/*.defender-info {
+    border: 2px solid black;
+    margin: auto;
+    align-self: flex-start;
+}
+.attacker-info {
+    border: 2px solid black;
+    margin: auto;
+    align-self: flex-end;
+}*/
