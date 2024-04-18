@@ -8,6 +8,7 @@ import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import { User } from "types";
 import Lobby from "models/Lobby";
+import game from "./Game";
 
 const LobbyScreen = () => {
 
@@ -27,7 +28,7 @@ const LobbyScreen = () => {
 
     let avatarId = null
 
-    //console.log("lobbyId is:", lobbyId);
+    const [gameId, setGameId] = useState(null);
 
     //console.log("lobbyId is:", lobbyId);
 
@@ -45,8 +46,6 @@ const LobbyScreen = () => {
                 const getLobbyResponse = await api.get(`/lobbies/${id}`, {headers: config});
                 const lobbyData = getLobbyResponse.data;
 
-                console.log(lobbyData)
-                console.log(lobbyData.players)
                 setLobby(lobbyData);
 
                 //console.log("lobby ", lobby);
@@ -63,11 +62,8 @@ const LobbyScreen = () => {
 
                 // get a list of the users according to the userIdList
                 const getUsersResponse = await api.post("/users/lobbies", requestBody);
-                console.log("DATA:", getUsersResponse.data)
 
                 setUsers(getUsersResponse.data);
-
-                console.log("USERS", users)
 
                 //const getOwnerResponse = await api.get("/users/" + userIdList[0], {headers: config})
                 //const userData = getOwnerResponse.data;
@@ -131,6 +127,16 @@ const LobbyScreen = () => {
             );
         }
     }
+    const getGame = async () => {
+        const requestBody = JSON.stringify({lobbyId,users});
+        const config = { Authorization: localStorage.getItem("lobbyToken") };
+
+        // get lobby info
+
+        const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody);
+        let gameID = getLobbyResponse.data.gameId;
+        navigate(`/risk/${gameID}`);
+    }
 
     let timer = null;
     var starting = false;
@@ -145,68 +151,7 @@ const LobbyScreen = () => {
             if (timer <= 0) {
                 clearInterval(startGame);
                 if (starting) {
-                    navigate("/game");
-                }
-            } else if (!starting || !timer) {
-                console.log("Countdown Stopped!")
-                clearInterval(startGame);
-                return;
-            }
-            timer -= 1; // Decrease the timer value
-        }, 1000);
-
-        function checkStarting(){
-            starting = startingGame;
-            return starting;
-        }
-    }
-
-    // Function to stop the countdown timer
-    function stopCountdown() {
-        starting = false;
-        clearInterval(timer); // Stop the interval
-        timer = null; // Reset the timer variable
-        console.log("timer: ", timer);
-    }
-
-    const gameStart = () => {
-        starting = true;
-        setStartingGame(true);
-        console.log("starting: ", startingGame)
-        //startCountdown();
-    }
-
-    const cancelGameStart = () => {
-        starting = false;
-        setStartingGame(false);
-        console.log("starting: ", startingGame)
-        //stopCountdown();
-    }
-
-    useEffect(() => {
-        if (startingGame){
-            startCountdown(); // Start the countdown for the new game
-        }
-        else {
-            stopCountdown();
-        }
-        console.log("starting: ", startingGame);
-    }, [startingGame]);
-
-    let timer = null;
-    var starting = false;
-
-    // Function to start the countdown timer
-    const startCountdown = () => {
-        timer = 5; // Set initial timer value
-        var startGame = setInterval(function() {
-            console.log("Countdown: ", timer);
-            console.log("starting2: ", startingGame);
-            starting = checkStarting();
-            if (timer <= 0) {
-                clearInterval(startGame);
-                if (starting) {
-                    navigate("/game");
+                    getGame();
                 }
             } else if (!starting || !timer) {
                 console.log("Countdown Stopped!")
@@ -255,9 +200,6 @@ const LobbyScreen = () => {
     }, [startingGame]);
 
     const Player = ({ user }: { user: User }) => (
-    <div className="lobby-player container" > {/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
-        <div className="lobby-player username">{user.username}</div>
-    </div>
       <div className="lobby-player container" > {/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
           <div className="lobby-player username">{user.username}</div>
       </div>
@@ -272,28 +214,33 @@ const LobbyScreen = () => {
     if (users) {
         content = (
           <div className="lobby">
-            <ul className="lobby user-list">
-              {users.map((user: User) => (
-                <li key={user.id}>
-                  <Player user={user} />
-                </li>
-              ))}
-            </ul>
-                {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ?
+              <ul>
+                  {users.map((user: User) => (
+                    <li key={user.id} style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            <span style={{ marginRight: "10px" }}>{user.username}</span>
+                            <img src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`}
+                                 alt="Avatar"
+                                 style={{ width: "40px", height: "40px", borderRadius: "50%" }} />
+                        </div>
+                    </li>
+                  ))}
+              </ul>
+              {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ?
                 (
-                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={gameStart}>
-                    Start Game
-                </Button>
+                  <Button width="100%" style={{ marginBottom: "10px" }} onClick={gameStart}>
+                      Start Game
+                  </Button>
                 ) : (
-                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={cancelGameStart}>
-                    Cancel Game
-                </Button>
+                  <Button width="100%" style={{ marginBottom: "10px" }} onClick={cancelGameStart}>
+                      Cancel Game
+                  </Button>
                 )
-                }
-                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => leaveLobby()}>
-                    Leave Lobby
-                </Button>
-            </div>
+              }
+              <Button width="100%" style={{ marginBottom: "10px" }} onClick={() => leaveLobby()}>
+                  Leave Lobby
+              </Button>
+          </div>
         );
     };
 
