@@ -8,7 +8,7 @@ import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import { User } from "types";
 import Lobby from "models/Lobby";
-import ApiStyles from "/Users/michaelebling/Documents/UZH/Sem_4/SoPra/Group_Project/sopra-fs24-template-client/src/helpers/avatarApiStyles.js"
+import ApiStyles from "helpers/avatarApiStyles";
 
 const LobbyScreen = () => {
 
@@ -92,9 +92,9 @@ const LobbyScreen = () => {
 
     }, [lobby]); // <-- add lobbyOwnerName again if needed as dependency
     
-    const enterProfile = (id) => {
+    /*const enterProfile = (id) => {
         navigate("/users/"+id);
-    }
+    }*/
 
     const leaveLobby = async () => {
         try {
