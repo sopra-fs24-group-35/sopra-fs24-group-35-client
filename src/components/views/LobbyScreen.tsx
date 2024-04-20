@@ -8,12 +8,15 @@ import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import { User } from "types";
 import Lobby from "models/Lobby";
+import ApiStyles from "helpers/avatarApiStyles";
 import game from "./Game";
 import { compileString } from "sass";
 
 const LobbyScreen = () => {
 
     const navigate = useNavigate();
+
+    const apiStyles = new ApiStyles;
 
     const [users, setUsers] = useState<User[]>(null);
 
@@ -45,6 +48,7 @@ const LobbyScreen = () => {
         async function fetchData(id) {
 
             try {
+
                 const config = {Authorization: localStorage.getItem("lobbyToken")};
 
                 // get lobby info
@@ -98,9 +102,9 @@ const LobbyScreen = () => {
 
     }, [lobby]); // <-- add lobbyOwnerName again if needed as dependency
 
-    const enterProfile = (id) => {
+    /*const enterProfile = (id) => {
         navigate("/users/"+id);
-    }
+    }*/
 
     const leaveLobby = async () => {
         try {
@@ -175,8 +179,9 @@ const LobbyScreen = () => {
     }, [startingGame])
 
     const Player = ({ user }: { user: User }) => (
-    <div className="lobby-player container" > {/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
+    <div className="lobby-player container" >{/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
         <div className="lobby-player username">{user.username}</div>
+        <img className="lobby-player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
     </div>
     );
     
@@ -201,16 +206,16 @@ const LobbyScreen = () => {
                       </li>
                     ))}
                 </ul>
-                {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ?
-                  (
-                    <Button width="100%" style={{ marginBottom: "10px" }} onClick={gameStart}>
-                        Start Game
-                    </Button>
-                  ) : (
-                    <Button width="100%" style={{ marginBottom: "10px" }} onClick={cancelGameStart}>
-                        Cancel Game
-                    </Button>
-                  )
+                {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ? 
+                (
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={gameStart}>
+                    Start Game
+                </Button>
+                ) : ((lobbyOwnerId === parseInt(localStorage.getItem("user_id"))) &&
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={cancelGameStart}>
+                    Cancel Game
+                </Button>
+                )
                 }
                 <Button width="100%" style={{ marginBottom: "10px" }} onClick={() => leaveLobby()}>
                     Leave Lobby
