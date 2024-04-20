@@ -45,6 +45,7 @@ class AdjDict {
             "Eastern Australia" : ["Western Australia", "New Guniea"]
 
         }
-        
     }
 }
+
+export default AdjDict;
