@@ -21,7 +21,7 @@ const joinScreen = () => {
       const response = await api.put("/lobbies/update", requestBody);
       const lobbyId = response.data.id;
       const token = response.headers["authorization"];
-      localStorage.setItem("lobbytoken", token);
+      localStorage.setItem("lobbyToken", token);
       navigate("/lobby/" + lobbyId);
 
     } catch (error) {
