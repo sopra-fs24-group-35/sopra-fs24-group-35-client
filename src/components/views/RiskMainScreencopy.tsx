@@ -8,10 +8,8 @@ const TitleScreen: React.FC = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalContent, setModalContent] = useState({
-        title: "Buy",
-        image: "https://res.cloudinary.com/sohmmie/image/upload/v1687376677/buy-icon_ybpo3h.png",
-        content: "We appreciate your selection of this item! The 'Buy Now' button will take you only one step closer to receiving all of the wonderful features and advantages it has to offer. Enjoy your shopping!",
-        buttonText: "Buy Now"
+        territory_def: "Add territory name here",
+        territory_atk: "Add territory name here",
     });
 
     const openModal = (content) => {
@@ -22,13 +20,11 @@ const TitleScreen: React.FC = () => {
     const closeModal = () => {
         setIsModalOpen(false);
     };
-    
-    const title = "Attacking";
-    const image = "https://res.cloudinary.com/sohmmie/image/upload/v1687376677/buy-icon_ybpo3h.png";
-    const content = "Add players here"
-    const buttonText = "Attack";
 
-    const cont = JSON.stringify({title, image, content, buttonText});
+    const territory_def = "Great Britain";
+    const territory_atk = "Iceland";
+
+    const cont = JSON.stringify({territory_def, territory_atk});
 
     return (
         <div className="basescreen title-screen">
@@ -46,6 +42,8 @@ const TitleScreen: React.FC = () => {
                             isModalOpen={isModalOpen}
                             modalContent={modalContent}
                             onClose={closeModal}
+                            lobbyId={2}
+                            gameId={4}
                             />
                         </section>
                         <Button
