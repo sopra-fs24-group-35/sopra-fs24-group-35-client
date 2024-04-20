@@ -14,7 +14,8 @@ const TitleScreen: React.FC = () => {
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
     const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
-    const [num, setNum] = useState(0);
+    let [num, setNum] = useState(0);
+    let [avatarPos, setAvatarPos] = useState(0);
     const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const id = localStorage.getItem("user_id")
     let avatarId
@@ -126,37 +127,50 @@ const TitleScreen: React.FC = () => {
         setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
     }
 
+    const fetchData = async () => {
+        try {
+            const config = { Authorization: localStorage.getItem("lobbyToken") };
+            // get lobby info
+            const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, { headers: config });
+            const lobbyData = getLobbyResponse.data;
+
+            // set the userIdList to an array of longs consisting of all the user IDs in the lobby
+            let userIdList = lobbyData.players;
+
+            const requestBody = JSON.stringify({ userIdList })
+            const getUserResponse = await api.post("users/lobbies", requestBody);
+
+            // Set the state after fetching data
+
+            getUserResponse.data.forEach(user => {
+                // Access each user object here
+
+                if(avatarPos === 0){
+                    setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num +1)
+                }
+                else if(avatarPos === 1){
+                    setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num +1)
+                }
+                else if(avatarPos === 2){
+                    setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num +1)
+                }
+                else if(avatarPos === 3){
+                    setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num +1)
+                }
+            });
+
+        } catch (error) {
+            alert(`Something went wrong with fetching the user data: \n${handleError(error)}`);
+        }
+    };
     const nextSate = document.getElementById('nextState');
     React.useEffect(() => {
-        let num = 0
-        let timeoutId
-        async function gettheUser() {
-            try {
-                const config = {Authorization: localStorage.getItem("lobbyToken")};
-                // get lobby info
-                const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, {headers: config});
-                const lobbyData = getLobbyResponse.data;
 
-                // set the userIdList to an array of longs consisting of all the user IDs in the lobby
-                let userIdList = lobbyData.players;
-
-                const requestBody = JSON.stringify({userIdList})
-                const getUserResponse = await api.post("users/lobbies",requestBody)
-                console.log(getUserResponse.data)
-                setUsers(getUserResponse.data)
-
-
-               // const response = await api.get("/users/"+id, {headers: config});
-                //avatarId = response.data.avatarId
-            } catch (error) {
-                alert(
-                  `Something went wrong with fetching the user data: \n${handleError(error)}`
-                );
-            }
-        }
-        gettheUser()
-
-        console.log(users)
+        fetchData()
         // Canvas setup
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
@@ -231,7 +245,7 @@ const TitleScreen: React.FC = () => {
 
         // Handle resize event
         window.addEventListener('resize', resizeCanvas);
-        
+
 
         return () => {
             window.removeEventListener('resize', resizeCanvas);
@@ -277,7 +291,7 @@ const TitleScreen: React.FC = () => {
                     <BaseContainer>
                         <div className="basescreen form">
                             <button
-                              onClick={() => AvatarCreation()}
+                              onClick={() => fetchData()}
                             > Count
                             </button>
                             <div style={containerStyle}>
