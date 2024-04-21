@@ -5,29 +5,28 @@ import { api, handleError } from "helpers/api";
 import {Button} from "../ui/Button";
 import {RoundButton} from "../ui/RoundButton";
 import BaseContainer from "../ui/BaseContainer";
-import { useNavigate, useParams } from "react-router-dom";
-import game from "./Game";
-import { User } from "../../types";
-
+import { useNavigate } from "react-router-dom";
 
 const TitleScreen: React.FC = () => {
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
     const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
-    let [num, setNum] = useState(0);
-    let [avatarPos, setAvatarPos] = useState(0);
+    const [num, setNum] = useState(0);
     const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const id = localStorage.getItem("user_id")
     let avatarId
-    const [avatar1, setAvatar1] = useState(null);
-    const [avatar2, setAvatar2] = useState(null);
-    const [avatar3, setAvatar3] = useState(null);
-    const [avatar4, setAvatar4] = useState(null);
-    const {gameId} = useParams()
-    const lobbyId = localStorage.getItem("lobbyId")
-    const [users, setUsers] = useState<User[]>(null);
+    const [anzeige, setAnzeige] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
+    const [startButton, setStartButton] = useState<string | null>(null);
+    const [endButton, setEndButton] = useState<string | null>(null);
+    const [drawingLine, setDrawingLine] = useState(false);
 
+    //reload idea
 
+    const [curx, setX] = useState(0);
+    const [cury, setY] = useState(0);
+    const [curwidth, setCurWidth] = useState(0);
+    const [curheight, setCurHeight] = useState(0);
+    const [picture, setPicture] = useState(null);
 
     const buttonData = [
         { id: 'Alaska', refKey: 'Alaska', text: 'Alaska', xratio: 0.08, yratio:0.14},
@@ -84,6 +83,89 @@ const TitleScreen: React.FC = () => {
         return button ? { xratio: button.xratio, yratio: button.yratio } : { xratio: 0, yratio: 0 }; // Return xratio and yratio if the button is found, otherwise return default values
     };
 
+    const handleButtonClick = (id: string) => {
+        console.log("First Terri: " + startButton + ", Second Terri: " + endButton + ", drawline: " + drawingLine + ".");
+        if (drawingLine) {
+            // Draw line between start button and clicked button
+            undoLine(startButton, id);
+            setStartButton(null);
+            setEndButton(null);
+            setDrawingLine(false); // Reset drawing line mode
+            setStartButton(id);
+        }else if(startButton){
+            drawLine(startButton, id);
+            setDrawingLine(true); // Enable drawing line mode
+        } else {
+            setStartButton(id);
+        }
+    };
+
+    const drawLine = (startId: string, endId: string) => {
+        let {x: startx, y: starty} = getButtonCoordinatesById(startId);
+        let {x: endx, y: endy} = getButtonCoordinatesById(endId);
+
+        const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+        const ctx = canvas.getContext('2d');
+
+        // Calculate a new endpoint that is 90% of the distance from the start point to the end point
+        const distance = Math.sqrt(Math.pow(endx - startx, 2) + Math.pow(endy - starty, 2));
+
+        let scaledPercentage = 0.8 + (0.99 - 0.8) * (distance - 50) / (200 - 50);
+        console.log(distance);
+
+        let ratio = scaledPercentage; // Adjust this ratio as needed
+        if(ratio > 1){
+            ratio = 0.982;
+        }
+        const newEndx = startx + ratio * (endx - startx);
+        const newEndy = starty + ratio * (endy - starty);
+
+        // Begin the path
+        ctx.beginPath();
+        // Move to the start point
+        ctx.moveTo(startx, starty);
+        // Draw a line to the new endpoint
+        ctx.lineTo(newEndx, newEndy);
+        ctx.lineWidth = 5;
+        // Set line style
+        ctx.strokeStyle = 'black'; // You can set any color you want
+        // Draw the line
+        ctx.stroke();
+
+        const angle = Math.atan2(endy - starty, endx - startx);
+        ctx.beginPath();
+        // Calculate arrowhead points
+        ctx.moveTo(newEndx, newEndy);
+        ctx.lineTo(newEndx - 20 * Math.cos(angle - Math.PI / 6), newEndy - 20 * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(newEndx, newEndy);
+        ctx.lineTo(newEndx - 20 * Math.cos(angle + Math.PI / 6), newEndy - 20 * Math.sin(angle + Math.PI / 6));
+        // Set arrowhead style
+        ctx.strokeStyle = 'black';
+        // Draw the arrowhead
+        ctx.stroke();
+
+    };
+
+    const undoLine = (startId: string, endId: string) => {
+        const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+        const ctx = canvas.getContext('2d');
+        // Clear the canvas
+        ctx.clearRect(curx, cury, curwidth, curheight);
+        ctx.drawImage(picture, curx, cury, curwidth, curheight);
+
+        //setReload(true);
+    };
+
+    const getButtonCoordinatesById = (id) => {
+        const button = buttonRefs.current[id];
+        if (button) {
+            const rect = button.getBoundingClientRect();
+            return { x: (rect.left+rect.right)/2, y: (rect.top+rect.bottom)/2 };
+        } else {
+            return { x: 0, y: 0 }; // Default position if button is not found
+        }
+    };
+
     //const redButton = document.getElementById('redButton');
     const containerStyle: React.CSSProperties = {
         position: 'fixed',
@@ -127,96 +209,56 @@ const TitleScreen: React.FC = () => {
         setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
     }
 
-    const fetchData = async () => {
-        try {
-            const config = { Authorization: localStorage.getItem("lobbyToken") };
-            // get lobby info
-            const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, { headers: config });
-            const lobbyData = getLobbyResponse.data;
-
-            // set the userIdList to an array of longs consisting of all the user IDs in the lobby
-            let userIdList = lobbyData.players;
-
-            const requestBody = JSON.stringify({ userIdList })
-            const getUserResponse = await api.post("users/lobbies", requestBody);
-
-            // Set the state after fetching data
-
-            getUserResponse.data.forEach(user => {
-                // Access each user object here
-
-                if(avatarPos === 0){
-                    setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
-                }
-                else if(avatarPos === 1){
-                    setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
-                }
-                else if(avatarPos === 2){
-                    setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
-                }
-                else if(avatarPos === 3){
-                    setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
-                }
-            });
-
-        } catch (error) {
-            alert(`Something went wrong with fetching the user data: \n${handleError(error)}`);
-        }
-    };
     const nextSate = document.getElementById('nextState');
     React.useEffect(() => {
-
-        fetchData()
+        async function gettheUser(id) {
+            try {
+                const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+                const response = await api.get("/users/"+id, {headers: config});
+                avatarId = response.data.avatarId
+                setAnzeige(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[avatarId]}`);
+            } catch (error) {
+                alert(
+                  `Something went wrong with fetching the user data: \n${handleError(error)}`
+                );
+            }
+        };
         // Canvas setup
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
         const imageSrc = require('./RiskMap21.png');
 
         const resizeCanvas = () => {
-            /*            canvas.width = window.innerWidth;
-                        canvas.height = window.innerHeight;*/
-
             canvas.width = canvas.parentElement.clientWidth;
             canvas.height = canvas.parentElement.clientHeight;
 
             const image = new Image();
             image.src = imageSrc;
-            /*            image1.onload = function(){
-                            ctx.drawImage(image1, 0, 0, canvas.width, canvas.height*0.8);
+            setPicture(image);
 
-                        }*/
+        const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
+            const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
+            const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
 
-    const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
-        const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
-        const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
+            Object.keys(buttonRefs.current).forEach((buttonId: string) => {
+                const button = buttonRefs.current[buttonId];
+                const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
 
-        Object.keys(buttonRefs.current).forEach((buttonId: string) => {
-            const button = buttonRefs.current[buttonId];
-            const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
+                button.style.left = `${x}px`;
+                button.style.top = `${y}px`;
+                button.style.width = `${buttonWidth}px`;
+                button.style.height = `${buttonHeight}px`;
+                button.style.fontSize = `${buttonHeight*0.35}px`;
+            });
+        };
 
-            button.style.left = `${x}px`;
-            button.style.top = `${y}px`;
-            button.style.width = `${buttonWidth}px`;
-            button.style.height = `${buttonHeight}px`;
-            button.style.fontSize = `${buttonHeight*0.35}px`;
-        });
-    };
+        const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
+            const {xratio, yratio} = getButtonRatiosById(buttonId)
+            let x = startx + drawWidth * xratio; // Default left position
+            let y = starty + drawHeight * yratio; // Default top position
 
-    const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
-
-
-        const {xratio, yratio} = getButtonRatiosById(buttonId)
-        let x = startx + drawWidth * xratio; // Default left position
-        let y = starty + drawHeight * yratio; // Default top position
-
-        return { x, y };
-    };
-
-
+            return { x, y };
+        };
             image.onload = () => {
                 const aspectRatio = image.width / image.height;
                 let drawWidth = canvas.width;
@@ -233,6 +275,12 @@ const TitleScreen: React.FC = () => {
                 const x = (canvas.width - drawWidth) / 2;
                 const y = (canvas.height - drawHeight) / 2;
 
+                setCurHeight(drawHeight);
+                setCurWidth(drawWidth);
+                setX(x);
+                setY(y);
+
+
                 // Clear the canvas and draw the image
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(image, x, y, drawWidth, drawHeight);
@@ -246,13 +294,9 @@ const TitleScreen: React.FC = () => {
         // Handle resize event
         window.addEventListener('resize', resizeCanvas);
 
-
         return () => {
             window.removeEventListener('resize', resizeCanvas);
         };
-
-
-
     }, []);
 
     return (
@@ -269,6 +313,7 @@ const TitleScreen: React.FC = () => {
                         }}
                         className="button"
                         style={{ backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue' }}
+                        onClick={() => handleButtonClick(button.id)}
                     >
                         {button.text}
                     </button>
@@ -291,45 +336,45 @@ const TitleScreen: React.FC = () => {
                     <BaseContainer>
                         <div className="basescreen form">
                             <button
-                              onClick={() => fetchData()}
+                              onClick={() => AvatarCreation()}
                             > Count
                             </button>
                             <div style={containerStyle}>
                                 <div style={imagePairStyle}>
                                     {num !== 0 ? (
                                       <div style={avatarStyle}>
-                                          <img src={avatar1} alt="avatar" style={imageStyle} />
+                                          <img src={anzeige} alt="avatar" style={imageStyle} />
                                       </div>
                                     ) : (
                                       <div style={avatarStylePlaying}>
-                                          <img src={avatar1} alt="avatar" style={imageStyle} />
+                                          <img src={anzeige} alt="avatar" style={imageStyle} />
                                       </div>
                                     )}
                                     {num !== 1 ? (
                                       <div style={avatarStyle}>
-                                          <img src={avatar2} alt="avatar" style={imageStyle} />
+                                          <img src={anzeige} alt="avatar" style={imageStyle} />
                                       </div>
                                     ) : (
                                       <div style={avatarStylePlaying}>
-                                          <img src={avatar2} alt="avatar" style={imageStyle} />
+                                          <img src={anzeige} alt="avatar" style={imageStyle} />
                                       </div>
                                     )}
                                     {num !== 2 ? (
                                       <div style={avatarStyle}>
-                                          <img src={avatar3} alt="avatar" style={imageStyle} />
+                                          <img src={anzeige} alt="avatar" style={imageStyle} />
                                       </div>
                                     ) : (
                                       <div style={avatarStylePlaying}>
-                                          <img src={avatar3} alt="avatar" style={imageStyle} />
+                                          <img src={anzeige} alt="avatar" style={imageStyle} />
                                       </div>
                                     )}
                                     {num !== 3 ? (
                                       <div style={avatarStyle}>
-                                          <img src={avatar4} alt="avatar" style={imageStyle} />
+                                          <img src={anzeige} alt="avatar" style={imageStyle} />
                                       </div>
                                     ) : (
                                       <div style={avatarStylePlaying}>
-                                          <img src={avatar4} alt="avatar" style={imageStyle} />
+                                          <img src={anzeige} alt="avatar" style={imageStyle} />
                                       </div>
                                     )}
                                 </div>
