@@ -12,6 +12,7 @@ import ApiStyles from "helpers/avatarApiStyles";
 import game from "./Game";
 import { compileString } from "sass";
 
+
 const LobbyScreen = () => {
 
     const navigate = useNavigate();
@@ -39,16 +40,16 @@ const LobbyScreen = () => {
 
 
     //console.log("lobbyId is:", lobbyId);
-
+   
     useEffect(() => {
-        localStorage.setItem("lobbyId", lobbyId)
+
         let timeoutId;
 
         // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
         async function fetchData(id) {
 
             try {
-
+                
                 const config = {Authorization: localStorage.getItem("lobbyToken")};
 
                 // get lobby info
@@ -90,7 +91,7 @@ const LobbyScreen = () => {
                 fetchData(id);
             }, 2000);
         }
-
+    
         // Initial fetch
         if (lobbyId) {
             debouncedFetchData(lobbyId);
@@ -201,16 +202,16 @@ const LobbyScreen = () => {
                     </li>
                 ))}
                 </ul>
-                {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ?
-                  (
-                    <Button width="100%" style={{ marginBottom: "10px" }} onClick={gameStart}>
-                        Start Game
-                    </Button>
-                  ) : ((lobbyOwnerId === parseInt(localStorage.getItem("user_id"))) &&
-                    <Button width="100%" style={{ marginBottom: "10px" }} onClick={cancelGameStart}>
-                        Cancel Game
-                    </Button>
-                  )
+                {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ? 
+                (
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={gameStart}>
+                    Start Game
+                </Button>
+                ) : ((lobbyOwnerId === parseInt(localStorage.getItem("user_id"))) &&
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={cancelGameStart}>
+                    Cancel Game
+                </Button>
+                )
                 }
                 <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => leaveLobby()}>
                     Leave Lobby
