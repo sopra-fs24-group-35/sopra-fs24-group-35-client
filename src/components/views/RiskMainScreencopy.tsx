@@ -1,3 +1,4 @@
+/*
 import React, { useState } from 'react';
 import "styles/views/TitleScreen.scss";
 import {Button} from "../ui/Button";
@@ -21,8 +22,8 @@ const TitleScreen: React.FC = () => {
         setIsModalOpen(false);
     };
 
-    const territory_def = "Great Britain";
-    const territory_atk = "Iceland";
+    const territory_def = "Add defending territory name here";
+    const territory_atk = "Add attacking territory name here";
 
     const cont = JSON.stringify({territory_def, territory_atk});
 
@@ -42,8 +43,6 @@ const TitleScreen: React.FC = () => {
                             isModalOpen={isModalOpen}
                             modalContent={modalContent}
                             onClose={closeModal}
-                            lobbyId={2}
-                            gameId={4}
                             />
                         </section>
                         <Button
@@ -57,4 +56,4 @@ const TitleScreen: React.FC = () => {
     );
 }
 
-export default TitleScreen;
+export default TitleScreen;*/
