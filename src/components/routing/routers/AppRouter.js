@@ -8,7 +8,7 @@ import {RegistrationGuard} from "../routeProtectors/RegistrationGuard";
 import Registration from "../../views/Registration";
 import UserProfile from "../../views/UserProfile";
 import LobbyErstellen from "../../views/LobbyErstellen";
-import RiskMainScreen from "../../views/RiskMainScreencopy";
+import RiskMainScreen from "../../views/RiskMainScreen";
 import JoinScreen from "../../views/joinScreen";
 import LobbyScreen from "../../views/LobbyScreen";
 import AvatarPage from "../../views/AvatarPage";

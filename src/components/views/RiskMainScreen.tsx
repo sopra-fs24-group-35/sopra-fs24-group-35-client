@@ -19,10 +19,10 @@ const TitleScreen: React.FC = () => {
     const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const id = localStorage.getItem("user_id")
     let avatarId
-    const [avatar1, setAvatar1] = useState(null);
-    const [avatar2, setAvatar2] = useState(null);
-    const [avatar3, setAvatar3] = useState(null);
-    const [avatar4, setAvatar4] = useState(null);
+    const [avatar1, setAvatar1] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
+    const [avatar2, setAvatar2] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
+    const [avatar3, setAvatar3] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
+    const [avatar4, setAvatar4] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
     const {gameId} = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
     const [users, setUsers] = useState<User[]>(null);
@@ -131,6 +131,7 @@ const TitleScreen: React.FC = () => {
         try {
             const config = { Authorization: localStorage.getItem("lobbyToken") };
             // get lobby info
+            console.log(config)
             const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, { headers: config });
             const lobbyData = getLobbyResponse.data;
 
@@ -141,6 +142,9 @@ const TitleScreen: React.FC = () => {
             const getUserResponse = await api.post("users/lobbies", requestBody);
 
             // Set the state after fetching data
+            let requestBodyGame =JSON.stringify({lobbyId})
+            const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config }, requestBodyGame)
+            console.log(getGame.data)
 
             getUserResponse.data.forEach(user => {
                 // Access each user object here
@@ -290,10 +294,6 @@ const TitleScreen: React.FC = () => {
                     <div className="basescreen overlay"></div>
                     <BaseContainer>
                         <div className="basescreen form">
-                            <button
-                              onClick={() => fetchData()}
-                            > Count
-                            </button>
                             <div style={containerStyle}>
                                 <div style={imagePairStyle}>
                                     {num !== 0 ? (
