@@ -32,10 +32,6 @@ const LobbyScreen = () => {
 
     const [gameId, setGameId] = useState(null);
 
-
-
-    //console.log("lobbyId is:", lobbyId);
-
     useEffect(() => {
         localStorage.setItem("lobbyId", lobbyId)
         let timeoutId;
@@ -105,9 +101,12 @@ const LobbyScreen = () => {
     const leaveLobby = async () => {
         try {
             //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
-            const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
-            const response1 = await api.delete("/lobbies/" + lobbyId, requestBody);
-            localStorage.removeItem("lobby_id")
+            const players = [Number(localStorage.getItem("user_id"))];
+            const requestBody = JSON.stringify({ players });
+            console.log("requestBody", requestBody);
+            await api.delete(`/lobbies/${lobbyId}`, requestBody);
+            localStorage.removeItem("lobbyId")
+            localStorage.removeItem("lobbyToken")
             navigate("/game");
             /*if (!users){
                 const response2 = await api.
