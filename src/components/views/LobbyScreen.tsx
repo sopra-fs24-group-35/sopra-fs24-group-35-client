@@ -9,6 +9,8 @@ import PropTypes from "prop-types";
 import { User } from "types";
 import Lobby from "models/Lobby";
 import ApiStyles from "helpers/avatarApiStyles";
+import game from "./Game";
+import { compileString } from "sass";
 
 const LobbyScreen = () => {
 
@@ -28,10 +30,14 @@ const LobbyScreen = () => {
 
     const { lobbyId } = useParams();
 
-    //console.log("lobbyId is:", lobbyId);
-   
-    useEffect(() => {
+    const [gameId, setGameId] = useState(null);
 
+
+
+    //console.log("lobbyId is:", lobbyId);
+
+    useEffect(() => {
+        localStorage.setItem("lobbyId", lobbyId)
         let timeoutId;
 
         // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
@@ -61,17 +67,17 @@ const LobbyScreen = () => {
 
             } catch (error) {
                 console.error(
-                `Something went wrong while fetching the users: \n${handleError(
+                  `Something went wrong while fetching the users: \n${handleError(
                     error
-                )}`
+                  )}`
                 );
                 console.error("Details:", error);
                 alert(
-                "Something went wrong while fetching the users! See the console for details."
+                  "Something went wrong while fetching the users! See the console for details."
                 );
             }
         }
-            
+
         function debouncedFetchData(id) {
             // Clear the previous timeout
             clearTimeout(timeoutId);
@@ -80,15 +86,15 @@ const LobbyScreen = () => {
                 fetchData(id);
             }, 2000);
         }
-    
+
         // Initial fetch
         if (lobbyId) {
             debouncedFetchData(lobbyId);
         }
-    
+
         // Cleanup function to clear the timeout when the component unmounts
         return () => clearTimeout(timeoutId);
-    
+
 
     }, [lobby]); // <-- add lobbyOwnerName again if needed as dependency
     
@@ -100,7 +106,8 @@ const LobbyScreen = () => {
         try {
             //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
             const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
-            const response1 = await api.put("/lobbies/" + lobbyId + "/remove", requestBody);
+            const response1 = await api.delete("/lobbies/" + lobbyId, requestBody);
+            localStorage.removeItem("lobby_id")
             navigate("/game");
             /*if (!users){
                 const response2 = await api.
@@ -110,14 +117,24 @@ const LobbyScreen = () => {
             alert(
               `Something went wrong while leaving the lobby! \n${handleError(error)}`
             );
-          }
+        }
+    }
+    const getGame = async () => {
+        const requestBody = JSON.stringify({lobbyId,users});
+        const config = { Authorization: localStorage.getItem("lobbyToken") };
+        // get lobby info
+
+        const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody);
+        let gameID = getLobbyResponse.data.gameId;
+        console.log(getLobbyResponse)
+        navigate(`/risk/${gameID}`);
     }
 
     let timer = null;
-    
+
     const gameStart = () => {
         setStartingGame(true);
-    } 
+    }
 
     const cancelGameStart = () => {
         setStartingGame(false);
@@ -126,15 +143,15 @@ const LobbyScreen = () => {
     var startGame = null;
 
     useEffect(() => {
-        
-        
+
+
         if (startingGame){
             timer = 5;
             startGame = setInterval(() => {
                 if (timer <= 0) {
                     clearInterval(startGame);
                     if (startingGame) {
-                        navigate("/game");
+                        getGame()
                     }
                 } else if (!startingGame || !timer) {
                     clearInterval(startGame);
@@ -174,11 +191,11 @@ const LobbyScreen = () => {
         content = (
             <div className="lobby">
                 <ul className="lobby user-list">
-                {users.map((user: User) => (
+                    {users.map((user: User) => (
                     <li key={user.id}>
                     <Player user={user} />
-                    </li>
-                ))}
+                      </li>
+                    ))}
                 </ul>
                 {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ? 
                 (
