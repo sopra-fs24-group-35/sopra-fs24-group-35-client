@@ -50,6 +50,10 @@ const LobbyScreen = () => {
                 // set the userIdList to an array of longs consisting of all the user IDs in the lobby
                 let userIdList = lobbyData.players;
 
+                if (lobbyData.gameId !== null){
+                    navigate(`/risk/${lobbyData.gameId}`);
+                }
+
                 setLobbyOwnerId(userIdList[0]);
 
                 const requestBody = JSON.stringify({ userIdList });
