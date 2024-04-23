@@ -104,7 +104,7 @@ const LobbyScreen = () => {
             const players = [Number(localStorage.getItem("user_id"))];
             const requestBody = JSON.stringify({ players });
             console.log("requestBody", requestBody);
-            await api.delete(`/lobbies/${lobbyId}`, requestBody);
+            await api.put(`/lobbies/${lobbyId}/remove`, requestBody);
             localStorage.removeItem("lobbyId")
             localStorage.removeItem("lobbyToken")
             navigate("/game");
@@ -123,7 +123,7 @@ const LobbyScreen = () => {
         const config = { Authorization: localStorage.getItem("lobbyToken") };
         // get lobby info
 
-        const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody);
+        const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody, {headers: config});
         let gameID = getLobbyResponse.data.gameId;
         console.log(getLobbyResponse)
         navigate(`/risk/${gameID}`);
