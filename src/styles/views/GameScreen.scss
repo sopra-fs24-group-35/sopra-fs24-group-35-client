@@ -35,7 +35,7 @@
   height: 100px; /* Adjust the height of the button */
   border-radius: 50%; /* Make the button circular */
   border: 2px solid black; /* Add a black border around the button */
-  color: #000000;
+  color: #ffffff;
   background-color: #1373c2;
   font-size: 16px;
   cursor: pointer;
@@ -74,6 +74,23 @@
   height: 20%; /* Use viewport height to fill the entire screen */
   width: 100vw; /* Use viewport width to fill the entire screen */
   background-color: aqua;
+  display: flex;
+}
+
+.gamescreen-bottomleft-container{
+  position: relative;
+  height: 100%; /* Use viewport height to fill the entire screen */
+  width: 65%; /* Use viewport width to fill the entire screen */
+  background-color: #dfe5e5;
+}
+.gamescreen-bottomright-container{
+  position: relative;
+  height: 100%; /* Use viewport height to fill the entire screen */
+  width: 35%; /* Use viewport width to fill the entire screen */
+  background-color: #9ea2a2;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 
 
