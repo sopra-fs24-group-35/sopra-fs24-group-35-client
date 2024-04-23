@@ -78,6 +78,12 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
     fetchData();
   }, []);
 
+  const attack = async() => {
+    const config = { Authorization: localStorage.getItem("lobbyToken") };
+    const requestBody = JSON.stringify({attackTerritory, defenseTerritory, selectedTroops, selectedAttacks});
+    const attackResponse = await api.post(`lobbies/${lobbyId}/game/${gameId}/attacks`, requestBody, {headers: config});
+  }
+
   const Player = ({ user }: { user: User }) => (
       <div className="player cont">
         <img className="player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
@@ -143,7 +149,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
             </div>
           </div>
           <div className="button-div">
-            <Button width="50%">Attack</Button>
+            <Button width="50%" onClick={attack}>Attack</Button>
           </div>
         </main>
       </div>
