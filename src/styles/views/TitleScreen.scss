@@ -72,6 +72,36 @@
     //background-color: #504536;
     color: #b03838;
   }
+
+  .avatar form{
+    margin-top: 2em;
+    min-height: 300px;
+    //we include the center mixin defined in _theme.scss and save three duplicate lines :) *!
+    @include center;
+    flex-direction: column;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: 50em;
+    //   height: 20em;
+    height: 100%;
+    font-size: 16px;
+    font-weight: 400;
+    padding-bottom: 40px;
+    padding-top: 40px;
+    padding-left: 37px;
+    padding-right: 37px;
+    border-radius: 3em;
+    background-color: $background;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: $dropShadow;
+
+  }
+  .bottomright form{
+
+  }
 }
 
 
