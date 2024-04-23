@@ -49,6 +49,10 @@ const LobbyScreen = () => {
 
                 setLobby(lobbyData);
 
+                if (lobbyData.gameId !== null){
+                    navigate(`/risk/${lobbyData.gameId}`);
+                }
+
                 // set the userIdList to an array of longs consisting of all the user IDs in the lobby
                 let userIdList = lobbyData.players;
 
@@ -149,7 +153,7 @@ const LobbyScreen = () => {
         if (startingGame){
             timer = 5;
             startGame = setInterval(() => {
-                if (timer <= 0) {
+                if (timer <= 1) {
                     clearInterval(startGame);
                     if (startingGame) {
                         getGame()
