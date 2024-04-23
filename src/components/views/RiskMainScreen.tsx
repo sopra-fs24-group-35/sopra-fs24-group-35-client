@@ -5,7 +5,9 @@ import { api, handleError } from "helpers/api";
 import {Button} from "../ui/Button";
 import {RoundButton} from "../ui/RoundButton";
 import BaseContainer from "../ui/BaseContainer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import game from "./Game";
+import { User } from "../../types";
 import AdjDict from '../../models/AdjDict.js';
 
 
@@ -13,10 +15,18 @@ const TitleScreen: React.FC = () => {
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
     const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
-    const [num, setNum] = useState(0);
+    let [num, setNum] = useState(0);
+    let [avatarPos, setAvatarPos] = useState(0);
     const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const id = localStorage.getItem("user_id")
     let avatarId
+    const [avatar1, setAvatar1] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
+    const [avatar2, setAvatar2] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
+    const [avatar3, setAvatar3] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
+    const [avatar4, setAvatar4] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
+    const {gameId} = useParams()
+    const lobbyId = localStorage.getItem("lobbyId")
+    const [users, setUsers] = useState<User[]>(null);
     const [anzeige, setAnzeige] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const [startButton, setStartButton] = useState<string | null>(null);
     const [endButton, setEndButton] = useState<string | null>(null);
@@ -298,13 +308,11 @@ const TitleScreen: React.FC = () => {
 
     const imagePairStyle: React.CSSProperties = {
         display: 'flex',
-        top:"20%",
-        left:"40%"
     };
 
     const avatarStylePlaying: React.CSSProperties = {
-        width: '85px', // Adjust the size of the circle
-        height: '85px', // Adjust the size of the circle
+        width: '75px', // Adjust the size of the circle
+        height: '75px', // Adjust the size of the circle
         borderRadius: '50%', // Makes the image circular
         overflow: 'hidden', // Hides the overflow
         marginRight: '10px', // Adjust the space between images
@@ -312,8 +320,8 @@ const TitleScreen: React.FC = () => {
     };
 
     const avatarStyle: React.CSSProperties = {
-        width: '85px', // Adjust the size of the circle
-        height: '85px', // Adjust the size of the circle
+        width: '75px', // Adjust the size of the circle
+        height: '75px', // Adjust the size of the circle
         borderRadius: '50%', // Makes the image circular
         overflow: 'hidden', // Hides the overflow
         marginRight: '10px', // Adjust the space between image
@@ -334,6 +342,50 @@ const TitleScreen: React.FC = () => {
         setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
     }
 
+    const fetchData = async () => {
+        try {
+            const config = { Authorization: localStorage.getItem("lobbyToken") };
+            // get lobby info
+            console.log(config)
+            const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, { headers: config });
+            const lobbyData = getLobbyResponse.data;
+
+            // set the userIdList to an array of longs consisting of all the user IDs in the lobby
+            let userIdList = lobbyData.players;
+
+            const requestBody = JSON.stringify({ userIdList })
+            const getUserResponse = await api.post("users/lobbies", requestBody);
+
+            // Set the state after fetching data
+            let requestBodyGame =JSON.stringify({lobbyId})
+            const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config }, requestBodyGame)
+            console.log(getGame.data)
+
+            getUserResponse.data.forEach(user => {
+                // Access each user object here
+
+                if(avatarPos === 0){
+                    setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num +1)
+                }
+                else if(avatarPos === 1){
+                    setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num +1)
+                }
+                else if(avatarPos === 2){
+                    setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num +1)
+                }
+                else if(avatarPos === 3){
+                    setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num +1)
+                }
+            });
+
+        } catch (error) {
+            alert(`Something went wrong with fetching the user data: \n${handleError(error)}`);
+        }
+    };
     const nextSate = document.getElementById('nextState');
     React.useEffect(() => {
         async function gettheUser(id) {
@@ -344,10 +396,12 @@ const TitleScreen: React.FC = () => {
                 setAnzeige(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[avatarId]}`);
             } catch (error) {
                 alert(
-                  `Something went wrong with fetching the user data: \n${handleError(error)}`
+                    `Something went wrong with fetching the user data: \n${handleError(error)}`
                 );
             }
         };
+
+        fetchData()
         // Canvas setup
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
