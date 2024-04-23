@@ -172,17 +172,19 @@ const LobbyScreen = () => {
     }, [startingGame])
 
     const Player = ({ user }: { user: User }) => (
-    <div className="lobby-player container" >{/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
-        <div className="lobby-player username">{user.username}</div>
-        <img className="lobby-player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
-    </div>
+        <div
+            className="lobby-player container">{/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
+            <div className="lobby-player username">{user.username}</div>
+            <img className="lobby-player avatar"
+                 src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar"/>
+        </div>
     );
-    
+
     Player.propTypes = {
-    user: PropTypes.object,
+        user: PropTypes.object,
     };
 
-    let content = <Spinner />
+    let content = <Spinner/>
 
     if (users) {
         content = (
