@@ -8,7 +8,7 @@ import {RegistrationGuard} from "../routeProtectors/RegistrationGuard";
 import Registration from "../../views/Registration";
 import UserProfile from "../../views/UserProfile";
 import LobbyErstellen from "../../views/LobbyErstellen";
-import RiskMainScreen from "../../views/RiskMainScreencopy";
+import RiskMainScreen from "../../views/RiskMainScreen";
 import JoinScreen from "../../views/joinScreen";
 import LobbyScreen from "../../views/LobbyScreen";
 import AvatarPage from "../../views/AvatarPage";
@@ -32,8 +32,8 @@ const AppRouter = () => {
           <Route path="/game/*" element={<GameRouter base="/game"/>} />
         </Route>
 
-        <Route path="/risk" element={<GameGuard />}>
-          <Route path="/risk" element={<RiskMainScreen/>} />
+        <Route path="/risk/:id" element={<GameGuard />}>
+          <Route path="/risk/:id" element={<RiskMainScreen/>} />
         </Route>
 
         <Route path="/avatar" element={<GameGuard />}>
