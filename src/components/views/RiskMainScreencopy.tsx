@@ -21,8 +21,8 @@ const TitleScreen: React.FC = () => {
         setIsModalOpen(false);
     };
 
-    const territory_def = "Great Britain";
-    const territory_atk = "Iceland";
+    const territory_def = "Argentina";
+    const territory_atk = "Brazil";
 
     const cont = JSON.stringify({territory_def, territory_atk});
 
@@ -42,8 +42,8 @@ const TitleScreen: React.FC = () => {
                             isModalOpen={isModalOpen}
                             modalContent={modalContent}
                             onClose={closeModal}
-                            lobbyId={2}
-                            gameId={4}
+                            lobbyId={5}
+                            gameId={6}
                             />
                         </section>
                         <Button
