@@ -31,18 +31,10 @@ const LobbyScreen = () => {
 
     const { lobbyId } = useParams();
 
-    const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
-
-    let avatarId = null
-
     const [gameId, setGameId] = useState(null);
 
-
-
-    //console.log("lobbyId is:", lobbyId);
-   
     useEffect(() => {
-
+        localStorage.setItem("lobbyId", lobbyId)
         let timeoutId;
 
         // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
@@ -91,28 +83,28 @@ const LobbyScreen = () => {
                 fetchData(id);
             }, 2000);
         }
-    
+
         // Initial fetch
         if (lobbyId) {
             debouncedFetchData(lobbyId);
         }
-    
+
         // Cleanup function to clear the timeout when the component unmounts
         return () => clearTimeout(timeoutId);
-    
+
 
     }, [lobby]); // <-- add lobbyOwnerName again if needed as dependency
 
-    const enterProfile = (id) => {
-        navigate("/users/"+id);
-    }
 
     const leaveLobby = async () => {
         try {
             //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
-            const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
-            const response1 = await api.put("/lobbies/" + lobbyId + "/remove", requestBody);
-            localStorage.removeItem("lobby_id")
+            const players = [Number(localStorage.getItem("user_id"))];
+            const requestBody = JSON.stringify({ players });
+            console.log("requestBody", requestBody);
+            await api.put(`/lobbies/${lobbyId}/remove`, requestBody);
+            localStorage.removeItem("lobbyId")
+            localStorage.removeItem("lobbyToken")
             navigate("/game");
             /*if (!users){
                 const response2 = await api.
@@ -129,14 +121,14 @@ const LobbyScreen = () => {
         const config = { Authorization: localStorage.getItem("lobbyToken") };
         // get lobby info
 
-        const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody);
+        const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody, {headers: config});
         let gameID = getLobbyResponse.data.gameId;
         console.log(getLobbyResponse)
         navigate(`/risk/${gameID}`);
     }
 
     let timer = null;
-    
+
     const gameStart = () => {
         setStartingGame(true);
     }
@@ -148,8 +140,8 @@ const LobbyScreen = () => {
     var startGame = null;
 
     useEffect(() => {
-        
-        
+
+
         if (startingGame){
             timer = 5;
             startGame = setInterval(() => {
