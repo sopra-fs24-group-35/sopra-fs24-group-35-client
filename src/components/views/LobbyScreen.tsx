@@ -9,6 +9,8 @@ import PropTypes from "prop-types";
 import { User } from "types";
 import Lobby from "models/Lobby";
 import ApiStyles from "helpers/avatarApiStyles";
+import game from "./Game";
+import { compileString } from "sass";
 
 const LobbyScreen = () => {
 
@@ -28,7 +30,7 @@ const LobbyScreen = () => {
 
     const { lobbyId } = useParams();
 
-    //console.log("lobbyId is:", lobbyId);
+    const [gameId, setGameId] = useState(null);
 
     useEffect(() => {
         localStorage.setItem("lobbyId", lobbyId)
@@ -38,7 +40,7 @@ const LobbyScreen = () => {
         async function fetchData(id) {
 
             try {
-
+                
                 const config = {Authorization: localStorage.getItem("lobbyToken")};
 
                 // get lobby info
@@ -91,7 +93,7 @@ const LobbyScreen = () => {
 
 
     }, [lobby]); // <-- add lobbyOwnerName again if needed as dependency
-
+    
     /*const enterProfile = (id) => {
         navigate("/users/"+id);
     }*/
@@ -99,9 +101,12 @@ const LobbyScreen = () => {
     const leaveLobby = async () => {
         try {
             //const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
-            const requestBody = JSON.stringify({ "players" : [localStorage.getItem("user_id")] } );
-            const response1 = await api.put("/lobbies/" + lobbyId + "/remove", requestBody);
+            const players = [Number(localStorage.getItem("user_id"))];
+            const requestBody = JSON.stringify({ players });
+            console.log("requestBody", requestBody);
+            await api.delete(`/lobbies/${lobbyId}`, requestBody);
             localStorage.removeItem("lobbyId")
+            localStorage.removeItem("lobbyToken")
             navigate("/game");
             /*if (!users){
                 const response2 = await api.
@@ -113,28 +118,28 @@ const LobbyScreen = () => {
             );
         }
     }
+    const getGame = async () => {
+        const requestBody = JSON.stringify({lobbyId,users});
+        const config = { Authorization: localStorage.getItem("lobbyToken") };
+        // get lobby info
+
+        const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody);
+        let gameID = getLobbyResponse.data.gameId;
+        console.log(getLobbyResponse)
+        navigate(`/risk/${gameID}`);
+    }
 
     let timer = null;
-
+    
     const gameStart = () => {
         setStartingGame(true);
-    }
+    } 
 
     const cancelGameStart = () => {
         setStartingGame(false);
     }
 
     var startGame = null;
-    const getGame = async () => {
-        const requestBody = JSON.stringify({lobbyId,users});
-        const config = { Authorization: localStorage.getItem("lobbyToken") };
-        // get lobby info
-
-        const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody, {headers: config});
-        let gameID = getLobbyResponse.data.gameId;
-        console.log(getLobbyResponse)
-        navigate(`/risk/${gameID}`);
-    }
 
     useEffect(() => {
 
@@ -169,58 +174,58 @@ const LobbyScreen = () => {
     }, [startingGame])
 
     const Player = ({ user }: { user: User }) => (
-      <div className="lobby-player container" >{/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
-          <div className="lobby-player username">{user.username}</div>
-          <img className="lobby-player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
-      </div>
+    <div className="lobby-player container" >{/*onClick={() => enterProfile(user.id)} put this back in in case we need it*/}
+        <div className="lobby-player username">{user.username}</div>
+        <img className="lobby-player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
+    </div>
     );
-
+    
     Player.propTypes = {
-        user: PropTypes.object,
+    user: PropTypes.object,
     };
 
     let content = <Spinner />
 
     if (users) {
         content = (
-          <div className="lobby">
-              <ul className="lobby user-list">
-                  {users.map((user: User) => (
+            <div className="lobby">
+                <ul className="lobby user-list">
+                {users.map((user: User) => (
                     <li key={user.id}>
-                        <Player user={user} />
+                    <Player user={user} />
                     </li>
-                  ))}
-              </ul>
-              {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ?
+                ))}
+                </ul>
+                {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ? 
                 (
-                  <Button width="100%" style={{ marginBottom: '10px' }}  onClick={gameStart}>
-                      Start Game
-                  </Button>
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={gameStart}>
+                    Start Game
+                </Button>
                 ) : ((lobbyOwnerId === parseInt(localStorage.getItem("user_id"))) &&
-                  <Button width="100%" style={{ marginBottom: '10px' }}  onClick={cancelGameStart}>
-                      Cancel Game
-                  </Button>
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={cancelGameStart}>
+                    Cancel Game
+                </Button>
                 )
-              }
-              <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => leaveLobby()}>
-                  Leave Lobby
-              </Button>
-          </div>
+                }
+                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => leaveLobby()}>
+                    Leave Lobby
+                </Button>
+            </div>
         );
     };
 
     return (
-      <div className="basescreen title-screen">
-          <div className="basescreen overlay"></div>
-          <BaseContainer className="lobby container">
-              <h2>{(users !== null) ? ("Welcome to " + users[0].username + "'s lobby!") : ("The lobby is loading.")}</h2>
-              <h3>The lobby code is { (lobby !== null) ? (lobby.code) : ("loading :)") }</h3>
-              {startingGame && (<h4 className="countdown">Game starts in: {startingTimer}</h4>)}
-              <p className="lobby paragraph">
-                  Joined players:
-              </p>
-              {content}
-          </BaseContainer>
+        <div className="basescreen title-screen">
+        <div className="basescreen overlay"></div>
+        <BaseContainer className="lobby container">
+          <h2>{(users !== null) ? ("Welcome to " + users[0].username + "'s lobby!") : ("The lobby is loading.")}</h2>
+          <h3>The lobby code is { (lobby !== null) ? (lobby.code) : ("loading :)") }</h3>
+          {startingGame && (<h4 className="countdown">Game starts in: {startingTimer}</h4>)}
+          <p className="lobby paragraph">
+            Joined players:
+          </p>
+          {content}
+        </BaseContainer>
       </div>
     );
 };
