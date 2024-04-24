@@ -5,6 +5,7 @@ import { api, handleError } from "helpers/api";
 import { User } from "types";
 import ApiStyles from "helpers/avatarApiStyles";
 import {Button} from "../ui/Button";
+import Game from "models/Game";
 
 const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) => {
   if (!isModalOpen) {
@@ -15,6 +16,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
 
   const [attacker, setAttacker] = useState<User>(null);
   const [defender, setDefender] = useState<User>(null);
+  const [game, setGame] = useState<Game>(null);
 
   const [defenseTerritory, setDefenseTerritory] = useState(null);
   const [attackTerritory, setAttackTerritory] = useState(null);
@@ -83,6 +85,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
     const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedTroops,"repeats" : selectedAttacks});
     console.log("requestBody: ", requestBody);
     const attackResponse = await api.post(`lobbies/${lobbyId}/game/${gameId}/attacks`, requestBody, {headers: config});
+    setGame(attackResponse.data);
   }
 
   const Player = ({ user }: { user: User }) => (
