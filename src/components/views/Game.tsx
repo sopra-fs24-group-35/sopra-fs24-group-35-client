@@ -20,6 +20,12 @@ const Game = () => {
   // more information can be found under https://react.dev/learn/state-a-components-memory and https://react.dev/reference/react/useState 
   const [users, setUsers] = useState<User[]>(null);
 
+  useEffect(() => {
+    if (localStorage.getItem("lobbyId") !== null){
+      navigate(`/lobby/${localStorage.getItem("lobbyId")}`);
+    }
+  }, [])
+
   const logout = async () => {
     try {
       const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
