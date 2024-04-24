@@ -43,6 +43,13 @@ const LobbyErstellen = () => {
   let players = [temp_sol];
 
 
+  useEffect(() => {
+    if (localStorage.getItem("lobbyId") !== null){
+      navigate(`/lobby/${localStorage.getItem("lobbyId")}`);
+    }
+  }, [])
+
+
   const doLobbyCreate = async () => {
     try {
       const requestBody = JSON.stringify({ players });
