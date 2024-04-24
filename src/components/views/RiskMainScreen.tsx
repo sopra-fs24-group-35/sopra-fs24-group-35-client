@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 //import React, { useEffect } from 'react';
 import "styles/views/GameScreen.scss";
 import { api, handleError } from "helpers/api";
@@ -10,7 +10,7 @@ import game from "./Game";
 import { User } from "../../types";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
-import Game from "models/Game";
+import Game from "../../models/Game.js";
 
 
 const TitleScreen: React.FC = () => {
@@ -46,6 +46,10 @@ const TitleScreen: React.FC = () => {
     const [curwidth, setCurWidth] = useState(0);
     const [curheight, setCurHeight] = useState(0);
     const [picture, setPicture] = useState(null);
+    const nextSate3 = document.getElementById('nextState');
+    const [curPlayer, setCurPlayer] = useState(null);
+    const config = {Authorization : localStorage.getItem("lobbyToken")};
+
 
     const [curstate, setCurState] = useState(1);
     const [buttonStateText, setButtonStateText] = useState('Go to Attack');
@@ -125,13 +129,6 @@ const TitleScreen: React.FC = () => {
         { id: 'India', refKey: 'India', text: 'India', xratio: 0.715, yratio:0.51, troops : 0 , playerid : 0},
         { id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio:0.55, troops : 0 , playerid : 0},
     ]);
-    const nextSate3 = document.getElementById('nextState');
-
-    const [curPlayer, setCurPlayer] = useState(null);
-    const [Game1, setGame1] = useState(-1);
-    const [CompleteGame, setCompleteGame] = useState(null);
-
-    const config = {Authorization : localStorage.getItem("lobbyToken")};
 
     useEffect (() => {
         async function getGame() {
@@ -447,16 +444,15 @@ const TitleScreen: React.FC = () => {
     const LoadData = async () => {
         try {
             const config = {Authorization: localStorage.getItem("lobbyToken")};
-            console.log("THIS IS GAME " + Game);
-            if(Game === -1){
-                console.log("AFANG");
+            //console.log("THIS IS GAME " + game);
+            if(game === null){
+                //console.log("AFANG");
                 const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config})
-                console.log(getGame.data)
+                //console.log(getGame.data)
                 const curgame = getGame.data;
                 const currentplayer = (curgame.turnCycle.currentPlayer.playerId);
                 setCurPlayer(currentplayer);
-                setGame(curgame.gameId);
-                setCompleteGame(curgame);
+                setGame(curgame);
                 UpdateLocalButtons(curgame.board.territories);
             } else {
                 if(curPlayer !== localStorage.getItem("user_id")){
@@ -464,8 +460,7 @@ const TitleScreen: React.FC = () => {
                 console.log(getGame.data)
                 const curgame = getGame.data;
                 const currentplayer = (curgame.turnCycle.currentPlayer.playerId);
-                setGame(curgame.gameId);
-                setCompleteGame(curgame);
+                setGame(getGame);
                 setCurPlayer(currentplayer);
                 UpdateLocalButtons(curgame.board.territories);
             }}
@@ -537,20 +532,16 @@ const TitleScreen: React.FC = () => {
 
             const curbutton = buttonData.find(button => button.id === buttonId);
 
-            if (Game !== -1) {
-                console.log("HALLLLOOOO:  " + Game);
-                cycle = Game.turnCycle.playerCycle;
-            }
+            if (game !== null) {
+                console.log("HALLLLOOOO:  " + game);
+                cycle = game.turnCycle.playerCycle;
 
+            }
             let completecycle = [];
 
             for (const playerid of cycle) {
                 completecycle.push(playerid.playerId);
             }
-            while (completecycle.length < 4) {
-                completecycle.push(-1); // or any placeholder value you prefer
-            }
-
             // Make sure completecycle has at least 4 elements
             if (completecycle.length < 4) {
                 completecycle = completecycle.concat(Array(4 - completecycle.length).fill(-1));
@@ -652,14 +643,13 @@ const TitleScreen: React.FC = () => {
         };
     }, []);
 
-
     React.useEffect(() => {
         const loadDataInterval = setInterval(async () => {
-            await LoadData();
-            if(curx !== 0 && cury !== 0 && curwidth !== 0 && curheight !== 0){
-            await resizeButtons(curx, cury, curwidth, curheight);}
-
-        }, 1000); // Interval set to 2 seconds (2000 milliseconds)
+            LoadData();
+            console.log("this is a game " + game);
+            // if(curx !== 0 && cury !== 0 && curwidth !== 0 && curheight !== 0){
+            // await resizeButtons(curx, cury, curwidth, curheight);}
+        }, 2000); // Interval set to 2 seconds (2000 milliseconds)
 
         // Cleanup function to clear the interval when the component unmounts or the effect is re-executed
         return () => {

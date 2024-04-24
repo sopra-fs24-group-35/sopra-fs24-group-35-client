@@ -1,12 +1,10 @@
-class User {
-    constructor(data = {}) {
-        gameId = this.gameId;
-        board = this.board;
-        players = this.players;
-        turnCycle = this.turnCycle;
-        diceResult = this.diceResult;
-        Object.assign(this, data);
+class Game {
+    constructor({ gameId, board, players, turnCycle, diceResult }) {
+        this.gameId = gameId;
+        this.board = board;
+        this.players = players;
+        this.turnCycle = turnCycle;
+        this.diceResult = diceResult;
     }
 }
-
 export default Game;
