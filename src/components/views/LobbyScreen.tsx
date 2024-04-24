@@ -37,6 +37,9 @@ const LobbyScreen = () => {
         localStorage.setItem("lobbyId", lobbyId)
         let timeoutId;
 
+        if(lobby !== null && lobby.gameId !== null){
+            navigate(`/risk/${lobby.gameId}`);
+        }
         // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
         async function fetchData(id) {
 
@@ -81,7 +84,7 @@ const LobbyScreen = () => {
             // Set a new timeout to call fetchData after 20000 milliseconds
             timeoutId = setTimeout(() => {
                 fetchData(id);
-            }, 2000);
+            }, 500);
         }
 
         // Initial fetch
@@ -122,9 +125,10 @@ const LobbyScreen = () => {
         // get lobby info
 
         const getLobbyResponse = await api.post(`/lobbies/${lobbyId}/game`, requestBody, {headers: config});
-        let gameID = getLobbyResponse.data.gameId;
-        console.log(getLobbyResponse)
-        navigate(`/risk/${gameID}`);
+        let gameId = getLobbyResponse.data.gameId;
+        localStorage.setItem("gameId", gameId);
+        //console.log(getLobbyResponse)
+        navigate(`/risk/${gameId}`);
     }
 
     let timer = null;
@@ -140,7 +144,6 @@ const LobbyScreen = () => {
     var startGame = null;
 
     useEffect(() => {
-
 
         if (startingGame){
             timer = 5;
