@@ -4,23 +4,20 @@ import {Button} from "../ui/Button";
 import AttackModal from "../ui/AttackModal";
 import BaseContainer from "../ui/BaseContainer";
 
-const TitleScreen: React.FC = () => {
+const TitleScreen1: React.FC = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalContent, setModalContent] = useState({
         territory_def: "Add territory name here",
         territory_atk: "Add territory name here",
     });
-
     const openModal = (content) => {
         setIsModalOpen(true);
         setModalContent(JSON.parse(content));
     };
-
     const closeModal = () => {
         setIsModalOpen(false);
     };
-
     const territory_def = "Argentina";
     const territory_atk = "Brazil";
 
@@ -57,4 +54,4 @@ const TitleScreen: React.FC = () => {
     );
 }
 
-export default TitleScreen;
+export default TitleScreen1;
