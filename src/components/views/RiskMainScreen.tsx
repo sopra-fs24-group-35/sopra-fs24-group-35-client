@@ -226,6 +226,7 @@ const TitleScreen: React.FC = () => {
     const nextState = async() => {
 
         if (phase === "MOVE") {
+            correctTerritories()
             setStartButton(null);
             setEndButton(null);
             setDrawingLine(null);
@@ -435,6 +436,7 @@ const TitleScreen: React.FC = () => {
                 player4Territories = player4Territories + 1
             }
         })
+        myTerritories = 0
 
         if(myTerritories === 0){
             setIsLooseModalOpen(true)
@@ -468,6 +470,7 @@ const TitleScreen: React.FC = () => {
 
             // set the userIdList to an array of longs consisting of all the user IDs in the lobby
             let userIdList = lobbyData.players;
+            console.log(userIdList)
 
             setPlayerCount(lobbyData.players.length)
             console.log(lobbyData.players.length)
@@ -487,8 +490,8 @@ const TitleScreen: React.FC = () => {
 
             getUserResponse.data.forEach(user => {
                 // Access each user object here
-
                 if(avatarPos === 0){
+                    console.log(user)
                     setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
                     setAvatar1Id(user.id)
                     getGame.data.board.territories.forEach(terr => {
@@ -540,6 +543,7 @@ const TitleScreen: React.FC = () => {
     const nextSate = document.getElementById('nextState');
     React.useEffect(() => {
         fetchData()
+        console.log("HHHHHHHEEEEERRREEE")
         // Canvas setup
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
@@ -698,38 +702,38 @@ const TitleScreen: React.FC = () => {
     <div className="gamescreen-bottomright-container">
         {num !== 0 ? (
             <div style={avatarStyle}>
-                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                <img src={avatar1} alt="avatar" style={imageStyle}/>
             </div>
         ) : (
             <div style={avatarStylePlaying}>
-                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                <img src={avatar1} alt="avatar" style={imageStyle}/>
                 </div>
             )}
             {num !== 1 ? (
                 <div style={avatarStyle}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                    <img src={avatar2} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
                 <div style={avatarStylePlaying}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                    <img src={avatar2} alt="avatar" style={imageStyle}/>
                 </div>
             )}
             {num !== 2 ? (
                 <div style={avatarStyle}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                    <img src={avatar3} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
                 <div style={avatarStylePlaying}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                    <img src={avatar3} alt="avatar" style={imageStyle}/>
                 </div>
             )}
             {num !== 3 ? (
                 <div style={avatarStyle}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                    <img src={avatar4} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
                 <div style={avatarStylePlaying}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                    <img src={avatar4} alt="avatar" style={imageStyle}/>
                 </div>
             )}
     </div>
