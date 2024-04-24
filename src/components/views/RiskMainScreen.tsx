@@ -10,9 +10,15 @@ import game from "./Game";
 import { User } from "../../types";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
+import Game from "models/Game";
 
 
 const TitleScreen: React.FC = () => {
+
+    const [game, setGame] = useState<Game>(null);
+    const [phase, setPhase] = useState(null);
+    const [currentPlayerId, setCurrentPlayerId] = useState(null);
+
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
     const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
@@ -42,7 +48,7 @@ const TitleScreen: React.FC = () => {
     const [picture, setPicture] = useState(null);
 
     const [curstate, setCurState] = useState(1);
-    const [buttonStateText, setButtonStateText] = useState('Go to Attack');
+    //const [buttonStateText, setButtonStateText] = useState('Go to Attack');
     const [curTroopAmount, setCurTroopAmount] = useState(15);
     const color = ["red", "blue", "violet", "green", "orange"];
 
@@ -61,31 +67,12 @@ const TitleScreen: React.FC = () => {
     
     const closeModal = () => {
         setIsModalOpen(false);
+        window.location.reload();
     };
 
     useEffect(() => {
         console.log("isModalOpen", isModalOpen);
     }, [isModalOpen]);
-    // useEffect (() => {
-    //     console.log("hello?", isModalOpen);
-    //     let renderButtons = buttonData.map((button) => (
-    //     <button
-    //         key={button.id}
-    //         id={button.id}
-    //         ref={(buttonRef) => {
-    //             if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
-    //         }}
-    //         className="button"
-    //         style={{ backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue' }}
-    //         onClick={() => handleButtonClick(button.id)}
-    //     >
-    //         {button.troops}
-    //     </button>));
-
-    //     if (isModalOpen) {
-    //         renderButtons = null;
-    //     }
-    // }, [isModalOpen])
     /*-------------------------------------------------*/
 
     const [buttonData, setButtonData] = useState([
@@ -138,6 +125,28 @@ const TitleScreen: React.FC = () => {
         { id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio:0.55, troops : 0 , playerid : 0},
     ]);
 
+    const config = {Authorization : localStorage.getItem("lobbyToken")};
+
+    useEffect (() => {
+        async function getGame() {
+            const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
+            console.log("gameResponse", gameResponse);
+            setGame(gameResponse.data);
+            setPhase(gameResponse.data.turnCycle.currentPhase);
+            setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId)
+        }
+
+        getGame();
+    }, []);
+
+    useEffect(() => {
+        if(game !== null){
+            console.log("game: ", game);
+            console.log("current phase: ", phase);
+            console.log("current player id: ", currentPlayerId);
+        }
+    }, [game, phase, currentPlayerId]);
+
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
         return button ? { xratio: button.xratio, yratio: button.yratio } : { xratio: 0, yratio: 0 }; // Return xratio and yratio if the button is found, otherwise return default values
@@ -153,13 +162,13 @@ const TitleScreen: React.FC = () => {
     }
 
     const handleButtonClick = (id: string) => {
-        if(curstate === 1){
+        if(phase === "REINFORCEMENT"){
             deploytroops(id);
         }
-        if(curstate === 2){
+        if(phase === "ATTACK"){
             attackTerritory(id);
         }
-        if(curstate === 3){
+        if(phase === "MOVE"){
             reinforceTroops(id);
         }
     }
@@ -200,31 +209,31 @@ const TitleScreen: React.FC = () => {
         }
     };
 
-    const nextState = () => {
-        if (curstate === 3) {
-            console.log(1);
-            setCurState(1);
+    const nextState = async() => {
+
+        if (phase === "MOVE") {
             setStartButton(null);
             setEndButton(null);
             setDrawingLine(null);
             if(startButton){
                 dehighlightadjbutton(startButton);}
             undoLine();
-            return 1;
         }
         else{
-            let state = curstate;
-            state += 1;
-            console.log(state);
-            setCurState(state);
             if(startButton){
                 dehighlightadjbutton(startButton);}
             undoLine();
             setStartButton(null);
             setEndButton(null);
             setDrawingLine(null);
-            return state;
         }
+
+        const requestBody = JSON.stringify({"board": game.board});
+        const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}`, requestBody, {headers: config});
+
+        setGame(updateGame.data);
+        setPhase(updateGame.data.turnCycle.currentPhase);
+        setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
     }
 
     const increaseTroops = (territory_id: string) => {
@@ -572,19 +581,10 @@ const TitleScreen: React.FC = () => {
             }}
             onClick={() => {// Set the value of x here
                 const cur = nextState();
-                const buttonText =
-                    cur === 1
-                        ? 'Go to Attack'
-                        : cur === 2
-                            ? 'Go to Reinforce'
-                            : cur === 3
-                                ? 'End the Turn'
-                                : 'Beginning State';
-                setButtonStateText(buttonText)
-
+                const buttonText = "Next Phase";
             }}
         >
-            {buttonStateText}
+            Next Phase
         </button>
 {/*                    <button
             id="nextState"
