@@ -9,6 +9,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import game from "./Game";
 import { User } from "../../types";
 import AdjDict from '../../models/AdjDict.js';
+import AttackModal from "../ui/AttackModal";
+import ModalWin from "../ui/ModalWin";
+import LooseModal from "../ui/LooseModal";
+import { Simulate } from "react-dom/test-utils";
+import play = Simulate.play;
 
 
 const TitleScreen: React.FC = () => {
@@ -16,7 +21,7 @@ const TitleScreen: React.FC = () => {
     const navigate = useNavigate();
     const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
     let [num, setNum] = useState(0);
-    let [avatarPos, setAvatarPos] = useState(0);
+    let avatarPos = 0
     const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const id = localStorage.getItem("user_id")
     let avatarId
@@ -24,14 +29,25 @@ const TitleScreen: React.FC = () => {
     const [avatar2, setAvatar2] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
     const [avatar3, setAvatar3] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
     const [avatar4, setAvatar4] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
+    const [avatar1Id, setAvatar1Id] = useState(null);
+    const [avatar2Id, setAvatar2Id] = useState(null);
+    const [avatar3Id, setAvatar3Id] = useState(null);
+    const [avatar4Id, setAvatar4Id] = useState(null);
     const {gameId} = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
-    const [users, setUsers] = useState<User[]>(null);
-    const [anzeige, setAnzeige] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const [startButton, setStartButton] = useState<string | null>(null);
     const [endButton, setEndButton] = useState<string | null>(null);
     const [drawingLine, setDrawingLine] = useState(false);
     const adjDict = new AdjDict();
+    const [currPlayer, setCurrPlayer] = useState(null);
+    const [isWinModalOpen, setIsWinModalOpen] = useState(false);
+    const [isLooseModalOpen, setIsLooseModalOpen] = useState(false)
+    let player1Territories = 0
+    let player2Territories = 0
+    let player3Territories = 0
+    let player4Territories = 0
+    let myTerritories = 0
+    const [playerCount, setPlayerCount] = useState(0)
     //reload idea
 
     const [curx, setX] = useState(0);
@@ -125,6 +141,7 @@ const TitleScreen: React.FC = () => {
         setNewPlayerOwner(id, 2);
     }
 
+
     const attackTerritory = (id: string) => {
         handleButtonClick1(id);
     }
@@ -156,6 +173,7 @@ const TitleScreen: React.FC = () => {
     const nextState = () => {
         if (curstate === 3) {
             console.log(1);
+            correctTerritories()
             setCurState(1);
             setStartButton(null);
             setEndButton(null);
@@ -169,6 +187,7 @@ const TitleScreen: React.FC = () => {
             let state = curstate;
             state += 1;
             console.log(state);
+            correctTerritories()
             setCurState(state);
             if(startButton){
                 dehighlightadjbutton(startButton);}
@@ -332,16 +351,61 @@ const TitleScreen: React.FC = () => {
         height: '100%',
         objectFit: 'cover', // Ensures the image covers the entire circle
     };
-    const AvatarCreation = () => {
-        let newNum = num + 1;
-        if (newNum >= 4) {
-            newNum = 0;
-        }
-        setNum(newNum);
-        console.log(newNum)
-        setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
-    }
 
+    const correctTerritories = async () => {
+        const config = { Authorization: localStorage.getItem("lobbyToken") };
+
+        let requestBodyGame =JSON.stringify({lobbyId})
+        const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config }, requestBodyGame)
+
+        let tempCounter = 0
+        let player1Territories = 0
+        let player2Territories = 0
+        let player3Territories = 0
+        let player4Territories = 0
+        let myTerritories = 0
+
+
+        getGame.data.board.territories.forEach(terr => {
+            if(terr.owner === parseInt(localStorage.getItem("user_id"))){
+                myTerritories = myTerritories + 1
+            }
+            if(terr.owner === avatar1Id){
+                player1Territories = player1Territories + 1
+            }
+            else if(terr.owner === avatar2Id){
+                player2Territories = player2Territories + 1
+            }
+            else if(terr.owner === avatar3Id){
+                player3Territories = player3Territories + 1
+            }
+            else if(terr.owner === avatar4Id){
+                player4Territories = player4Territories + 1
+            }
+        })
+        
+        if(myTerritories === 0){
+            setIsLooseModalOpen(true)
+        }
+
+        if(player1Territories === 0){
+            tempCounter = tempCounter + 1
+        }
+        if(player2Territories === 0){
+            tempCounter = tempCounter + 1
+        }
+        if(player3Territories === 0){
+            tempCounter = tempCounter + 1
+        }
+        if(player4Territories === 0){
+            tempCounter = tempCounter + 1
+        }
+
+        if(myTerritories !==0 && tempCounter >= playerCount-1){
+            setIsWinModalOpen(true)
+        }
+
+    }
     const fetchData = async () => {
         try {
             const config = { Authorization: localStorage.getItem("lobbyToken") };
@@ -353,54 +417,76 @@ const TitleScreen: React.FC = () => {
             // set the userIdList to an array of longs consisting of all the user IDs in the lobby
             let userIdList = lobbyData.players;
 
+            setPlayerCount(lobbyData.players.length)
+            console.log(lobbyData.players.length)
+
             const requestBody = JSON.stringify({ userIdList })
             const getUserResponse = await api.post("users/lobbies", requestBody);
 
             // Set the state after fetching data
             let requestBodyGame =JSON.stringify({lobbyId})
             const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config }, requestBodyGame)
-            console.log(getGame.data)
+
+            getGame.data.board.territories.forEach(terr => {
+                if(terr.owner === parseInt(localStorage.getItem("user_id"))) {
+                    player4Territories = player4Territories + 1
+                }
+            })
 
             getUserResponse.data.forEach(user => {
                 // Access each user object here
 
                 if(avatarPos === 0){
                     setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
+                    setAvatar1Id(user.id)
+                    getGame.data.board.territories.forEach(terr => {
+                        if(terr.owner === user.id){
+                            player1Territories = player1Territories + 1
+                        }
+                    })
+                    avatarPos = avatarPos +1
                 }
                 else if(avatarPos === 1){
                     setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
+                    setAvatar2Id(user.id)
+                    getGame.data.board.territories.forEach(terr => {
+                        if(terr.owner === user.id){
+                            player2Territories = player2Territories + 1
+                        }
+                    })
+                    avatarPos = avatarPos +1
                 }
                 else if(avatarPos === 2){
                     setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
+                    setAvatar3Id(user.id)
+                    getGame.data.board.territories.forEach(terr => {
+                        if(terr.owner === user.id){
+                            player3Territories = player3Territories + 1
+                        }
+                    })
+                    avatarPos = avatarPos +1
                 }
                 else if(avatarPos === 3){
                     setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
+                    setAvatar4Id(user.id)
+                    getGame.data.board.territories.forEach(terr => {
+                        if(terr.owner === user.id){
+                            player4Territories = player4Territories + 1
+                        }
+                    })
+                    avatarPos = avatarPos +1
                 }
+
+
             });
 
         } catch (error) {
             alert(`Something went wrong with fetching the user data: \n${handleError(error)}`);
         }
     };
+
     const nextSate = document.getElementById('nextState');
     React.useEffect(() => {
-        async function gettheUser(id) {
-            try {
-                const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
-                const response = await api.get("/users/"+id, {headers: config});
-                avatarId = response.data.avatarId
-                setAnzeige(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[avatarId]}`);
-            } catch (error) {
-                alert(
-                    `Something went wrong with fetching the user data: \n${handleError(error)}`
-                );
-            }
-        };
-
         fetchData()
         // Canvas setup
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
@@ -518,6 +604,18 @@ const TitleScreen: React.FC = () => {
             </div>
             <div className="gamescreen-innerlower-container">
                 <div className="gamescreen-bottomleft-container">
+                    <Button
+                      width="100%" onClick={() => setIsLooseModalOpen(true)}>
+                        ModalTest
+                    </Button>
+                    <section>
+                        <LooseModal
+                          isModalOpen={isLooseModalOpen}
+                          onClose={() => setIsLooseModalOpen(false)} />
+                        <ModalWin
+                          isModalOpen={isWinModalOpen}
+                          onClose={() => setIsWinModalOpen(false)} />
+                    </section>
                     <button
                         id="nextState"
                         className="gamescreen-buttons-container"
@@ -573,38 +671,38 @@ const TitleScreen: React.FC = () => {
                 <div className="gamescreen-bottomright-container">
                     {num !== 0 ? (
                         <div style={avatarStyle}>
-                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                            <img src={avatar1} alt="avatar" style={imageStyle}/>
                         </div>
                     ) : (
                         <div style={avatarStylePlaying}>
-                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                            <img src={avatar1} alt="avatar" style={imageStyle}/>
                             </div>
                         )}
                         {num !== 1 ? (
                             <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                                <img src={avatar2} alt="avatar" style={imageStyle}/>
                             </div>
                         ) : (
                             <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                                <img src={avatar2} alt="avatar" style={imageStyle}/>
                             </div>
                         )}
                         {num !== 2 ? (
                             <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                                <img src={avatar3} alt="avatar" style={imageStyle}/>
                             </div>
                         ) : (
                             <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                                <img src={avatar3} alt="avatar" style={imageStyle}/>
                             </div>
                         )}
                         {num !== 3 ? (
                             <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                                <img src={avatar4} alt="avatar" style={imageStyle}/>
                             </div>
                         ) : (
                             <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                                <img src={avatar4} alt="avatar" style={imageStyle}/>
                             </div>
                         )}
                 </div>
