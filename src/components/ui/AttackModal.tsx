@@ -86,6 +86,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
     console.log("requestBody: ", requestBody);
     const attackResponse = await api.post(`lobbies/${lobbyId}/game/${gameId}/attacks`, requestBody, {headers: config});
     setGame(attackResponse.data);
+    console.log("attack response:", attackResponse);
   }
 
   const Player = ({ user }: { user: User }) => (
