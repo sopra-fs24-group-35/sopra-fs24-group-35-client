@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 //import React, { useEffect } from 'react';
 import "styles/views/GameScreen.scss";
-import { api, handleError } from "helpers/api";
+import {api, handleError} from "helpers/api";
 import {Button} from "../ui/Button";
 import {RoundButton} from "../ui/RoundButton";
 import BaseContainer from "../ui/BaseContainer";
-import { useNavigate, useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import game from "./Game";
-import { User } from "../../types";
+import {User} from "../../types";
 import AdjDict from '../../models/AdjDict.js';
 
 
@@ -407,6 +407,10 @@ const TitleScreen: React.FC = () => {
         },
         {id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio: 0.55, troops: 0, playerid: 0,},
     ]);
+    const nextSate = document.getElementById('nextState');
+
+    const [curPlayer, setCurPlayer] = useState(null);
+    const [Game, setGame] = useState(null);
 
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
@@ -448,312 +452,342 @@ const TitleScreen: React.FC = () => {
     }
 
 
-        const handleButtonClick = (id: string) => {
-            if (curstate === 1) {
-                deploytroops(id);
-            }
-            if (curstate === 2) {
-                attackTerritory(id);
-            }
-            if (curstate === 3) {
-                reinforceTroops(id);
-            }
+    const handleButtonClick = (id: string) => {
+        if (curstate === 1) {
+            deploytroops(id);
         }
-        const deploytroops = (id: string) => {
-            increaseTroops(id);
-            setNewPlayerOwner(id, 2);
+        if (curstate === 2) {
+            attackTerritory(id);
         }
+        if (curstate === 3) {
+            reinforceTroops(id);
+        }
+    }
+    const deploytroops = (id: string) => {
+        increaseTroops(id);
+        setNewPlayerOwner(id, 2);
+    }
 
-        const attackTerritory = (id: string) => {
-            handleButtonClick1(id);
-        }
+    const attackTerritory = (id: string) => {
+        handleButtonClick1(id);
+    }
 
-        const reinforceTroops = (id: string) => {
-            redirectTroops(id)
-        }
+    const reinforceTroops = (id: string) => {
+        redirectTroops(id)
+    }
 
-        const handleButtonClick1 = (id: string) => {
-            console.log("First Terri: " + startButton + ", Second Terri: " + endButton + ", drawline: " + drawingLine + ".");
-            if (drawingLine) {
-                // Draw line between start button and clicked button
-                undoLine();
-                setStartButton(null);
-                setEndButton(null);
-                setDrawingLine(false); // Reset drawing line mode
-                setStartButton(id);
-                highlightadjbutton(id)
-            } else if (startButton) {
+    const handleButtonClick1 = (id: string) => {
+        console.log("First Terri: " + startButton + ", Second Terri: " + endButton + ", drawline: " + drawingLine + ".");
+        if (drawingLine) {
+            // Draw line between start button and clicked button
+            undoLine();
+            setStartButton(null);
+            setEndButton(null);
+            setDrawingLine(false); // Reset drawing line mode
+            setStartButton(id);
+            highlightadjbutton(id)
+        } else if (startButton) {
+            dehighlightadjbutton(startButton);
+            drawLine(startButton, id);
+            setDrawingLine(true); // Enable drawing line mode
+        } else {
+            setStartButton(id);
+            highlightadjbutton(id);
+        }
+    };
+
+    const nextState = () => {
+        if (curstate === 3) {
+            console.log(1);
+            setCurState(1);
+            setStartButton(null);
+            setEndButton(null);
+            setDrawingLine(null);
+            if (startButton) {
                 dehighlightadjbutton(startButton);
-                drawLine(startButton, id);
-                setDrawingLine(true); // Enable drawing line mode
-            } else {
-                setStartButton(id);
-                highlightadjbutton(id);
             }
-        };
-
-        const nextState = () => {
-            if (curstate === 3) {
-                console.log(1);
-                setCurState(1);
-                setStartButton(null);
-                setEndButton(null);
-                setDrawingLine(null);
-                if (startButton) {
-                    dehighlightadjbutton(startButton);
-                }
-                undoLine();
-                return 1;
-            } else {
-                let state = curstate;
-                state += 1;
-                console.log(state);
-                setCurState(state);
-                if (startButton) {
-                    dehighlightadjbutton(startButton);
-                }
-                undoLine();
-                setStartButton(null);
-                setEndButton(null);
-                setDrawingLine(null);
-                return state;
+            undoLine();
+            return 1;
+        } else {
+            let state = curstate;
+            state += 1;
+            console.log(state);
+            setCurState(state);
+            if (startButton) {
+                dehighlightadjbutton(startButton);
             }
+            undoLine();
+            setStartButton(null);
+            setEndButton(null);
+            setDrawingLine(null);
+            return state;
         }
+    }
 
-        const increaseTroops = (territory_id: string) => {
-            const button = buttonData.find(button => button.id === territory_id); // Find the button data for the startId
-            if (button) {
-                button.troops += 1; // Increment the troops count
+    const increaseTroops = (territory_id: string) => {
+        const button = buttonData.find(button => button.id === territory_id); // Find the button data for the startId
+        if (button) {
+            button.troops += 1; // Increment the troops count
+            setButtonData([...buttonData]); // Update the button data array in the state
+        }
+    }
+
+    const redirectTroops = (id: string) => {
+        if (drawingLine) {
+            // Draw line between start button and clicked button
+            undoLine();
+            setStartButton(null);
+            setEndButton(null);
+            setDrawingLine(false); // Reset drawing line mode
+            setStartButton(id);
+            // highlightadjbutton(id)
+            checkForAllValidReinforcements(id, 2);
+        } else if (startButton) {
+            dehighlightadjbutton(startButton);
+            const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
+            const button_to = buttonData.find(button => button.id === id);
+            if (button_from && button_to) {
+                button_from.troops -= 1; // Increment the troops count
+                button_to.troops += 1;
                 setButtonData([...buttonData]); // Update the button data array in the state
             }
+            drawLine(startButton, id);
+            setDrawingLine(true); // Enable drawing line mode
+        } else {
+            setStartButton(id);
+            checkForAllValidReinforcements(id, 2);
         }
+    }
 
-        const redirectTroops = (id: string) => {
-            if (drawingLine) {
-                // Draw line between start button and clicked button
-                undoLine();
-                setStartButton(null);
-                setEndButton(null);
-                setDrawingLine(false); // Reset drawing line mode
-                setStartButton(id);
-                // highlightadjbutton(id)
-                checkForAllValidReinforcements(id, 2);
-            } else if (startButton) {
-                dehighlightadjbutton(startButton);
-                const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
-                const button_to = buttonData.find(button => button.id === id);
-                if (button_from && button_to) {
-                    button_from.troops -= 1; // Increment the troops count
-                    button_to.troops += 1;
-                    setButtonData([...buttonData]); // Update the button data array in the state
-                }
-                drawLine(startButton, id);
-                setDrawingLine(true); // Enable drawing line mode
-            } else {
-                setStartButton(id);
-                checkForAllValidReinforcements(id, 2);
+    const highlightadjbutton = (startId: string) => {
+        //increaseTroops(startId);
+        const adjacentTerritories = adjDict.dict[startId];
+        console.log(adjacentTerritories);
+        for (const territory of adjacentTerritories) {
+            const button = buttonRefs.current[territory]
+            button.style.border = "2px solid white";
+        }
+    }
+
+    const dehighlightadjbutton = (startId: string) => {
+        const adjacentTerritories = adjDict.dict[startId];
+        console.log(adjacentTerritories);
+        for (const territory of adjacentTerritories) {
+            const button = buttonRefs.current[territory]
+            button.style.border = "2px solid black";
+        }
+        for (const territory of curListOfValidReinforcements) {
+            const button = buttonRefs.current[territory]
+            button.style.border = "2px solid black";
+        }
+    }
+
+    const drawLine = (startId: string, endId: string) => {
+        let {x: startx, y: starty} = getButtonCoordinatesById(startId);
+        let {x: endx, y: endy} = getButtonCoordinatesById(endId);
+
+        const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+        const ctx = canvas.getContext('2d');
+
+        // Calculate a new endpoint that is 90% of the distance from the start point to the end point
+        const distance = Math.sqrt(Math.pow(endx - startx, 2) + Math.pow(endy - starty, 2));
+
+        let scaledPercentage = 0.8 + (0.99 - 0.8) * (distance - 50) / (200 - 50);
+        console.log(distance);
+
+        let ratio = scaledPercentage; // Adjust this ratio as needed
+        if (ratio > 1) {
+            ratio = 0.982;
+        }
+        const newEndx = startx + ratio * (endx - startx);
+        const newEndy = starty + ratio * (endy - starty);
+
+        // Begin the path
+        ctx.beginPath();
+        // Move to the start point
+        ctx.moveTo(startx, starty);
+        // Draw a line to the new endpoint
+        ctx.lineTo(newEndx, newEndy);
+        ctx.lineWidth = 5;
+        // Set line style
+        ctx.strokeStyle = 'black'; // You can set any color you want
+        // Draw the line
+        ctx.stroke();
+
+        const angle = Math.atan2(endy - starty, endx - startx);
+        ctx.beginPath();
+        // Calculate arrowhead points
+        ctx.moveTo(newEndx, newEndy);
+        ctx.lineTo(newEndx - 20 * Math.cos(angle - Math.PI / 6), newEndy - 20 * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(newEndx, newEndy);
+        ctx.lineTo(newEndx - 20 * Math.cos(angle + Math.PI / 6), newEndy - 20 * Math.sin(angle + Math.PI / 6));
+        // Set arrowhead style
+        ctx.strokeStyle = 'black';
+        // Draw the arrowhead
+        ctx.stroke();
+
+    };
+
+    const undoLine = () => {
+        const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+        const ctx = canvas.getContext('2d');
+        // Clear the canvas
+        ctx.clearRect(curx, cury, curwidth, curheight);
+        ctx.drawImage(picture, curx, cury, curwidth, curheight);
+
+        //setReload(true);
+    };
+
+    const getButtonCoordinatesById = (id) => {
+        const button = buttonRefs.current[id];
+        if (button) {
+            const rect = button.getBoundingClientRect();
+            return {x: (rect.left + rect.right) / 2, y: (rect.top + rect.bottom) / 2};
+        } else {
+            return {x: 0, y: 0}; // Default position if button is not found
+        }
+    };
+
+    const searchDictionaryByName = (dictionary, name) => {
+        for (const entry of dictionary) {
+            if (entry.name === name) {
+                return entry;
             }
         }
+    };
 
-        const highlightadjbutton = (startId: string) => {
-            //increaseTroops(startId);
-            const adjacentTerritories = adjDict.dict[startId];
-            console.log(adjacentTerritories);
-            for (const territory of adjacentTerritories) {
-                const button = buttonRefs.current[territory]
-                button.style.border = "2px solid white";
-            }
+    const UpdateLocalButtons = (all_territories) => {
+        // for(const territories of all_territories){
+        //     buttonData[territories].playerid = all_territories
+        // }
+        console.log("THIS DATA")
+        console.log(searchDictionaryByName(all_territories, "Peru"));
+
+    };
+
+    //const redButton = document.getElementById('redButton');
+    const containerStyle: React.CSSProperties = {
+        position: 'fixed',
+        bottom: '10px',
+        right: '0',
+    };
+
+    const imagePairStyle: React.CSSProperties = {
+        display: 'flex',
+    };
+
+    const avatarStylePlaying: React.CSSProperties = {
+        width: '75px', // Adjust the size of the circle
+        height: '75px', // Adjust the size of the circle
+        borderRadius: '50%', // Makes the image circular
+        overflow: 'hidden', // Hides the overflow
+        marginRight: '10px', // Adjust the space between images
+        border: '4px solid red', // Red outline
+    };
+
+    const avatarStyle: React.CSSProperties = {
+        width: '75px', // Adjust the size of the circle
+        height: '75px', // Adjust the size of the circle
+        borderRadius: '50%', // Makes the image circular
+        overflow: 'hidden', // Hides the overflow
+        marginRight: '10px', // Adjust the space between image
+    };
+
+    const imageStyle: React.CSSProperties = {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover', // Ensures the image covers the entire circle
+    };
+    const AvatarCreation = () => {
+        let newNum = num + 1;
+        if (newNum >= 4) {
+            newNum = 0;
         }
+        setNum(newNum);
+        console.log(newNum)
+        setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
+    }
 
-        const dehighlightadjbutton = (startId: string) => {
-            const adjacentTerritories = adjDict.dict[startId];
-            console.log(adjacentTerritories);
-            for (const territory of adjacentTerritories) {
-                const button = buttonRefs.current[territory]
-                button.style.border = "2px solid black";
-            }
-            for (const territory of curListOfValidReinforcements) {
-                const button = buttonRefs.current[territory]
-                button.style.border = "2px solid black";
-            }
-        }
-
-        const drawLine = (startId: string, endId: string) => {
-            let {x: startx, y: starty} = getButtonCoordinatesById(startId);
-            let {x: endx, y: endy} = getButtonCoordinatesById(endId);
-
-            const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-            const ctx = canvas.getContext('2d');
-
-            // Calculate a new endpoint that is 90% of the distance from the start point to the end point
-            const distance = Math.sqrt(Math.pow(endx - startx, 2) + Math.pow(endy - starty, 2));
-
-            let scaledPercentage = 0.8 + (0.99 - 0.8) * (distance - 50) / (200 - 50);
-            console.log(distance);
-
-            let ratio = scaledPercentage; // Adjust this ratio as needed
-            if (ratio > 1) {
-                ratio = 0.982;
-            }
-            const newEndx = startx + ratio * (endx - startx);
-            const newEndy = starty + ratio * (endy - starty);
-
-            // Begin the path
-            ctx.beginPath();
-            // Move to the start point
-            ctx.moveTo(startx, starty);
-            // Draw a line to the new endpoint
-            ctx.lineTo(newEndx, newEndy);
-            ctx.lineWidth = 5;
-            // Set line style
-            ctx.strokeStyle = 'black'; // You can set any color you want
-            // Draw the line
-            ctx.stroke();
-
-            const angle = Math.atan2(endy - starty, endx - startx);
-            ctx.beginPath();
-            // Calculate arrowhead points
-            ctx.moveTo(newEndx, newEndy);
-            ctx.lineTo(newEndx - 20 * Math.cos(angle - Math.PI / 6), newEndy - 20 * Math.sin(angle - Math.PI / 6));
-            ctx.moveTo(newEndx, newEndy);
-            ctx.lineTo(newEndx - 20 * Math.cos(angle + Math.PI / 6), newEndy - 20 * Math.sin(angle + Math.PI / 6));
-            // Set arrowhead style
-            ctx.strokeStyle = 'black';
-            // Draw the arrowhead
-            ctx.stroke();
-
-        };
-
-        const undoLine = () => {
-            const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-            const ctx = canvas.getContext('2d');
-            // Clear the canvas
-            ctx.clearRect(curx, cury, curwidth, curheight);
-            ctx.drawImage(picture, curx, cury, curwidth, curheight);
-
-            //setReload(true);
-        };
-
-        const getButtonCoordinatesById = (id) => {
-            const button = buttonRefs.current[id];
-            if (button) {
-                const rect = button.getBoundingClientRect();
-                return {x: (rect.left + rect.right) / 2, y: (rect.top + rect.bottom) / 2};
-            } else {
-                return {x: 0, y: 0}; // Default position if button is not found
-            }
-        };
-
-        //const redButton = document.getElementById('redButton');
-        const containerStyle: React.CSSProperties = {
-            position: 'fixed',
-            bottom: '10px',
-            right: '0',
-        };
-
-        const imagePairStyle: React.CSSProperties = {
-            display: 'flex',
-        };
-
-        const avatarStylePlaying: React.CSSProperties = {
-            width: '75px', // Adjust the size of the circle
-            height: '75px', // Adjust the size of the circle
-            borderRadius: '50%', // Makes the image circular
-            overflow: 'hidden', // Hides the overflow
-            marginRight: '10px', // Adjust the space between images
-            border: '4px solid red', // Red outline
-        };
-
-        const avatarStyle: React.CSSProperties = {
-            width: '75px', // Adjust the size of the circle
-            height: '75px', // Adjust the size of the circle
-            borderRadius: '50%', // Makes the image circular
-            overflow: 'hidden', // Hides the overflow
-            marginRight: '10px', // Adjust the space between image
-        };
-
-        const imageStyle: React.CSSProperties = {
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover', // Ensures the image covers the entire circle
-        };
-        const AvatarCreation = () => {
-            let newNum = num + 1;
-            if (newNum >= 4) {
-                newNum = 0;
-            }
-            setNum(newNum);
-            console.log(newNum)
-            setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
-        }
-
-        const fetchData = async () => {
-            try {
-                const config = {Authorization: localStorage.getItem("lobbyToken")};
-                // get lobby info
-                console.log(config)
-                const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, {headers: config});
-                const lobbyData = getLobbyResponse.data;
-
-                // set the userIdList to an array of longs consisting of all the user IDs in the lobby
-                let userIdList = lobbyData.players;
-
-                const requestBody = JSON.stringify({userIdList})
-                const getUserResponse = await api.post("users/lobbies", requestBody);
-
-                // Set the state after fetching data
-                let requestBodyGame = JSON.stringify({lobbyId})
-                const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config}, requestBodyGame)
+    const LoadData = async () => {
+        try {
+            const config = {Authorization: localStorage.getItem("lobbyToken")};
+            if(Game === null){
+                console.log("AFANG");
+                const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config})
                 console.log(getGame.data)
+                const curgame = getGame.data;
+                const currentplayer = (curgame.turnCycle.currentPlayer.playerId);
+                setGame(curgame);
+                setCurPlayer(currentplayer);
+                UpdateLocalButtons(curgame.board.territories);
+            } else {
+                if(curPlayer !== localStorage.getItem("user_id")){
+                const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config})
+                console.log(getGame.data)
+                const curgame = getGame.data;
+                const currentplayer = (curgame.turnCycle.currentPlayer.playerId);
+                setGame(curgame);
+                setCurPlayer(currentplayer);
+                UpdateLocalButtons(curgame.board.territories);
+            }}
 
-                getUserResponse.data.forEach(user => {
-                    // Access each user object here
+        } catch (error) {
+            alert(`Something went wrong with fetching the user data: \n${handleError(error)}`);
+        }
+    };
 
-                    if (avatarPos === 0) {
-                        setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                        setAvatarPos(num + 1)
-                    } else if (avatarPos === 1) {
-                        setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                        setAvatarPos(num + 1)
-                    } else if (avatarPos === 2) {
-                        setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                        setAvatarPos(num + 1)
-                    } else if (avatarPos === 3) {
-                        setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                        setAvatarPos(num + 1)
-                    }
-                });
+    const fetchData = async () => {
+        try {
+            const config = {Authorization: localStorage.getItem("lobbyToken")};
+            // get lobby info
+            console.log(config)
+            const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, {headers: config});
+            const lobbyData = getLobbyResponse.data;
 
-            } catch (error) {
-                alert(`Something went wrong with fetching the user data: \n${handleError(error)}`);
-            }
-        };
-        const nextSate = document.getElementById('nextState');
-        React.useEffect(() => {
-            async function gettheUser(id) {
-                try {
-                    const config = {
-                        Authorization: localStorage.getItem("token"),
-                        User_ID: localStorage.getItem("user_id")
-                    };
-                    const response = await api.get("/users/" + id, {headers: config});
-                    avatarId = response.data.avatarId
-                    setAnzeige(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[avatarId]}`);
-                } catch (error) {
-                    alert(
-                        `Something went wrong with fetching the user data: \n${handleError(error)}`
-                    );
+            // set the userIdList to an array of longs consisting of all the user IDs in the lobby
+            let userIdList = lobbyData.players;
+
+            const requestBody = JSON.stringify({userIdList})
+            const getUserResponse = await api.post("users/lobbies", requestBody);
+
+            // Set the state after fetching data
+            let requestBodyGame = JSON.stringify({lobbyId})
+            const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config})
+            console.log(getGame.data)
+
+            getUserResponse.data.forEach(user => {
+                // Access each user object here
+
+                if (avatarPos === 0) {
+                    setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num + 1)
+                } else if (avatarPos === 1) {
+                    setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num + 1)
+                } else if (avatarPos === 2) {
+                    setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num + 1)
+                } else if (avatarPos === 3) {
+                    setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
+                    setAvatarPos(num + 1)
                 }
-            };
+            });
 
-            fetchData()
-            // Canvas setup
+        } catch (error) {
+            alert(`Something went wrong with fetching the user data: \n${handleError(error)}`);
+        }
+    };
+
+    const ReloadScreen = async () => {
+        try {
+            const config = {Authorization: localStorage.getItem("lobbyToken")};
+            const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config})
+            //console.log(getGame.data)
+
             const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
             const ctx = canvas.getContext('2d');
             const imageSrc = require('./RiskMap21.png');
-
-            const resizeCanvas = () => {
-                canvas.width = canvas.parentElement.clientWidth;
+            canvas.width = canvas.parentElement.clientWidth;
                 canvas.height = canvas.parentElement.clientHeight;
 
                 const image = new Image();
@@ -777,15 +811,15 @@ const TitleScreen: React.FC = () => {
                         const curbutton = buttonData.find(button => button.id === buttonId);
 
                         if (curbutton.playerid === 1) {
-                            button.style.backgroundColor = color[0];
-                        } else if (curbutton.playerid === 2) {
                             button.style.backgroundColor = color[1];
-                        } else if (curbutton.playerid === 3) {
+                        } else if (curbutton.playerid === 2) {
                             button.style.backgroundColor = color[2];
-                        } else if (curbutton.playerid === 4) {
+                        } else if (curbutton.playerid === 3) {
                             button.style.backgroundColor = color[3];
-                        } else {
+                        } else if (curbutton.playerid === 4) {
                             button.style.backgroundColor = color[4];
+                        } else {
+                            button.style.backgroundColor = color[0];
                         }
 
                     });
@@ -824,68 +858,107 @@ const TitleScreen: React.FC = () => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(image, x, y, drawWidth, drawHeight);
                     resizeButtons(x, y, drawWidth, drawHeight);
+
+            };
+        } catch (error) {
+            alert(`Something went wrong with fetching the user data: \n${handleError(error)}`);
+        }
+    };
+
+    React.useEffect(() => {
+        async function gettheUser(id) {
+            try {
+                const config = {
+                    Authorization: localStorage.getItem("token"),
+                    User_ID: localStorage.getItem("user_id")
                 };
-            };
+                const response = await api.get("/users/" + id, {headers: config});
+                avatarId = response.data.avatarId
+                setAnzeige(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[avatarId]}`);
+            } catch (error) {
+                alert(
+                    `Something went wrong with fetching the user data: \n${handleError(error)}`
+                );
+            }
+        }
 
-            // Initial setup
-            resizeCanvas();
+        fetchData()
+        ReloadScreen();
+        // Canvas setup
 
-            // Handle resize event
-            window.addEventListener('resize', resizeCanvas);
+        // Handle resize event
+        window.addEventListener('resize', ReloadScreen);
 
-            return () => {
-                window.removeEventListener('resize', resizeCanvas);
-            };
-        }, []);
+        return () => {
+            window.removeEventListener('resize', ReloadScreen);
+        };
+    }, []);
 
-        return (
-            <div className="gamescreen-container">
-                <div className="gamescreen-innerupper-container">
-                    <canvas id="myCanvas"></canvas>
-                    {/* North America */}
-                    {buttonData.map((button) => (
-                        <button
-                            key={button.id}
-                            id={button.id}
-                            ref={(buttonRef) => {
-                                if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
-                            }}
-                            className="button"
-                            style={{backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue'}}
-                            onClick={() => handleButtonClick(button.id)}
-                        >
-                            {button.troops}
-                        </button>
-                    ))}
-                </div>
-                <div className="gamescreen-innerlower-container">
-                    <div className="gamescreen-bottomleft-container">
-                        <button
-                            id="nextState"
-                            className="gamescreen-buttons-container"
-                            style={{
-                                left: '5%',
-                                top: '50%',
-                                backgroundColor: 'red',
-                                transform: 'translateY(-50%)',
-                            }}
-                            onClick={() => {// Set the value of x here
-                                const cur = nextState();
-                                const buttonText =
-                                    cur === 1
-                                        ? 'Go to Attack'
-                                        : cur === 2
-                                            ? 'Go to Reinforce'
-                                            : cur === 3
-                                                ? 'End the Turn'
-                                                : 'Beginning State';
-                                setButtonStateText(buttonText)
 
-                            }}
-                        >
-                            {buttonStateText}
-                        </button>
-                        {/*                    <button
+    React.useEffect(() => {
+        const loadDataInterval = setInterval(async () => {
+            await LoadData();
+        }, 2000000); // Interval set to 2 seconds (2000 milliseconds)
+
+        // Call LoadData initially
+        LoadData();
+
+        // Cleanup function to clear the interval when the component unmounts or the effect is re-executed
+        return () => {
+            clearInterval(loadDataInterval);
+        };
+    }, []);
+
+
+
+    return (
+        <div className="gamescreen-container">
+            <div className="gamescreen-innerupper-container">
+                <canvas id="myCanvas"></canvas>
+                {/* North America */}
+                {buttonData.map((button) => (
+                    <button
+                        key={button.id}
+                        id={button.id}
+                        ref={(buttonRef) => {
+                            if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
+                        }}
+                        className="button"
+                        style={{backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue'}}
+                        onClick={() => handleButtonClick(button.id)}
+                    >
+                        {button.troops}
+                    </button>
+                ))}
+            </div>
+            <div className="gamescreen-innerlower-container">
+                <div className="gamescreen-bottomleft-container">
+                    <button
+                        id="nextState"
+                        className="gamescreen-buttons-container"
+                        style={{
+                            left: '5%',
+                            top: '50%',
+                            backgroundColor: 'red',
+                            transform: 'translateY(-50%)',
+                        }}
+                        onClick={() => {// Set the value of x here
+                            const cur = nextState();
+                            const buttonText =
+                                cur === 1
+                                    ? 'Go to Attack'
+                                    : cur === 2
+                                        ? 'Go to Reinforce'
+                                        : cur === 3
+                                            ? 'End the Turn'
+                                            : 'Beginning State';
+                            setButtonStateText(buttonText)
+
+                        }}
+                    >
+                        {buttonStateText}
+                    </button>
+                    {/*                    <button
                         id="nextState"
                         className="gamescreen-buttons-container"
                         style={{
@@ -898,63 +971,62 @@ const TitleScreen: React.FC = () => {
                     >
                         Next Player
                     </button>*/}
-                        <div
-                            id="nextState"
-                            className="gamescreen-buttons-container"
-                            style={{
-                                left: '45%',
-                                top: '50%', // Change top to 50% to position it in the vertical middle
-                                transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
-                                backgroundColor: 'red',
-                                display: 'inline-block',
-                            }}
-                        >
-                            Troop Amount: {curTroopAmount}
-                        </div>
-                    </div>
-                    <div className="gamescreen-bottomright-container">
-                        {num !== 0 ? (
-                            <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                        {num !== 1 ? (
-                            <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                        {num !== 2 ? (
-                            <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                        {num !== 3 ? (
-                            <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
+                    <div
+                        id="nextState"
+                        className="gamescreen-buttons-container"
+                        style={{
+                            left: '45%',
+                            top: '50%', // Change top to 50% to position it in the vertical middle
+                            transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
+                            backgroundColor: 'red',
+                            display: 'inline-block',
+                        }}
+                    >
+                        Troop Amount: {curTroopAmount}
                     </div>
                 </div>
+                <div className="gamescreen-bottomright-container">
+                    {num !== 0 ? (
+                        <div style={avatarStyle}>
+                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                        </div>
+                    ) : (
+                        <div style={avatarStylePlaying}>
+                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                        </div>
+                    )}
+                    {num !== 1 ? (
+                        <div style={avatarStyle}>
+                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                        </div>
+                    ) : (
+                        <div style={avatarStylePlaying}>
+                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                        </div>
+                    )}
+                    {num !== 2 ? (
+                        <div style={avatarStyle}>
+                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                        </div>
+                    ) : (
+                        <div style={avatarStylePlaying}>
+                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                        </div>
+                    )}
+                    {num !== 3 ? (
+                        <div style={avatarStyle}>
+                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                        </div>
+                    ) : (
+                        <div style={avatarStylePlaying}>
+                            <img src={anzeige} alt="avatar" style={imageStyle}/>
+                        </div>
+                    )}
+                </div>
             </div>
-        );
-    }
-
+        </div>
+    );
+}
 
 
 export default TitleScreen;
