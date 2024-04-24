@@ -69,13 +69,15 @@ const TitleScreen: React.FC = () => {
     };
 
     
-    const closeModal = () => {
+    const closeModal = async () => {
+        const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
+        setGame(updatedGame.data);
         setIsModalOpen(false);
-        window.location.reload();
+        undoLine();
     };
 
     useEffect(() => {
-        console.log("isModalOpen", isModalOpen);
+        //console.log("isModalOpen", isModalOpen);
     }, [isModalOpen]);
     /*-------------------------------------------------*/
 
@@ -135,7 +137,7 @@ const TitleScreen: React.FC = () => {
     useEffect (() => {
         async function getGame() {
             const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
-            console.log("gameResponse", gameResponse);
+            //console.log("gameResponse", gameResponse);
             setGame(gameResponse.data);
             setPhase(gameResponse.data.turnCycle.currentPhase);
             setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
@@ -156,31 +158,30 @@ const TitleScreen: React.FC = () => {
 
             console.log("playerOrder:", playerOrder);
 
-            if(!playerOrder) {
-                for(let j = 0; j < game.players.length; j++){
+            for(let j = 0; j < game.players.length; j++){
 
+                if(!playerOrder) {
+                    console.log("are you here?");
                     if (playerColors.length === 0) {
                         console.log('No more colors to select');
                         break;
-                      }
-    
+                        }
+
                     // Get a random index from the remaining values array
                     const randomIndex = Math.floor(Math.random() * playerColors.length);
-    
+
                     // Get the random value from the remaining values array
                     const randomValue = playerColors[randomIndex];
-    
+
                     // Remove the selected value from the remaining values array
                     const updatedPlayerColors = playerColors.filter((value, index) => index !== randomIndex);
                     playerColors = updatedPlayerColors;
-                      
                     order[game.players[j].playerId] = randomValue;
-                    // console.log("playerId: ", game.players[j].playerId);
-                    // console.log("color: ", order[game.players[j].playerId]);
+                    setPlayerOrder(order);
                 }
+                // console.log("playerId: ", game.players[j].playerId);
+                // console.log("color: ", order[game.players[j].playerId]);
             }
-            
-            setPlayerOrder(order);
 
             for(let i = 0; i < buttonData.length; i++){
                 const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
@@ -276,7 +277,6 @@ const TitleScreen: React.FC = () => {
                 dehighlightadjbutton(startButton);}
             undoLine();
             setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
-            console.log("troopBonus set");
         }
         else{
             if(startButton){
@@ -308,7 +308,7 @@ const TitleScreen: React.FC = () => {
 
             setButtonData([...buttonData]); // Update the button data array in the state
             setGame(game);
-            console.log("territory: ", territory);
+            //console.log("territory: ", territory);
         }
     }
 
@@ -340,17 +340,29 @@ const TitleScreen: React.FC = () => {
 
     const highlightadjbutton = (startId: string) => {
         //increaseTroops(startId);
-        const adjacentTerritories = adjDict.dict[startId];
-        console.log(adjacentTerritories);
-        for(const territory of adjacentTerritories){
-            const button = buttonRefs.current[territory]
-            button.style.border= "2px solid white";
+        if(phase === "ATTACK"){
+            const adjacentTerritories = adjDict.dict[startId];
+            let enemyAdjacentTerritories = [];
+            for(let name of adjacentTerritories){
+                const territory = game.board.territories.find(territory => territory.name === name);
+                //console.log("territory: ", territory);
+                //console.log("currentPlayer:", currentPlayerId);
+                if(territory.owner !== currentPlayerId){
+                    enemyAdjacentTerritories.push(name);
+                }
+            }
+            //console.log("enemy: ",enemyAdjacentTerritories);
+            for(const territory of enemyAdjacentTerritories){
+                const button = buttonRefs.current[territory];
+                button.style.border= "2px solid white";
+            }
         }
+        
     }
 
     const dehighlightadjbutton = (startId: string) => {
         const adjacentTerritories = adjDict.dict[startId];
-        console.log(adjacentTerritories);
+        //console.log(adjacentTerritories);
         for(const territory of adjacentTerritories){
             const button = buttonRefs.current[territory]
             button.style.border = "2px solid black";
@@ -368,7 +380,7 @@ const TitleScreen: React.FC = () => {
         const distance = Math.sqrt(Math.pow(endx - startx, 2) + Math.pow(endy - starty, 2));
 
         let scaledPercentage = 0.8 + (0.99 - 0.8) * (distance - 50) / (200 - 50);
-        console.log(distance);
+        //console.log(distance);
 
         let ratio = scaledPercentage; // Adjust this ratio as needed
         if(ratio > 1){
@@ -462,7 +474,7 @@ const TitleScreen: React.FC = () => {
             newNum = 0;
         }
         setNum(newNum);
-        console.log(newNum)
+        //console.log(newNum)
         setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
     }
 
@@ -470,7 +482,7 @@ const TitleScreen: React.FC = () => {
         try {
             const config = { Authorization: localStorage.getItem("lobbyToken") };
             // get lobby info
-            console.log(config)
+            //console.log(config)
             const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, { headers: config });
             const lobbyData = getLobbyResponse.data;
 
@@ -483,7 +495,7 @@ const TitleScreen: React.FC = () => {
             // Set the state after fetching data
             let requestBodyGame =JSON.stringify({lobbyId})
             const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config }, requestBodyGame)
-            console.log(getGame.data)
+            //console.log(getGame.data)
 
             getUserResponse.data.forEach(user => {
                 // Access each user object here
@@ -556,9 +568,15 @@ const TitleScreen: React.FC = () => {
 
                 //console.log("playerOrder:", playerOrder);
 
-                if(game !== null){
+                // had to do an extremely ugly work around because of the async behaviour of useState, but it works :)
+                if(playerOrder !== null){
+                    console.log("hello?");
                     const territory = game.board.territories.find(territory => territory.name === buttonId);
                     button.style.backgroundColor = playerOrder[territory.owner];
+                }
+                else if (game !== null){
+                    const territory = game.board.territories.find(territory => territory.name === buttonId);
+                    button.style.backgroundColor = order[territory.owner];
                 }
 
             });
@@ -609,8 +627,9 @@ const TitleScreen: React.FC = () => {
         return () => {
             window.removeEventListener('resize', resizeCanvas);
         };
-    }, [playerOrder]);
+    }, [game]);
 
+    // button mapping
     let renderButtons = (
         buttonData.map((button) => (
             <button
@@ -620,7 +639,6 @@ const TitleScreen: React.FC = () => {
                     if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
                 }}
                 className="button"
-                style={{ backgroundColor: (button.refKey === 'red' ? 'red' : 'blue')}}
                 onClick={() => handleButtonClick(button.id)}
             >
                 {button.troops}
@@ -628,6 +646,7 @@ const TitleScreen: React.FC = () => {
         ))
     );
 
+    // lower screen content
     let lowerContent = (<div className="gamescreen-innerlower-container">
     <div className="gamescreen-bottomleft-container">
         <button
@@ -714,9 +733,9 @@ const TitleScreen: React.FC = () => {
                     />
                 </section>
                 <canvas id="myCanvas"></canvas>
-                {isModalOpen ? (null) : renderButtons}
+                {renderButtons}
             </div>
-            {isModalOpen ? (null) : lowerContent}
+            {lowerContent}
             
         </div>
     );
