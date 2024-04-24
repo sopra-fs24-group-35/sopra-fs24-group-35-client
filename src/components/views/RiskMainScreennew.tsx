@@ -5,7 +5,7 @@ import "styles/views/TitleScreennew.scss";
 import {Button} from "../ui/Button";
 import BaseContainer from "../ui/BaseContainer";
 
-const TitleScreen: React.FC = () => {
+const TitleScreen2: React.FC = () => {
     return (
         <div className="basescreen title-screen">
             <div className="basescreen overlay"></div>
@@ -28,4 +28,4 @@ const TitleScreen: React.FC = () => {
     );
 }
 
-export default TitleScreen;
+export default TitleScreen2;

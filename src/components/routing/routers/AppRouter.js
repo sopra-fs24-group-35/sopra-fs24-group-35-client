@@ -9,6 +9,7 @@ import Registration from "../../views/Registration";
 import UserProfile from "../../views/UserProfile";
 import LobbyErstellen from "../../views/LobbyErstellen";
 import RiskMainScreen from "../../views/RiskMainScreen";
+import RiskMainScreencopy from "../../views/RiskMainScreencopy";
 import JoinScreen from "../../views/joinScreen";
 import LobbyScreen from "../../views/LobbyScreen";
 import AvatarPage from "../../views/AvatarPage";
