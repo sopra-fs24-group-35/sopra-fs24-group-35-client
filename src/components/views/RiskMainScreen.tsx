@@ -190,8 +190,8 @@ const TitleScreen: React.FC = () => {
             dehighlightadjbutton(startButton);
             drawLine(startButton, id);
             setDrawingLine(true); // Enable drawing line mode
-            const territory_def = startButton;
-            const territory_atk = id;
+            const territory_def = id;
+            const territory_atk = startButton;
             const cont = JSON.stringify({territory_def, territory_atk});
             openModal(cont);
         } else {
@@ -543,7 +543,8 @@ const TitleScreen: React.FC = () => {
         };
     }, []);
 
-    const renderButtons = (buttonData.map((button) => (
+    let renderButtons = (
+        buttonData.map((button) => (
         <button
             key={button.id}
             id={button.id}
@@ -557,6 +558,100 @@ const TitleScreen: React.FC = () => {
             {button.troops}
         </button>
     )));
+
+    let lowerContent = (<div className="gamescreen-innerlower-container">
+    <div className="gamescreen-bottomleft-container">
+        <button
+            id="nextState"
+            className="gamescreen-buttons-container"
+            style={{
+                left: '5%',
+                top: '50%',
+                backgroundColor: 'red',
+                transform: 'translateY(-50%)',
+            }}
+            onClick={() => {// Set the value of x here
+                const cur = nextState();
+                const buttonText =
+                    cur === 1
+                        ? 'Go to Attack'
+                        : cur === 2
+                            ? 'Go to Reinforce'
+                            : cur === 3
+                                ? 'End the Turn'
+                                : 'Beginning State';
+                setButtonStateText(buttonText)
+
+            }}
+        >
+            {buttonStateText}
+        </button>
+{/*                    <button
+            id="nextState"
+            className="gamescreen-buttons-container"
+            style={{
+                left: '60%',
+                top: '25%',
+                backgroundColor: 'red',
+
+            }}
+            onClick={() => AvatarCreation()}
+        >
+            Next Player
+        </button>*/}
+        <div
+            id="nextState"
+            className="gamescreen-buttons-container"
+            style={{
+                left: '45%',
+                top: '50%', // Change top to 50% to position it in the vertical middle
+                transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
+                backgroundColor: 'red',
+                display: 'inline-block',
+            }}
+        >
+            Troop Amount: {curTroopAmount}
+        </div>
+    </div>
+    <div className="gamescreen-bottomright-container">
+        {num !== 0 ? (
+            <div style={avatarStyle}>
+                <img src={anzeige} alt="avatar" style={imageStyle}/>
+            </div>
+        ) : (
+            <div style={avatarStylePlaying}>
+                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+            {num !== 1 ? (
+                <div style={avatarStyle}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            ) : (
+                <div style={avatarStylePlaying}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+            {num !== 2 ? (
+                <div style={avatarStyle}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            ) : (
+                <div style={avatarStylePlaying}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+            {num !== 3 ? (
+                <div style={avatarStyle}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            ) : (
+                <div style={avatarStylePlaying}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+    </div>
+</div>);
 
     return (
         <div className="gamescreen-container">
@@ -574,99 +669,8 @@ const TitleScreen: React.FC = () => {
                 <canvas id="myCanvas"></canvas>
                 {isModalOpen ? (null) : renderButtons}
             </div>
-            <div className="gamescreen-innerlower-container">
-                <div className="gamescreen-bottomleft-container">
-                    <button
-                        id="nextState"
-                        className="gamescreen-buttons-container"
-                        style={{
-                            left: '5%',
-                            top: '50%',
-                            backgroundColor: 'red',
-                            transform: 'translateY(-50%)',
-                        }}
-                        onClick={() => {// Set the value of x here
-                            const cur = nextState();
-                            const buttonText =
-                                cur === 1
-                                    ? 'Go to Attack'
-                                    : cur === 2
-                                        ? 'Go to Reinforce'
-                                        : cur === 3
-                                            ? 'End the Turn'
-                                            : 'Beginning State';
-                            setButtonStateText(buttonText)
-
-                        }}
-                    >
-                        {buttonStateText}
-                    </button>
-{/*                    <button
-                        id="nextState"
-                        className="gamescreen-buttons-container"
-                        style={{
-                            left: '60%',
-                            top: '25%',
-                            backgroundColor: 'red',
-
-                        }}
-                        onClick={() => AvatarCreation()}
-                    >
-                        Next Player
-                    </button>*/}
-                    <div
-                        id="nextState"
-                        className="gamescreen-buttons-container"
-                        style={{
-                            left: '45%',
-                            top: '50%', // Change top to 50% to position it in the vertical middle
-                            transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
-                            backgroundColor: 'red',
-                            display: 'inline-block',
-                        }}
-                    >
-                        Troop Amount: {curTroopAmount}
-                    </div>
-                </div>
-                <div className="gamescreen-bottomright-container">
-                    {num !== 0 ? (
-                        <div style={avatarStyle}>
-                            <img src={anzeige} alt="avatar" style={imageStyle}/>
-                        </div>
-                    ) : (
-                        <div style={avatarStylePlaying}>
-                            <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                        {num !== 1 ? (
-                            <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                        {num !== 2 ? (
-                            <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                        {num !== 3 ? (
-                            <div style={avatarStyle}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                </div>
-            </div>
+            {isModalOpen ? (null) : lowerContent}
+            
         </div>
     );
 }

@@ -17,6 +17,7 @@
     background-size: cover;
     background-position: center;
     position: relative; //!* To position buttons relative to title-screen *!
+    @include center;
   }
 
   &.form {
