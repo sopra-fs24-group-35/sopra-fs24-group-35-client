@@ -39,10 +39,10 @@ class AdjDict {
             "Middle East" : ["Southern Europe", "Ukraine", "Afghanistan", "India", "East Africa", "Egypt"],
             "India" : ["Middle East", "Afghanistan", "China", "Siam"],
             "Siam" : ["India", "China", "Indonesia"],
-            "Indonesia" : ["Siam", "New Guniea", "Western Australia"],
-            "New Guniea" : ["Indonesia", "Western Australia", "Eastern Australia"],
-            "Western Australia" : ["Indonesia", "Eastern Australia", "New Guniea"],
-            "Eastern Australia" : ["Western Australia", "New Guniea"]
+            "Indonesia" : ["Siam", "New Guinea", "Western Australia"],
+            "New Guinea" : ["Indonesia", "Western Australia", "Eastern Australia"],
+            "Western Australia" : ["Indonesia", "Eastern Australia", "New Guinea"],
+            "Eastern Australia" : ["Western Australia", "New Guinea"]
 
         }
     }
