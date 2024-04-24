@@ -6,6 +6,7 @@ import { Button } from "components/ui/Button";
 import "styles/views/Login.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
+let riskLogo = require("./Risk.png");
 
 /*
 It is possible to add multiple components inside a single file,
@@ -65,26 +66,28 @@ const LobbyErstellen = () => {
   }
 
   return (
-    <div className="basescreen title-screen">
+    <div className="basescreen title-screen" style={{ position: 'relative' }}>
       <div className="basescreen overlay"></div>
-      <BaseContainer>
-        <div className="basescreen form">
-          <div className="basescreen title">Risk: Global Domination</div>
-          <div className="basescreen buttons-container" style={{ gap: '30px' }}>
-            <Button
-              width="100%"
-              onClick={() => navigate("/join")}>
-              Join Lobby
-            </Button>
-            <Button
-              width="100%"
-              onClick={() => doLobbyCreate()}>
-
-              Crate Lobby
-            </Button>
-          </div>
+      <div className="basescreen title" style={{ marginBottom: '50px' }}>
+        <img src={riskLogo} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', position: 'absolute', top: '0', left: '50%', transform: `translate(${-50}%, ${-10}%)` }} alt="My Image" />
+      </div>
+      
+      <div className="basescreen form" style={{ height: '150px', transform: `translate(${0}%, ${70}%)`}}>
+        <div className="basescreen buttons-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1, marginTop: '20px' }}>
+          <Button
+            width="100%"
+            onClick={() => navigate("/join")}
+            style={{ marginBottom: '15px' }}>
+            Join Lobby
+          </Button>
+          <Button
+            width="100%"
+            onClick={() => doLobbyCreate()}>
+            Create Lobby
+          </Button>
         </div>
-      </BaseContainer>
+      </div>
+      
     </div>
   );
 };
