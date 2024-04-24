@@ -78,7 +78,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
     }    
     
     fetchData();
-  }, []);
+  }, [game]);
 
   const attack = async() => {
     const config = { Authorization: localStorage.getItem("lobbyToken") };

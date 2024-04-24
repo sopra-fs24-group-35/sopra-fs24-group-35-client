@@ -1,10 +1,10 @@
-class User {
+class Game{
     constructor(data = {}) {
-        gameId = this.gameId;
-        board = this.board;
-        players = this.players;
-        turnCycle = this.turnCycle;
-        diceResult = this.diceResult;
+        this.gameId = null;
+        this.board = null;
+        this.players = null;
+        this.turnCycle = null;
+        this.diceResult = null;
         Object.assign(this, data);
     }
 }
