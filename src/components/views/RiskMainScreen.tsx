@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 //import React, { useEffect } from 'react';
 import "styles/views/GameScreen.scss";
 import { api, handleError } from "helpers/api";
@@ -14,9 +14,15 @@ import ModalWin from "../ui/ModalWin";
 import LooseModal from "../ui/LooseModal";
 import { Simulate } from "react-dom/test-utils";
 import play = Simulate.play;
+import Game from "models/Game";
 
 
 const TitleScreen: React.FC = () => {
+
+    const [game, setGame] = useState<Game>(null);
+    const [phase, setPhase] = useState(null);
+    const [currentPlayerId, setCurrentPlayerId] = useState(null);
+
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
     const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
@@ -35,6 +41,8 @@ const TitleScreen: React.FC = () => {
     const [avatar4Id, setAvatar4Id] = useState(null);
     const {gameId} = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
+    const [users, setUsers] = useState<User[]>(null);
+    const [anzeige, setAnzeige] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const [startButton, setStartButton] = useState<string | null>(null);
     const [endButton, setEndButton] = useState<string | null>(null);
     const [drawingLine, setDrawingLine] = useState(false);
@@ -57,9 +65,32 @@ const TitleScreen: React.FC = () => {
     const [picture, setPicture] = useState(null);
 
     const [curstate, setCurState] = useState(1);
-    const [buttonStateText, setButtonStateText] = useState('Go to Attack');
+    //const [buttonStateText, setButtonStateText] = useState('Go to Attack');
     const [curTroopAmount, setCurTroopAmount] = useState(15);
     const color = ["red", "blue", "violet", "green", "orange"];
+
+    /*---------------Attack Modal Setup----------------*/
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [modalContent, setModalContent] = useState({
+        territory_def: "Add territory name here",
+        territory_atk: "Add territory name here",
+    });
+
+    const openModal = (content) => {
+        setIsModalOpen(true);
+        setModalContent(JSON.parse(content));
+    };
+
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        window.location.reload();
+    };
+
+    useEffect(() => {
+        console.log("isModalOpen", isModalOpen);
+    }, [isModalOpen]);
+    /*-------------------------------------------------*/
 
     const [buttonData, setButtonData] = useState([
         { id: 'Alaska', refKey: 'Alaska', text: 'Alaska', xratio: 0.08, yratio:0.14, troops : 0, playerid : 0},
@@ -111,6 +142,28 @@ const TitleScreen: React.FC = () => {
         { id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio:0.55, troops : 0 , playerid : 0},
     ]);
 
+    const config = {Authorization : localStorage.getItem("lobbyToken")};
+
+    useEffect (() => {
+        async function getGame() {
+            const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
+            console.log("gameResponse", gameResponse);
+            setGame(gameResponse.data);
+            setPhase(gameResponse.data.turnCycle.currentPhase);
+            setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId)
+        }
+
+        getGame();
+    }, []);
+
+    useEffect(() => {
+        if(game !== null){
+            console.log("game: ", game);
+            console.log("current phase: ", phase);
+            console.log("current player id: ", currentPlayerId);
+        }
+    }, [game, phase, currentPlayerId]);
+
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
         return button ? { xratio: button.xratio, yratio: button.yratio } : { xratio: 0, yratio: 0 }; // Return xratio and yratio if the button is found, otherwise return default values
@@ -126,13 +179,13 @@ const TitleScreen: React.FC = () => {
     }
 
     const handleButtonClick = (id: string) => {
-        if(curstate === 1){
+        if(phase === "REINFORCEMENT"){
             deploytroops(id);
         }
-        if(curstate === 2){
+        if(phase === "ATTACK"){
             attackTerritory(id);
         }
-        if(curstate === 3){
+        if(phase === "MOVE"){
             reinforceTroops(id);
         }
     }
@@ -151,7 +204,7 @@ const TitleScreen: React.FC = () => {
     }
 
     const handleButtonClick1 = (id: string) => {
-        console.log("First Terri: " + startButton + ", Second Terri: " + endButton + ", drawline: " + drawingLine + ".");
+        console.log(" First Terri: " + startButton + ", Second Terri: " + id + ", drawline: " + drawingLine + ".");
         if (drawingLine) {
             // Draw line between start button and clicked button
             undoLine();
@@ -170,33 +223,32 @@ const TitleScreen: React.FC = () => {
         }
     };
 
-    const nextState = () => {
-        if (curstate === 3) {
-            console.log(1);
-            correctTerritories()
-            setCurState(1);
+    const nextState = async() => {
+
+        if (phase === "MOVE") {
             setStartButton(null);
             setEndButton(null);
             setDrawingLine(null);
             if(startButton){
                 dehighlightadjbutton(startButton);}
             undoLine();
-            return 1;
         }
         else{
-            let state = curstate;
-            state += 1;
-            console.log(state);
-            correctTerritories()
-            setCurState(state);
+          correctTerritories()
             if(startButton){
                 dehighlightadjbutton(startButton);}
             undoLine();
             setStartButton(null);
             setEndButton(null);
             setDrawingLine(null);
-            return state;
         }
+
+        const requestBody = JSON.stringify({"board": game.board});
+        const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}`, requestBody, {headers: config});
+
+        setGame(updateGame.data);
+        setPhase(updateGame.data.turnCycle.currentPhase);
+        setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
     }
 
     const increaseTroops = (territory_id: string) => {
@@ -383,7 +435,7 @@ const TitleScreen: React.FC = () => {
                 player4Territories = player4Territories + 1
             }
         })
-        
+
         if(myTerritories === 0){
             setIsLooseModalOpen(true)
         }
@@ -582,131 +634,125 @@ const TitleScreen: React.FC = () => {
         };
     }, []);
 
+    let renderButtons = (
+        buttonData.map((button) => (
+        <button
+            key={button.id}
+            id={button.id}
+            ref={(buttonRef) => {
+                if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
+            }}
+            className="button"
+            style={{ backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue' }}
+            onClick={() => handleButtonClick(button.id)}
+        >
+            {button.troops}
+        </button>
+    )));
+
+    let lowerContent = (<div className="gamescreen-innerlower-container">
+    <div className="gamescreen-bottomleft-container">
+        <button
+            id="nextState"
+            className="gamescreen-buttons-container"
+            style={{
+                left: '5%',
+                top: '50%',
+                backgroundColor: 'red',
+                transform: 'translateY(-50%)',
+            }}
+            onClick={() => {// Set the value of x here
+                const cur = nextState();
+                const buttonText = "Next Phase";
+            }}
+        >
+            Next Phase
+        </button>
+{/*                    <button
+            id="nextState"
+            className="gamescreen-buttons-container"
+            style={{
+                left: '60%',
+                top: '25%',
+                backgroundColor: 'red',
+
+            }}
+            onClick={() => AvatarCreation()}
+        >
+            Next Player
+        </button>*/}
+        <div
+            id="nextState"
+            className="gamescreen-buttons-container"
+            style={{
+                left: '45%',
+                top: '50%', // Change top to 50% to position it in the vertical middle
+                transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
+                backgroundColor: 'red',
+                display: 'inline-block',
+            }}
+        >
+            Troop Amount: {curTroopAmount}
+        </div>
+    </div>
+    <div className="gamescreen-bottomright-container">
+        {num !== 0 ? (
+            <div style={avatarStyle}>
+                <img src={anzeige} alt="avatar" style={imageStyle}/>
+            </div>
+        ) : (
+            <div style={avatarStylePlaying}>
+                <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+            {num !== 1 ? (
+                <div style={avatarStyle}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            ) : (
+                <div style={avatarStylePlaying}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+            {num !== 2 ? (
+                <div style={avatarStyle}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            ) : (
+                <div style={avatarStylePlaying}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+            {num !== 3 ? (
+                <div style={avatarStyle}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            ) : (
+                <div style={avatarStylePlaying}>
+                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+    </div>
+</div>);
+
     return (
         <div className="gamescreen-container">
             <div className="gamescreen-innerupper-container">
+                {/*Attack Modal Section*/}
+                <section>
+                    <AttackModal
+                    isModalOpen={isModalOpen}
+                    modalContent={modalContent}
+                    onClose={closeModal}
+                    lobbyId={lobbyId}
+                    gameId={gameId}
+                    />
+                </section>
                 <canvas id="myCanvas"></canvas>
-                {/* North America */}
-                {buttonData.map((button) => (
-                    <button
-                        key={button.id}
-                        id={button.id}
-                        ref={(buttonRef) => {
-                            if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
-                        }}
-                        className="button"
-                        style={{ backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue' }}
-                        onClick={() => handleButtonClick(button.id)}
-                    >
-                        {button.troops}
-                    </button>
-                ))}
+                {isModalOpen ? (null) : renderButtons}
             </div>
-            <div className="gamescreen-innerlower-container">
-                <div className="gamescreen-bottomleft-container">
-                    <Button
-                      width="100%" onClick={() => setIsLooseModalOpen(true)}>
-                        ModalTest
-                    </Button>
-                    <section>
-                        <LooseModal
-                          isModalOpen={isLooseModalOpen}
-                          onClose={() => setIsLooseModalOpen(false)} />
-                        <ModalWin
-                          isModalOpen={isWinModalOpen}
-                          onClose={() => setIsWinModalOpen(false)} />
-                    </section>
-                    <button
-                        id="nextState"
-                        className="gamescreen-buttons-container"
-                        style={{
-                            left: '5%',
-                            top: '50%',
-                            backgroundColor: 'red',
-                            transform: 'translateY(-50%)',
-                        }}
-                        onClick={() => {// Set the value of x here
-                            const cur = nextState();
-                            const buttonText =
-                                cur === 1
-                                    ? 'Go to Attack'
-                                    : cur === 2
-                                        ? 'Go to Reinforce'
-                                        : cur === 3
-                                            ? 'End the Turn'
-                                            : 'Beginning State';
-                            setButtonStateText(buttonText)
+            {isModalOpen ? (null) : lowerContent}
 
-                        }}
-                    >
-                        {buttonStateText}
-                    </button>
-{/*                    <button
-                        id="nextState"
-                        className="gamescreen-buttons-container"
-                        style={{
-                            left: '60%',
-                            top: '25%',
-                            backgroundColor: 'red',
-
-                        }}
-                        onClick={() => AvatarCreation()}
-                    >
-                        Next Player
-                    </button>*/}
-                    <div
-                        id="nextState"
-                        className="gamescreen-buttons-container"
-                        style={{
-                            left: '45%',
-                            top: '50%', // Change top to 50% to position it in the vertical middle
-                            transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
-                            backgroundColor: 'red',
-                            display: 'inline-block',
-                        }}
-                    >
-                        Troop Amount: {curTroopAmount}
-                    </div>
-                </div>
-                <div className="gamescreen-bottomright-container">
-                    {num !== 0 ? (
-                        <div style={avatarStyle}>
-                            <img src={avatar1} alt="avatar" style={imageStyle}/>
-                        </div>
-                    ) : (
-                        <div style={avatarStylePlaying}>
-                            <img src={avatar1} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                        {num !== 1 ? (
-                            <div style={avatarStyle}>
-                                <img src={avatar2} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={avatar2} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                        {num !== 2 ? (
-                            <div style={avatarStyle}>
-                                <img src={avatar3} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={avatar3} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                        {num !== 3 ? (
-                            <div style={avatarStyle}>
-                                <img src={avatar4} alt="avatar" style={imageStyle}/>
-                            </div>
-                        ) : (
-                            <div style={avatarStylePlaying}>
-                                <img src={avatar4} alt="avatar" style={imageStyle}/>
-                            </div>
-                        )}
-                </div>
-            </div>
         </div>
     );
 }
