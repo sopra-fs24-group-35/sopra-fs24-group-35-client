@@ -80,7 +80,8 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
 
   const attack = async() => {
     const config = { Authorization: localStorage.getItem("lobbyToken") };
-    const requestBody = JSON.stringify({attackTerritory, defenseTerritory, selectedTroops, selectedAttacks});
+    const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedTroops,"repeats" : selectedAttacks});
+    console.log("requestBody: ", requestBody);
     const attackResponse = await api.post(`lobbies/${lobbyId}/game/${gameId}/attacks`, requestBody, {headers: config});
   }
 
