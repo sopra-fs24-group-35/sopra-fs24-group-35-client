@@ -287,9 +287,9 @@ const TitleScreen: React.FC = () => {
             playerid: 0,
         },
         {
-            id: 'New Guniea',
-            refKey: 'New Guniea',
-            text: 'New Guniea',
+            id: 'New Guinea',
+            refKey: 'New Guinea',
+            text: 'New Guinea',
             xratio: 0.884,
             yratio: 0.68,
             troops: 0,
@@ -410,7 +410,8 @@ const TitleScreen: React.FC = () => {
     const nextSate = document.getElementById('nextState');
 
     const [curPlayer, setCurPlayer] = useState(null);
-    const [Game, setGame] = useState(null);
+    const [Game, setGame] = useState(-1);
+    const [CompleteGame, setCompleteGame] = useState(null);
 
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
@@ -648,21 +649,13 @@ const TitleScreen: React.FC = () => {
         }
     };
 
-    const searchDictionaryByName = (dictionary, name) => {
-        for (const entry of dictionary) {
-            if (entry.name === name) {
-                return entry;
-            }
-        }
-    };
-
     const UpdateLocalButtons = (all_territories) => {
-        // for(const territories of all_territories){
-        //     buttonData[territories].playerid = all_territories
-        // }
-        console.log("THIS DATA")
-        console.log(searchDictionaryByName(all_territories, "Peru"));
-
+        for(const territories of all_territories){
+            const button = buttonData.find(button => button.id === territories.name);
+            button.playerid = territories.owner;
+            button.troops = territories.troops;
+        }
+        setButtonData([...buttonData]);
     };
 
     //const redButton = document.getElementById('redButton');
@@ -711,14 +704,16 @@ const TitleScreen: React.FC = () => {
     const LoadData = async () => {
         try {
             const config = {Authorization: localStorage.getItem("lobbyToken")};
-            if(Game === null){
+            console.log("THIS IS GAME " + Game);
+            if(Game === -1){
                 console.log("AFANG");
                 const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config})
                 console.log(getGame.data)
                 const curgame = getGame.data;
                 const currentplayer = (curgame.turnCycle.currentPlayer.playerId);
-                setGame(curgame);
                 setCurPlayer(currentplayer);
+                setGame(curgame.gameId);
+                setCompleteGame(curgame);
                 UpdateLocalButtons(curgame.board.territories);
             } else {
                 if(curPlayer !== localStorage.getItem("user_id")){
@@ -726,7 +721,8 @@ const TitleScreen: React.FC = () => {
                 console.log(getGame.data)
                 const curgame = getGame.data;
                 const currentplayer = (curgame.turnCycle.currentPlayer.playerId);
-                setGame(curgame);
+                setGame(curgame.gameId);
+                setCompleteGame(curgame);
                 setCurPlayer(currentplayer);
                 UpdateLocalButtons(curgame.board.territories);
             }}
@@ -778,12 +774,67 @@ const TitleScreen: React.FC = () => {
         }
     };
 
+    const resizeButtons = (startx: number, starty: number, drawWidth: number, drawHeight: number) => {
+        const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
+        const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
+
+        Object.keys(buttonRefs.current).forEach((buttonId: string) => {
+            const button = buttonRefs.current[buttonId];
+            const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
+            let cycle = [];
+
+            button.style.left = `${x}px`;
+            button.style.top = `${y}px`;
+            button.style.width = `${buttonWidth}px`;
+            button.style.height = `${buttonHeight}px`;
+            button.style.fontSize = `${buttonHeight * 0.35}px`;
+
+            const curbutton = buttonData.find(button => button.id === buttonId);
+
+            if (Game !== -1) {
+                console.log("HALLLLOOOO:  " + Game);
+                cycle = Game.turnCycle.playerCycle;
+            }
+
+            let completecycle = [];
+
+            for (const playerid of cycle) {
+                completecycle.push(playerid.playerId);
+            }
+            while (completecycle.length < 4) {
+                completecycle.push(-1); // or any placeholder value you prefer
+            }
+
+            // Make sure completecycle has at least 4 elements
+            if (completecycle.length < 4) {
+                completecycle = completecycle.concat(Array(4 - completecycle.length).fill(-1));
+            }
+
+            // Compare curbutton.playerid with completecycle elements
+            if (curbutton.playerid === completecycle[0]) {
+                button.style.backgroundColor = color[1];
+            } else if (curbutton.playerid === completecycle[1]) {
+                button.style.backgroundColor = color[2];
+            } else if (curbutton.playerid === completecycle[2]) {
+                button.style.backgroundColor = color[3];
+            } else if (curbutton.playerid === completecycle[3]) {
+                button.style.backgroundColor = color[4];
+            } else {
+                button.style.backgroundColor = color[0];
+            }
+        });
+    };
+
+    const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
+        const {xratio, yratio} = getButtonRatiosById(buttonId)
+        let x = startx + drawWidth * xratio; // Default left position
+        let y = starty + drawHeight * yratio; // Default top position
+
+        return {x, y};
+    };
+
     const ReloadScreen = async () => {
         try {
-            const config = {Authorization: localStorage.getItem("lobbyToken")};
-            const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config})
-            //console.log(getGame.data)
-
             const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
             const ctx = canvas.getContext('2d');
             const imageSrc = require('./RiskMap21.png');
@@ -794,44 +845,6 @@ const TitleScreen: React.FC = () => {
                 image.src = imageSrc;
                 setPicture(image);
 
-                const resizeButtons = (startx: number, starty: number, drawWidth: number, drawHeight: number) => {
-                    const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
-                    const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
-
-                    Object.keys(buttonRefs.current).forEach((buttonId: string) => {
-                        const button = buttonRefs.current[buttonId];
-                        const {x, y} = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
-
-                        button.style.left = `${x}px`;
-                        button.style.top = `${y}px`;
-                        button.style.width = `${buttonWidth}px`;
-                        button.style.height = `${buttonHeight}px`;
-                        button.style.fontSize = `${buttonHeight * 0.35}px`;
-
-                        const curbutton = buttonData.find(button => button.id === buttonId);
-
-                        if (curbutton.playerid === 1) {
-                            button.style.backgroundColor = color[1];
-                        } else if (curbutton.playerid === 2) {
-                            button.style.backgroundColor = color[2];
-                        } else if (curbutton.playerid === 3) {
-                            button.style.backgroundColor = color[3];
-                        } else if (curbutton.playerid === 4) {
-                            button.style.backgroundColor = color[4];
-                        } else {
-                            button.style.backgroundColor = color[0];
-                        }
-
-                    });
-                };
-
-                const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
-                    const {xratio, yratio} = getButtonRatiosById(buttonId)
-                    let x = startx + drawWidth * xratio; // Default left position
-                    let y = starty + drawHeight * yratio; // Default top position
-
-                    return {x, y};
-                };
                 image.onload = () => {
                     const aspectRatio = image.width / image.height;
                     let drawWidth = canvas.width;
@@ -852,7 +865,6 @@ const TitleScreen: React.FC = () => {
                     setCurWidth(drawWidth);
                     setX(x);
                     setY(y);
-
 
                     // Clear the canvas and draw the image
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -898,10 +910,10 @@ const TitleScreen: React.FC = () => {
     React.useEffect(() => {
         const loadDataInterval = setInterval(async () => {
             await LoadData();
-        }, 2000000); // Interval set to 2 seconds (2000 milliseconds)
+            if(curx !== 0 && cury !== 0 && curwidth !== 0 && curheight !== 0){
+            await resizeButtons(curx, cury, curwidth, curheight);}
 
-        // Call LoadData initially
-        LoadData();
+        }, 1000); // Interval set to 2 seconds (2000 milliseconds)
 
         // Cleanup function to clear the interval when the component unmounts or the effect is re-executed
         return () => {
