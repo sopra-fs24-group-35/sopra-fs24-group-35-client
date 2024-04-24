@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 //import React, { useEffect } from 'react';
 import "styles/views/GameScreen.scss";
 import { api, handleError } from "helpers/api";
@@ -9,6 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import game from "./Game";
 import { User } from "../../types";
 import AdjDict from '../../models/AdjDict.js';
+import AttackModal from "../ui/AttackModal";
 
 
 const TitleScreen: React.FC = () => {
@@ -44,6 +45,48 @@ const TitleScreen: React.FC = () => {
     const [buttonStateText, setButtonStateText] = useState('Go to Attack');
     const [curTroopAmount, setCurTroopAmount] = useState(15);
     const color = ["red", "blue", "violet", "green", "orange"];
+
+    /*---------------Attack Modal Setup----------------*/
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [modalContent, setModalContent] = useState({
+        territory_def: "Add territory name here",
+        territory_atk: "Add territory name here",
+    });
+
+    const openModal = (content) => {
+        setIsModalOpen(true);
+        setModalContent(JSON.parse(content));
+    };
+
+    
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    useEffect(() => {
+        console.log("isModalOpen", isModalOpen);
+    }, [isModalOpen]);
+    // useEffect (() => {
+    //     console.log("hello?", isModalOpen);
+    //     let renderButtons = buttonData.map((button) => (
+    //     <button
+    //         key={button.id}
+    //         id={button.id}
+    //         ref={(buttonRef) => {
+    //             if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
+    //         }}
+    //         className="button"
+    //         style={{ backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue' }}
+    //         onClick={() => handleButtonClick(button.id)}
+    //     >
+    //         {button.troops}
+    //     </button>));
+
+    //     if (isModalOpen) {
+    //         renderButtons = null;
+    //     }
+    // }, [isModalOpen])
+    /*-------------------------------------------------*/
 
     const [buttonData, setButtonData] = useState([
         { id: 'Alaska', refKey: 'Alaska', text: 'Alaska', xratio: 0.08, yratio:0.14, troops : 0, playerid : 0},
@@ -134,7 +177,7 @@ const TitleScreen: React.FC = () => {
     }
 
     const handleButtonClick1 = (id: string) => {
-        console.log("First Terri: " + startButton + ", Second Terri: " + endButton + ", drawline: " + drawingLine + ".");
+        console.log(" First Terri: " + startButton + ", Second Terri: " + id + ", drawline: " + drawingLine + ".");
         if (drawingLine) {
             // Draw line between start button and clicked button
             undoLine();
@@ -147,6 +190,10 @@ const TitleScreen: React.FC = () => {
             dehighlightadjbutton(startButton);
             drawLine(startButton, id);
             setDrawingLine(true); // Enable drawing line mode
+            const territory_def = startButton;
+            const territory_atk = id;
+            const cont = JSON.stringify({territory_def, territory_atk});
+            openModal(cont);
         } else {
             setStartButton(id);
             highlightadjbutton(id);
@@ -496,25 +543,36 @@ const TitleScreen: React.FC = () => {
         };
     }, []);
 
+    const renderButtons = (buttonData.map((button) => (
+        <button
+            key={button.id}
+            id={button.id}
+            ref={(buttonRef) => {
+                if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
+            }}
+            className="button"
+            style={{ backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue' }}
+            onClick={() => handleButtonClick(button.id)}
+        >
+            {button.troops}
+        </button>
+    )));
+
     return (
         <div className="gamescreen-container">
             <div className="gamescreen-innerupper-container">
+                {/*Attack Modal Section*/}
+                <section>
+                    <AttackModal
+                    isModalOpen={isModalOpen}
+                    modalContent={modalContent}
+                    onClose={closeModal}
+                    lobbyId={lobbyId}
+                    gameId={gameId}
+                    />
+                </section>
                 <canvas id="myCanvas"></canvas>
-                {/* North America */}
-                {buttonData.map((button) => (
-                    <button
-                        key={button.id}
-                        id={button.id}
-                        ref={(buttonRef) => {
-                            if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
-                        }}
-                        className="button"
-                        style={{ backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue' }}
-                        onClick={() => handleButtonClick(button.id)}
-                    >
-                        {button.troops}
-                    </button>
-                ))}
+                {isModalOpen ? (null) : renderButtons}
             </div>
             <div className="gamescreen-innerlower-container">
                 <div className="gamescreen-bottomleft-container">
