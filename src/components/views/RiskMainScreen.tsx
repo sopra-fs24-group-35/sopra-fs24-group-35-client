@@ -11,6 +11,7 @@ import { User } from "../../types";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
 import Game from "models/Game";
+import ApiStyles from "helpers/avatarApiStyles";
 
 
 const TitleScreen: React.FC = () => {
@@ -18,10 +19,13 @@ const TitleScreen: React.FC = () => {
     const [game, setGame] = useState<Game>(null);
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
+    const [troopBonus, setTroopBonus] = useState(null);
+    const [playerOrder, setPlayerOrder] = useState(null);
+    let playerColors = ["red", "blue", "purple", "green", "orange", "brown"];
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
-    const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
+    const styles = new ApiStyles;
     let [num, setNum] = useState(0);
     let [avatarPos, setAvatarPos] = useState(0);
     const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
@@ -107,7 +111,7 @@ const TitleScreen: React.FC = () => {
         { id: 'Madagascar', refKey: 'Madagascar', text: 'Madagascar', xratio: 0.627, yratio:0.84, troops : 0 , playerid : 0},
 
         { id: 'Indonesia', refKey: 'Indonesia', text: 'Indonesia', xratio: 0.805, yratio:0.71, troops : 0 , playerid : 0},
-        { id: 'New Guniea', refKey: 'New Guniea', text: 'New Guniea', xratio: 0.884, yratio:0.68, troops : 0 , playerid : 0},
+        { id: 'New Guinea', refKey: 'New Guinea', text: 'New Guinea', xratio: 0.884, yratio:0.68, troops : 0 , playerid : 0},
         { id: 'Western Australia', refKey: 'Western Australia', text: 'Western Australia', xratio: 0.84, yratio:0.85, troops : 0 , playerid : 0},
         { id: 'Eastern Australia', refKey: 'Eastern Australia', text: 'Eastern Australia', xratio: 0.915, yratio:0.82, troops : 0 , playerid : 0},
 
@@ -125,6 +129,7 @@ const TitleScreen: React.FC = () => {
         { id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio:0.55, troops : 0 , playerid : 0},
     ]);
 
+
     const config = {Authorization : localStorage.getItem("lobbyToken")};
 
     useEffect (() => {
@@ -133,17 +138,70 @@ const TitleScreen: React.FC = () => {
             console.log("gameResponse", gameResponse);
             setGame(gameResponse.data);
             setPhase(gameResponse.data.turnCycle.currentPhase);
-            setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId)
+            setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
+            setTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
         }
 
         getGame();
     }, []);
+
+    const order = {};
 
     useEffect(() => {
         if(game !== null){
             console.log("game: ", game);
             console.log("current phase: ", phase);
             console.log("current player id: ", currentPlayerId);
+            console.log("current troop bonus: ", troopBonus);
+
+            console.log("playerOrder:", playerOrder);
+
+            if(!playerOrder) {
+                for(let j = 0; j < game.players.length; j++){
+
+                    if (playerColors.length === 0) {
+                        console.log('No more colors to select');
+                        break;
+                      }
+    
+                    // Get a random index from the remaining values array
+                    const randomIndex = Math.floor(Math.random() * playerColors.length);
+    
+                    // Get the random value from the remaining values array
+                    const randomValue = playerColors[randomIndex];
+    
+                    // Remove the selected value from the remaining values array
+                    const updatedPlayerColors = playerColors.filter((value, index) => index !== randomIndex);
+                    playerColors = updatedPlayerColors;
+                      
+                    order[game.players[j].playerId] = randomValue;
+                    // console.log("playerId: ", game.players[j].playerId);
+                    // console.log("color: ", order[game.players[j].playerId]);
+                }
+            }
+            
+            setPlayerOrder(order);
+
+            for(let i = 0; i < buttonData.length; i++){
+                const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
+                const button = buttonData[i];
+                if (territory) {
+                    // console.log("Updating troops for territory:", button.id);
+                    // console.log("Button before update:", button);
+                    // console.log("Territory troops:", territory.troops);
+                    button.troops = territory.troops;
+                    button.playerid = territory.playerId;
+                    // console.log("color: ", order[territory.owner]);
+                    //button.style.backgroundColor = order[territory.playerId];
+                    // console.log("Button after update:", button);
+                } else {
+                    console.log("Territory not found for button:", button.id);
+                }
+                // console.log("button", button);
+                // button.troops = territory.troops;
+                // console.log("buttonTroops", button.troops);
+                setButtonData([...buttonData]);
+            }
         }
     }, [game, phase, currentPlayerId]);
 
@@ -174,7 +232,6 @@ const TitleScreen: React.FC = () => {
     }
     const deploytroops = (id: string) => {
         increaseTroops(id);
-        setNewPlayerOwner(id, 2);
     }
 
     const attackTerritory = (id: string) => {
@@ -218,10 +275,12 @@ const TitleScreen: React.FC = () => {
             if(startButton){
                 dehighlightadjbutton(startButton);}
             undoLine();
+            setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
+            console.log("troopBonus set");
         }
         else{
             if(startButton){
-                dehighlightadjbutton(startButton);}
+            dehighlightadjbutton(startButton);}
             undoLine();
             setStartButton(null);
             setEndButton(null);
@@ -237,10 +296,19 @@ const TitleScreen: React.FC = () => {
     }
 
     const increaseTroops = (territory_id: string) => {
+        const territory = game.board.territories.find(territory => territory.name === territory_id);
         const button = buttonData.find(button => button.id === territory_id); // Find the button data for the startId
-        if (button) {
-            button.troops += 1; // Increment the troops count
+
+        if (button && troopBonus !== 0 && territory.owner === currentPlayerId) {
+            territory.troops += 1; // Increment the troops count
+            button.troops = territory.troops; // set troop count to server troop count
+
+            let troops = troopBonus;
+            setTroopBonus(troops - 1);
+
             setButtonData([...buttonData]); // Update the button data array in the state
+            setGame(game);
+            console.log("territory: ", territory);
         }
     }
 
@@ -443,7 +511,8 @@ const TitleScreen: React.FC = () => {
         }
     };
     const nextSate = document.getElementById('nextState');
-    React.useEffect(() => {
+    
+    useEffect(() => {
         async function gettheUser(id) {
             try {
                 const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
@@ -485,21 +554,11 @@ const TitleScreen: React.FC = () => {
                 button.style.height = `${buttonHeight}px`;
                 button.style.fontSize = `${buttonHeight*0.35}px`;
 
-                const curbutton = buttonData.find(button => button.id === buttonId);
+                //console.log("playerOrder:", playerOrder);
 
-                if(curbutton.playerid === 1){
-                    button.style.backgroundColor = color[0];
-                }
-                else if(curbutton.playerid === 2){
-                    button.style.backgroundColor = color[1];
-                }
-                else if(curbutton.playerid === 3){
-                    button.style.backgroundColor = color[2];
-                }
-                else if(curbutton.playerid === 4){
-                    button.style.backgroundColor = color[3];
-                } else {
-                    button.style.backgroundColor = color[4];
+                if(game !== null){
+                    const territory = game.board.territories.find(territory => territory.name === buttonId);
+                    button.style.backgroundColor = playerOrder[territory.owner];
                 }
 
             });
@@ -550,23 +609,24 @@ const TitleScreen: React.FC = () => {
         return () => {
             window.removeEventListener('resize', resizeCanvas);
         };
-    }, []);
+    }, [playerOrder]);
 
     let renderButtons = (
         buttonData.map((button) => (
-        <button
-            key={button.id}
-            id={button.id}
-            ref={(buttonRef) => {
-                if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
-            }}
-            className="button"
-            style={{ backgroundColor: button.refKey === 'redButton' ? 'red' : 'blue' }}
-            onClick={() => handleButtonClick(button.id)}
-        >
-            {button.troops}
-        </button>
-    )));
+            <button
+                key={button.id}
+                id={button.id}
+                ref={(buttonRef) => {
+                    if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
+                }}
+                className="button"
+                style={{ backgroundColor: (button.refKey === 'red' ? 'red' : 'blue')}}
+                onClick={() => handleButtonClick(button.id)}
+            >
+                {button.troops}
+            </button>
+        ))
+    );
 
     let lowerContent = (<div className="gamescreen-innerlower-container">
     <div className="gamescreen-bottomleft-container">
@@ -586,20 +646,7 @@ const TitleScreen: React.FC = () => {
         >
             Next Phase
         </button>
-{/*                    <button
-            id="nextState"
-            className="gamescreen-buttons-container"
-            style={{
-                left: '60%',
-                top: '25%',
-                backgroundColor: 'red',
-
-            }}
-            onClick={() => AvatarCreation()}
-        >
-            Next Player
-        </button>*/}
-        <div
+        {(troopBonus !== 0 && phase === "REINFORCEMENT") && <div
             id="nextState"
             className="gamescreen-buttons-container"
             style={{
@@ -610,8 +657,8 @@ const TitleScreen: React.FC = () => {
                 display: 'inline-block',
             }}
         >
-            Troop Amount: {curTroopAmount}
-        </div>
+            Troop Amount: {troopBonus}
+        </div>}
     </div>
     <div className="gamescreen-bottomright-container">
         {num !== 0 ? (
