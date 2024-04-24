@@ -21,7 +21,6 @@ const TitleScreen: React.FC = () => {
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [troopBonus, setTroopBonus] = useState(null);
     const [playerOrder, setPlayerOrder] = useState(null);
-    let playerColors = ["red", "blue", "purple", "green", "orange", "brown"];
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -54,7 +53,10 @@ const TitleScreen: React.FC = () => {
     const [curstate, setCurState] = useState(1);
     //const [buttonStateText, setButtonStateText] = useState('Go to Attack');
     const [curTroopAmount, setCurTroopAmount] = useState(15);
-    const color = ["red", "blue", "violet", "green", "orange"];
+    const [PlayerColor, setPlayerColor] = useState({});
+    const Colors = ["red", "blue", "violet", "green", "orange"];
+    const [PlayerCycle, setPlayerCycle] = useState(null);
+    const [curListOfValidReinforcements, setcurListOfValidReinforcements] = useState([]);
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -68,7 +70,6 @@ const TitleScreen: React.FC = () => {
         setModalContent(JSON.parse(content));
     };
 
-    
     const closeModal = () => {
         setIsModalOpen(false);
         window.location.reload();
@@ -129,19 +130,17 @@ const TitleScreen: React.FC = () => {
         { id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio:0.55, troops : 0 , playerid : 0},
     ]);
 
-
     const config = {Authorization : localStorage.getItem("lobbyToken")};
 
     useEffect (() => {
         async function getGame() {
             const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
-            console.log("gameResponse", gameResponse);
             setGame(gameResponse.data);
             setPhase(gameResponse.data.turnCycle.currentPhase);
             setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
             setTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
+            setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
         }
-
         getGame();
     }, []);
 
@@ -153,53 +152,29 @@ const TitleScreen: React.FC = () => {
             console.log("current phase: ", phase);
             console.log("current player id: ", currentPlayerId);
             console.log("current troop bonus: ", troopBonus);
+            console.log("playerCycle:", PlayerCycle);
 
-            console.log("playerOrder:", playerOrder);
-
-            if(!playerOrder) {
-                for(let j = 0; j < game.players.length; j++){
-
-                    if (playerColors.length === 0) {
-                        console.log('No more colors to select');
-                        break;
-                      }
-    
-                    // Get a random index from the remaining values array
-                    const randomIndex = Math.floor(Math.random() * playerColors.length);
-    
-                    // Get the random value from the remaining values array
-                    const randomValue = playerColors[randomIndex];
-    
-                    // Remove the selected value from the remaining values array
-                    const updatedPlayerColors = playerColors.filter((value, index) => index !== randomIndex);
-                    playerColors = updatedPlayerColors;
-                      
-                    order[game.players[j].playerId] = randomValue;
-                    // console.log("playerId: ", game.players[j].playerId);
-                    // console.log("color: ", order[game.players[j].playerId]);
+            let PlayerwithColors = {};
+            let x = 0;
+            if(PlayerCycle !== null) {
+                for(const player of PlayerCycle){
+                    PlayerwithColors[player.playerId] = Colors[x];
+                    console.log("playerid " + player.playerId + "color: " + Colors[x]);
+                    x++;
                 }
             }
-            
-            setPlayerOrder(order);
+            setPlayerColor(PlayerwithColors);
 
             for(let i = 0; i < buttonData.length; i++){
                 const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
                 const button = buttonData[i];
                 if (territory) {
-                    // console.log("Updating troops for territory:", button.id);
-                    // console.log("Button before update:", button);
-                    // console.log("Territory troops:", territory.troops);
                     button.troops = territory.troops;
                     button.playerid = territory.playerId;
-                    // console.log("color: ", order[territory.owner]);
-                    //button.style.backgroundColor = order[territory.playerId];
-                    // console.log("Button after update:", button);
+
                 } else {
                     console.log("Territory not found for button:", button.id);
                 }
-                // console.log("button", button);
-                // button.troops = territory.troops;
-                // console.log("buttonTroops", button.troops);
                 setButtonData([...buttonData]);
             }
         }
@@ -215,8 +190,36 @@ const TitleScreen: React.FC = () => {
         button.playerid = playerid;
         setButtonData([...buttonData]);
         const curbutton = buttonRefs.current[id];
-        curbutton.style.backgroundColor = color[2];
+        curbutton.style.backgroundColor = Colors[2];
 
+    }
+
+    const checkForAllValidReinforcements = (id: string) => {
+        const playerid = currentPlayerId;
+        console.log("MY PLAYER ID:", playerid);
+        let validbuttonid = [];
+        let buttonqueue = [id];
+        let visited = {}; // Keep track of visited territories
+        visited[id] = true; // Mark the starting territory as visited
+
+        while (buttonqueue.length !== 0) {
+            const curbut = buttonqueue.shift(); // Use shift() to dequeue the first element
+            validbuttonid.push(curbut);
+            // Iterate through adjacent territories
+            for (const iterterritory of adjDict.dict[curbut]) {
+                const nextterritory = game.board.territories.find(territory => territory.name === iterterritory);
+                if (!visited[iterterritory] && nextterritory.owner === playerid) {
+                    buttonqueue.push(iterterritory); // Enqueue unvisited adjacent territories
+                    visited[iterterritory] = true; // Mark as visited
+                }
+            }
+        }
+        setcurListOfValidReinforcements(validbuttonid);
+
+        for (const button of validbuttonid) {
+            const curbutton = buttonRefs.current[button]
+            curbutton.style.border = "2px solid white";
+        }
     }
 
     const handleButtonClick = (id: string) => {
@@ -243,7 +246,6 @@ const TitleScreen: React.FC = () => {
     }
 
     const handleButtonClick1 = (id: string) => {
-        console.log(" First Terri: " + startButton + ", Second Terri: " + id + ", drawline: " + drawingLine + ".");
         if (drawingLine) {
             // Draw line between start button and clicked button
             undoLine();
@@ -276,7 +278,6 @@ const TitleScreen: React.FC = () => {
                 dehighlightadjbutton(startButton);}
             undoLine();
             setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
-            console.log("troopBonus set");
         }
         else{
             if(startButton){
@@ -308,7 +309,6 @@ const TitleScreen: React.FC = () => {
 
             setButtonData([...buttonData]); // Update the button data array in the state
             setGame(game);
-            console.log("territory: ", territory);
         }
     }
 
@@ -320,7 +320,7 @@ const TitleScreen: React.FC = () => {
             setEndButton(null);
             setDrawingLine(false); // Reset drawing line mode
             setStartButton(id);
-            highlightadjbutton(id)
+            checkForAllValidReinforcements(id);
         }else if(startButton){
             dehighlightadjbutton(startButton);
             const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
@@ -334,14 +334,13 @@ const TitleScreen: React.FC = () => {
             setDrawingLine(true); // Enable drawing line mode
         } else {
             setStartButton(id);
-            highlightadjbutton(id);
+            checkForAllValidReinforcements(id);
         }
     }
 
     const highlightadjbutton = (startId: string) => {
         //increaseTroops(startId);
         const adjacentTerritories = adjDict.dict[startId];
-        console.log(adjacentTerritories);
         for(const territory of adjacentTerritories){
             const button = buttonRefs.current[territory]
             button.style.border= "2px solid white";
@@ -350,8 +349,11 @@ const TitleScreen: React.FC = () => {
 
     const dehighlightadjbutton = (startId: string) => {
         const adjacentTerritories = adjDict.dict[startId];
-        console.log(adjacentTerritories);
         for(const territory of adjacentTerritories){
+            const button = buttonRefs.current[territory]
+            button.style.border = "2px solid black";
+        }
+        for (const territory of curListOfValidReinforcements) {
             const button = buttonRefs.current[territory]
             button.style.border = "2px solid black";
         }
@@ -368,7 +370,7 @@ const TitleScreen: React.FC = () => {
         const distance = Math.sqrt(Math.pow(endx - startx, 2) + Math.pow(endy - starty, 2));
 
         let scaledPercentage = 0.8 + (0.99 - 0.8) * (distance - 50) / (200 - 50);
-        console.log(distance);
+
 
         let ratio = scaledPercentage; // Adjust this ratio as needed
         if(ratio > 1){
@@ -462,7 +464,6 @@ const TitleScreen: React.FC = () => {
             newNum = 0;
         }
         setNum(newNum);
-        console.log(newNum)
         setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
     }
 
@@ -470,7 +471,6 @@ const TitleScreen: React.FC = () => {
         try {
             const config = { Authorization: localStorage.getItem("lobbyToken") };
             // get lobby info
-            console.log(config)
             const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, { headers: config });
             const lobbyData = getLobbyResponse.data;
 
@@ -483,7 +483,6 @@ const TitleScreen: React.FC = () => {
             // Set the state after fetching data
             let requestBodyGame =JSON.stringify({lobbyId})
             const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config }, requestBodyGame)
-            console.log(getGame.data)
 
             getUserResponse.data.forEach(user => {
                 // Access each user object here
@@ -554,11 +553,10 @@ const TitleScreen: React.FC = () => {
                 button.style.height = `${buttonHeight}px`;
                 button.style.fontSize = `${buttonHeight*0.35}px`;
 
-                //console.log("playerOrder:", playerOrder);
 
                 if(game !== null){
                     const territory = game.board.territories.find(territory => territory.name === buttonId);
-                    button.style.backgroundColor = playerOrder[territory.owner];
+                    button.style.backgroundColor = PlayerColor[territory.owner];
                 }
 
             });
@@ -609,7 +607,7 @@ const TitleScreen: React.FC = () => {
         return () => {
             window.removeEventListener('resize', resizeCanvas);
         };
-    }, [playerOrder]);
+    }, [PlayerColor]);
 
     let renderButtons = (
         buttonData.map((button) => (
@@ -620,7 +618,7 @@ const TitleScreen: React.FC = () => {
                     if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
                 }}
                 className="button"
-                style={{ backgroundColor: (button.refKey === 'red' ? 'red' : 'blue')}}
+                style={{}}
                 onClick={() => handleButtonClick(button.id)}
             >
                 {button.troops}
