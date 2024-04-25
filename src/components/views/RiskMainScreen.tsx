@@ -59,6 +59,8 @@ const TitleScreen: React.FC = () => {
     const [CurrentHighlightedButtons, setCurrentHighlightedButtons] = useState(null);
     const NameCycle = ["Go to Attack", "Go to Troop Movement", "End The Turn"];
     const [Cyclecount, setCyclecount] = useState(0);
+    const [CurrentText, setCurrentText] = useState("Go To Attack");
+
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalContent, setModalContent] = useState({
@@ -180,6 +182,16 @@ const TitleScreen: React.FC = () => {
                 }
                 setButtonData([...buttonData]);
             }
+            if(phase === "REINFORCEMENT") {
+                setCurrentText(NameCycle[0]);
+            }
+            else if(phase === "ATTACK") {
+                setCurrentText(NameCycle[1]);
+            }
+            else if(phase === "MOVE") {
+                setCurrentText(NameCycle[2]);
+            }
+
         }
     }, [game, phase, currentPlayerId]);
 
@@ -794,10 +806,9 @@ const TitleScreen: React.FC = () => {
                 }}
                 onClick={() => {// Set the value of x here
                     const cur = nextState();
-                    setCyclecount(prevCount => prevCount + 1);
                 }}
             >
-                {NameCycle[Cyclecount % 3]}
+                {CurrentText}
             </button>
             {(troopBonus !== 0 && phase === "REINFORCEMENT") && <div
                 id="nextState"
