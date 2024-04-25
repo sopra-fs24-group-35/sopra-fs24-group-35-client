@@ -58,6 +58,8 @@ const TitleScreen: React.FC = () => {
     const [PlayerCycle, setPlayerCycle] = useState(null);
     const [curListOfValidReinforcements, setcurListOfValidReinforcements] = useState([]);
     const [CurrentHighlightedButtons, setCurrentHighlightedButtons] = useState(null);
+    const NameCycle = ["Go to Attack", "Go to Troop Movement", "End The Turn"];
+    const [Cyclecount, setCyclecount] = useState(0);
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalContent, setModalContent] = useState({
@@ -223,7 +225,7 @@ const TitleScreen: React.FC = () => {
             const curbutton = buttonRefs.current[button]
             if(button === id) {
                 curbutton.style.border = "2px double white";
-                curbutton.style.padding = "10px"; // Example padding
+                curbutton.style.padding = "5px"; // Example padding
             }
             else {
                 curbutton.style.border= "2px solid white";}
@@ -400,7 +402,7 @@ const TitleScreen: React.FC = () => {
             }
             const button = buttonRefs.current[startId];
             button.style.border = "2px double white";
-            button.style.padding = "10px"; // Example padding
+            button.style.padding = "5px"; // Example padding
 
         }
     }
@@ -504,7 +506,8 @@ const TitleScreen: React.FC = () => {
         height: '75px', // Adjust the size of the circle
         borderRadius: '50%', // Makes the image circular
         overflow: 'hidden', // Hides the overflow
-        marginRight: '10px', // Adjust the space between images
+        marginRight: '5px', // Adjust the space between images
+        marginLeft: '5px', // Adjust the space between images
         border: '4px solid red', // Red outline
     };
 
@@ -513,7 +516,8 @@ const TitleScreen: React.FC = () => {
         height: '75px', // Adjust the size of the circle
         borderRadius: '50%', // Makes the image circular
         overflow: 'hidden', // Hides the overflow
-        marginRight: '10px', // Adjust the space between image
+        marginRight: '5px', // Adjust the space between image
+        marginLeft: '5px', // Adjust the space between images
     };
 
     const imageStyle: React.CSSProperties = {
@@ -592,7 +596,8 @@ const TitleScreen: React.FC = () => {
         // Canvas setup
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
-        const imageSrc = require('./RiskMap21.png');
+        //const imageSrc = require('./RiskMap21.png');
+        const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
 
         const resizeCanvas = () => {
             canvas.width = canvas.parentElement.clientWidth;
@@ -623,6 +628,25 @@ const TitleScreen: React.FC = () => {
                 }
 
             });
+
+            //Dynamically Adjust heigh and Widgt of the lower Textboxes
+            //const troopAmountDiv = document.getElementById('nextState');
+            let allbuttons = document.querySelectorAll('.dynbut');
+            let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+            for (const but of buttonsArray) {
+                (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
+                (but as HTMLButtonElement).style.width = `${buttonWidth*9}px`;
+                (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.35*2.5}px`;
+            }
+
+            allbuttons = document.querySelectorAll('.avatar');
+            buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+            for (const but of buttonsArray) {
+                (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
+                (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
+            }
+
+
         };
 
         const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
@@ -690,76 +714,49 @@ const TitleScreen: React.FC = () => {
     );
 
     let lowerContent = (<div className="gamescreen-innerlower-container">
-    <div className="gamescreen-bottomleft-container">
-        <button
-            id="nextState"
-            className="gamescreen-buttons-container"
-            style={{
-                left: '5%',
-                top: '50%',
-                backgroundColor: 'red',
-                transform: 'translateY(-50%)',
-            }}
-            onClick={() => {// Set the value of x here
-                const cur = nextState();
-                const buttonText = "Next Phase";
-            }}
-        >
-            Next Phase
-        </button>
-        {(troopBonus !== 0 && phase === "REINFORCEMENT") && <div
-            id="nextState"
-            className="gamescreen-buttons-container"
-            style={{
-                left: '45%',
-                top: '50%', // Change top to 50% to position it in the vertical middle
-                transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
-                backgroundColor: 'red',
-                display: 'inline-block',
-            }}
-        >
-            Troop Amount: {troopBonus}
-        </div>}
-    </div>
-    <div className="gamescreen-bottomright-container">
-        {num !== 0 ? (
-            <div style={avatarStyle}>
-                <img src={anzeige} alt="avatar" style={imageStyle}/>
-            </div>
-        ) : (
-            <div style={avatarStylePlaying}>
-                <img src={anzeige} alt="avatar" style={imageStyle}/>
-                </div>
-            )}
-            {num !== 1 ? (
-                <div style={avatarStyle}>
+        <div className="gamescreen-bottomleft-container">
+            <button
+                id="nextState"
+                className="dynbut gamescreen-buttons-container"
+                style={{
+                    left: '7%',
+                    top: '50%',
+                    backgroundColor: 'red',
+                    transform: 'translateY(-50%)',
+                }}
+                onClick={() => {// Set the value of x here
+                    const cur = nextState();
+                    setCyclecount(prevCount => prevCount + 1);
+                }}
+            >
+                {NameCycle[Cyclecount % 3]}
+            </button>
+            {(troopBonus !== 0 && phase === "REINFORCEMENT") && <div
+                id="nextState"
+                className="dynbut gamescreen-buttons-container"
+                style={{
+                    left: 'calc(45% + 25px)',
+                    top: '50%', // Change top to 50% to position it in the vertical middle
+                    transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
+                    backgroundColor: 'red',
+                }}
+            >
+                Troop Amount: {troopBonus}
+            </div>}
+        </div>
+        <div className="gamescreen-bottomright-container">
+            {Array.from({length: 4}, (_, index) => (
+                <div
+                    key={index}
+                    //className={num !== index ? "avatar-inactive" : "avatar-active"} // Define your class names here
+                    className={"avatar"}
+                    style={num !== index ? avatarStyle : avatarStylePlaying}
+                >
                     <img src={anzeige} alt="avatar" style={imageStyle}/>
                 </div>
-            ) : (
-                <div style={avatarStylePlaying}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
-                </div>
-            )}
-            {num !== 2 ? (
-                <div style={avatarStyle}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div style={avatarStylePlaying}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
-                </div>
-            )}
-            {num !== 3 ? (
-                <div style={avatarStyle}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div style={avatarStylePlaying}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
-                </div>
-            )}
-    </div>
-</div>);
+            ))}
+        </div>
+    </div>);
 
     return (
         <div className="gamescreen-container">
@@ -767,10 +764,10 @@ const TitleScreen: React.FC = () => {
                 {/*Attack Modal Section*/}
                 <section>
                     <AttackModal
-                    isModalOpen={isModalOpen}
-                    modalContent={modalContent}
-                    onClose={closeModal}
-                    lobbyId={lobbyId}
+                        isModalOpen={isModalOpen}
+                        modalContent={modalContent}
+                        onClose={closeModal}
+                        lobbyId={lobbyId}
                     gameId={gameId}
                     />
                 </section>
