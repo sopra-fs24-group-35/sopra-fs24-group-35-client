@@ -36,6 +36,10 @@ const TitleScreen: React.FC = () => {
     const [avatar2, setAvatar2] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
     const [avatar3, setAvatar3] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
     const [avatar4, setAvatar4] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
+    const [avatar1Id, setAvatar1Id] = useState(null);
+    const [avatar2Id, setAvatar2Id] = useState(null);
+    const [avatar3Id, setAvatar3Id] = useState(null);
+    const [avatar4Id, setAvatar4Id] = useState(null);
     const {gameId} = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
     const [users, setUsers] = useState<User[]>(null);
@@ -44,6 +48,14 @@ const TitleScreen: React.FC = () => {
     const [endButton, setEndButton] = useState<string | null>(null);
     const [drawingLine, setDrawingLine] = useState(false);
     const adjDict = new AdjDict();
+    const [isWinModalOpen, setIsWinModalOpen] = useState(false);
+    const [isLooseModalOpen, setIsLooseModalOpen] = useState(false)
+    let player1Territories = 0
+    let player2Territories = 0
+    let player3Territories = 0
+    let player4Territories = 0
+    let myTerritories = 0
+    const [playerCount, setPlayerCount] = useState(0)
     //reload idea
 
     const [curx, setX] = useState(0);
@@ -68,10 +80,10 @@ const TitleScreen: React.FC = () => {
         territory_def: "Add territory name here",
         territory_atk: "Add territory name here",
     });
-    const [color1, setColor1] = useState(null)
-    const [color2, setColor2] = useState(null)
-    const [color3, setColor3] = useState(null)
-    const [color4, setColor4] = useState(null)
+    const [color1, setColor1] = useState("")
+    const [color2, setColor2] = useState("")
+    const [color3, setColor3] = useState("")
+    const [color4, setColor4] = useState("")
     const openModal = (content) => {
         setIsModalOpen(true);
         setModalContent(JSON.parse(content));
@@ -510,9 +522,9 @@ const TitleScreen: React.FC = () => {
         height: '75px', // Adjust the size of the circle
         borderRadius: '50%', // Makes the image circular
         overflow: 'hidden', // Hides the overflow
-        marginRight: '5px', // Adjust the space between images
+        marginRight: '5px',
         marginLeft: '5px', // Adjust the space between images
-        border: '4px solid black', // Red outline
+        border: '4px solid Green', // Red outline
     };
 
     const avatarStyle: React.CSSProperties = {
@@ -520,8 +532,8 @@ const TitleScreen: React.FC = () => {
         height: '75px', // Adjust the size of the circle
         borderRadius: '50%', // Makes the image circular
         overflow: 'hidden', // Hides the overflow
-        marginRight: '5px', // Adjust the space between image
-        marginLeft: '5px', // Adjust the space between images
+        marginRight: '5px',
+        marginLeft: '5px'// Adjust the space between image
     };
 
     const imageStyle: React.CSSProperties = {
@@ -529,13 +541,60 @@ const TitleScreen: React.FC = () => {
         height: '100%',
         objectFit: 'cover', // Ensures the image covers the entire circle
     };
-    const AvatarCreation = () => {
-        let newNum = num + 1;
-        if (newNum >= 4) {
-            newNum = 0;
+    const correctTerritories = async () => {
+        const config = { Authorization: localStorage.getItem("lobbyToken") };
+
+        let requestBodyGame =JSON.stringify({lobbyId})
+        const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config }, requestBodyGame)
+
+        let tempCounter = 0
+        let player1Territories = 0
+        let player2Territories = 0
+        let player3Territories = 0
+        let player4Territories = 0
+        let myTerritories = 0
+
+
+        getGame.data.board.territories.forEach(terr => {
+            if(terr.owner === parseInt(localStorage.getItem("user_id"))){
+                myTerritories = myTerritories + 1
+            }
+            if(terr.owner === avatar1Id){
+                player1Territories = player1Territories + 1
+            }
+            else if(terr.owner === avatar2Id){
+                player2Territories = player2Territories + 1
+            }
+            else if(terr.owner === avatar3Id){
+                player3Territories = player3Territories + 1
+            }
+            else if(terr.owner === avatar4Id){
+                player4Territories = player4Territories + 1
+            }
+        })
+        myTerritories = 0
+
+        if(myTerritories === 0){
+            setIsLooseModalOpen(true)
         }
-        setNum(newNum);
-        setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
+
+        if(player1Territories === 0){
+            tempCounter = tempCounter + 1
+        }
+        if(player2Territories === 0){
+            tempCounter = tempCounter + 1
+        }
+        if(player3Territories === 0){
+            tempCounter = tempCounter + 1
+        }
+        if(player4Territories === 0){
+            tempCounter = tempCounter + 1
+        }
+
+        if(myTerritories !==0 && tempCounter >= playerCount-1){
+            setIsWinModalOpen(true)
+        }
+
     }
 
     const fetchData = async () => {
@@ -557,26 +616,50 @@ const TitleScreen: React.FC = () => {
 
             getUserResponse.data.forEach(user => {
                 // Access each user object here
-
+                console.log(user)
                 if(avatarPos === 0){
-                    setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    avatarPos = avatarPos +1
+                    setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[user.avatarId]}`)
+                    setAvatar1Id(user.id)
+                    getGame.data.board.territories.forEach(terr => {
+                        if(terr.owner === user.id){
+                            player1Territories = player1Territories + 1
+                        }
+                    })
                     setColor1(PlayerColor[user.id])
+                    avatarPos = avatarPos +1
                 }
                 else if(avatarPos === 1){
-                    setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    avatarPos = avatarPos +1
+                    setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[user.avatarId]}`)
+                    setAvatar2Id(user.id)
+                    getGame.data.board.territories.forEach(terr => {
+                        if(terr.owner === user.id){
+                            player2Territories = player2Territories + 1
+                        }
+                    })
                     setColor2(PlayerColor[user.id])
+                    avatarPos = avatarPos +1
                 }
                 else if(avatarPos === 2){
-                    setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    avatarPos = avatarPos +1
+                    setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[user.avatarId]}`)
+                    setAvatar3Id(user.id)
+                    getGame.data.board.territories.forEach(terr => {
+                        if(terr.owner === user.id){
+                            player3Territories = player3Territories + 1
+                        }
+                    })
                     setColor3(PlayerColor[user.id])
+                    avatarPos = avatarPos +1
                 }
                 else if(avatarPos === 3){
-                    setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    avatarPos = avatarPos +1
+                    setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[user.avatarId]}`)
+                    setAvatar4Id(user.id)
+                    getGame.data.board.territories.forEach(terr => {
+                        if(terr.owner === user.id){
+                            player4Territories = player4Territories + 1
+                        }
+                    })
                     setColor4(PlayerColor[user.id])
+                    avatarPos = avatarPos +1
                 }
             });
 
@@ -587,18 +670,6 @@ const TitleScreen: React.FC = () => {
     const nextSate = document.getElementById('nextState');
     
     useEffect(() => {
-        async function gettheUser(id) {
-            try {
-                const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
-                const response = await api.get("/users/"+id, {headers: config});
-                avatarId = response.data.avatarId
-                setAnzeige(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[avatarId]}`);
-            } catch (error) {
-                alert(
-                    `Something went wrong with fetching the user data: \n${handleError(error)}`
-                );
-            }
-        };
 
         fetchData()
         // Canvas setup
@@ -752,7 +823,7 @@ const TitleScreen: React.FC = () => {
             </div>}
         </div>
         <div className="gamescreen-bottomright-container">
-            {num !== 1 ? (
+            {currentPlayerId !== avatar1Id ? (
                 <div style={{...avatarStyle, border: `4px solid ${color1}`}}>
                     <img src={avatar1} alt="avatar" style={imageStyle}/>
                 </div>
@@ -761,7 +832,7 @@ const TitleScreen: React.FC = () => {
                     <img src={avatar1} alt="avatar" style={imageStyle}/>
                 </div>
             )}
-            {num !== 1 ? (
+            {currentPlayerId !== avatar2Id ? (
                 <div style={{...avatarStyle, border: `4px solid ${color2}`}}>
                     <img src={avatar2} alt="avatar" style={imageStyle}/>
                 </div>
@@ -770,7 +841,7 @@ const TitleScreen: React.FC = () => {
                     <img src={avatar2} alt="avatar" style={imageStyle}/>
                 </div>
             )}
-            {num !== 2 ? (
+            {currentPlayerId !== avatar3Id ? (
                 <div style={{...avatarStyle, border: `4px solid ${color3}`}}>
                     <img src={avatar3} alt="avatar" style={imageStyle}/>
                 </div>
@@ -779,7 +850,7 @@ const TitleScreen: React.FC = () => {
                     <img src={avatar3} alt="avatar" style={imageStyle}/>
                 </div>
             )}
-            {num !== 3 ? (
+            {currentPlayerId !== avatar4Id ? (
                 <div style={{...avatarStyle, border: `4px solid ${color4}`}}>
                     <img src={avatar4} alt="avatar" style={imageStyle}/>
                 </div>
