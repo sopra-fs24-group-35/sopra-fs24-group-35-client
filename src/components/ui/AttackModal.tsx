@@ -24,6 +24,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
 
   const [selectedTroops, setSelectedTroops] = useState(3);
   const [selectedAttacks, setSelectedAttacks] = useState(100);
+  const [MoveTroops, setMoveTroops] = useState();
   //console.log("selectedTroops", selectedTroops);
 
   useEffect(() => {
@@ -98,12 +99,18 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
   }
 
   const move = async() => {
+    const number = parseInt(MoveTroops);
     const config = { Authorization: localStorage.getItem("lobbyToken") };
-    const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedAttacks});
-    console.log("requestBody: ", requestBody);
-    const moveResponse = await api.put(`lobbies/${lobbyId}/game/${gameId}/transfer`, requestBody, {headers: config});
-    setGame(moveResponse.data);
-    console.log("move response:", moveResponse);
+    const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
+    const now = gameResponse.data.board;
+    const territory1 = now.territories.find(territory => territory.name === attackTerritory.name);
+    const territory2 = now.territories.find(territory => territory.name === defenseTerritory.name);
+    territory1.troops -= number;
+    territory2.troops += number;
+    const requestBody = JSON.stringify({"board": now});
+    const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}`, requestBody, {headers: config});
+    onClose(true);
+
   }
 
 
@@ -167,20 +174,26 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
                 )
                 : (null)}
                 <label className="select-label">
-                {(!sameOwner) ? "Attacks:" : "Move Troops:"}
-                  <select className="select" value={selectedAttacks} onChange={e => setSelectedAttacks(e.target.value)}>
-                    <option value={1}>1</option>
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
+                  {(!sameOwner) ? "Attacks:" : "Move Troops:"}
+                  <input
+                      type="number"
+                      className="input"
+                      value={MoveTroops}
+                      onChange={e => {
+                        const value = parseInt(e.target.value);
+                        // Check if the value is a positive integer and within the specified range
+                        if (!isNaN(value) && value > 0 && value < attackTerritory.troops) {
+                          setMoveTroops(value);
+                        }
+                      }}
+                  />
                 </label>
               </div>
             </div>
           </div>
           <div className="button-div">
-            {(!sameOwner) ? <Button width="50%" onClick={attack}>Attack</Button> : <Button width="50%" onClick={move}>Move Troops</Button>}
+            {(!sameOwner) ? <Button width="50%" onClick={attack}>Attack</Button> :
+                <Button width="50%" onClick={move}>Move Troops</Button>}
           </div>
         </main>
       </div>
