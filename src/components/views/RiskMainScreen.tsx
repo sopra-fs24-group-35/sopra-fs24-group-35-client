@@ -409,10 +409,6 @@ const TitleScreen: React.FC = () => {
                 const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
                 const button_to = buttonData.find(button => button.id === id);
                 if (button_from && button_to && button_from.troops > 1) {
-                    /*button_from.troops -= 1; // Increment the troops count
-                    button_to.troops += 1;
-                    territory.troops += 1;
-                    territory_from.troops -= 1;*/
                     const territory_def = id;
                     const territory_atk = startButton;
                     const cont = JSON.stringify({territory_def, territory_atk});
