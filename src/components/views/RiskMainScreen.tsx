@@ -47,7 +47,7 @@ const TitleScreen: React.FC = () => {
     const [cury, setY] = useState(0);
     const [curwidth, setCurWidth] = useState(0);
     const [curheight, setCurHeight] = useState(0);
-    const [picture, setPicture] = useState(null);
+    const [picture, setPicture] = useState('../../styles/views/Pictures/RiskMap21.png');
 
     const [curstate, setCurState] = useState(1);
     //const [buttonStateText, setButtonStateText] = useState('Go to Attack');
@@ -165,7 +165,10 @@ const TitleScreen: React.FC = () => {
 
         // Set up the interval to call getGame every 2 seconds
         const intervalId = setInterval(() => {
-            getGame();
+            if(currentPlayerId !== null){
+            if(parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))){
+                console.log(currentPlayerId+ "              ------------   " + parseInt(localStorage.getItem("user_id")));
+            getGame();}}
         }, 2000);
 
         // Clean up the interval when the component unmounts or when the dependency array changes
@@ -535,9 +538,11 @@ const TitleScreen: React.FC = () => {
     const undoLine = () => {
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
+        const picture1 = require('../../styles/views/Pictures/RiskMap21.png');
+        const image = new Image(picture1);
         // Clear the canvas
         ctx.clearRect(curx, cury, curwidth, curheight);
-        ctx.drawImage(picture, curx, cury, curwidth, curheight);
+        ctx.drawImage(image, curx, cury, curwidth, curheight);
 
         //setReload(true);
     };
@@ -632,8 +637,7 @@ const TitleScreen: React.FC = () => {
     };
     const nextSate = document.getElementById('nextState');
 
-    useLayoutEffect(() => {
-        if(currentPlayerId !== localStorage.getItem("user_id")){
+    useEffect(() => {
         // Function to preload the image
         const preloadImage = (url) => {
             return new Promise((resolve, reject) => {
@@ -646,7 +650,8 @@ const TitleScreen: React.FC = () => {
 
         // Preload the image
         const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
-        preloadImage(imageSrc).then((image: HTMLImageElement) => {
+        preloadImage(imageSrc).then((image : HTMLImageElement) => {
+
             // Once the image is fully loaded, update the canvas
             fetchData();
             const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
@@ -658,6 +663,7 @@ const TitleScreen: React.FC = () => {
                 let aspectRatio = 0
 
                 aspectRatio = image.width / image.height;
+
                 let drawWidth = canvas.width;
                 let drawHeight = canvas.height;
 
@@ -740,9 +746,11 @@ const TitleScreen: React.FC = () => {
                 window.removeEventListener('resize', resizeCanvas);
             };
         }
-        )};
+        );
 
     }, [PlayerColor]);
+
+    //PlayerColor
 
 
 
@@ -872,6 +880,7 @@ const TitleScreen: React.FC = () => {
                 className="button"
                 style={{}}
                 onClick={() => handleButtonClick(button.id)}
+                disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
             >
                 {button.troops}
             </button>
@@ -918,6 +927,7 @@ const TitleScreen: React.FC = () => {
                 onClick={() => {// Set the value of x here
                     const cur = nextState();
                 }}
+                disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
             >
                 {CurrentText}
             </button>
@@ -930,6 +940,7 @@ const TitleScreen: React.FC = () => {
                     transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
                     backgroundColor: 'red',
                 }}
+                disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
             >
                 Troop Amount: {troopBonus}
             </div>}
