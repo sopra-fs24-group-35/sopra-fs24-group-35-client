@@ -700,7 +700,7 @@ const TitleScreen: React.FC = () => {
         </div>
     </div>
     <div className="gamescreen-bottomright-container">
-        {num !== 0 ? (
+        {currentPlayerId !== avatar1Id ? (
             <div style={avatarStyle}>
                 <img src={avatar1} alt="avatar" style={imageStyle}/>
             </div>
@@ -709,7 +709,7 @@ const TitleScreen: React.FC = () => {
                 <img src={avatar1} alt="avatar" style={imageStyle}/>
                 </div>
             )}
-            {num !== 1 ? (
+            {currentPlayerId !== avatar2Id  ? (
                 <div style={avatarStyle}>
                     <img src={avatar2} alt="avatar" style={imageStyle}/>
                 </div>
@@ -718,7 +718,7 @@ const TitleScreen: React.FC = () => {
                     <img src={avatar2} alt="avatar" style={imageStyle}/>
                 </div>
             )}
-            {num !== 2 ? (
+            {currentPlayerId !== avatar3Id  ? (
                 <div style={avatarStyle}>
                     <img src={avatar3} alt="avatar" style={imageStyle}/>
                 </div>
@@ -727,7 +727,7 @@ const TitleScreen: React.FC = () => {
                     <img src={avatar3} alt="avatar" style={imageStyle}/>
                 </div>
             )}
-            {num !== 3 ? (
+            {currentPlayerId !== avatar4Id  ? (
                 <div style={avatarStyle}>
                     <img src={avatar4} alt="avatar" style={imageStyle}/>
                 </div>
