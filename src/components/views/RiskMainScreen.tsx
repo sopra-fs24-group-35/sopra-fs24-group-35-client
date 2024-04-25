@@ -554,53 +554,19 @@ const TitleScreen: React.FC = () => {
 
         let requestBodyGame =JSON.stringify({lobbyId})
         const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config }, requestBodyGame)
-
-        let tempCounter = 0
-        let player1Territories = 0
-        let player2Territories = 0
-        let player3Territories = 0
-        let player4Territories = 0
         let myTerritories = 0
-
+        let myId = localStorage.getItem("user_id")
 
         getGame.data.board.territories.forEach(terr => {
-            if(terr.owner === parseInt(localStorage.getItem("user_id"))){
+            if(parseInt(terr.owner) === parseInt(myId)){
                 myTerritories = myTerritories + 1
             }
-            if(terr.owner === avatar1Id){
-                player1Territories = player1Territories + 1
-            }
-            else if(terr.owner === avatar2Id){
-                player2Territories = player2Territories + 1
-            }
-            else if(terr.owner === avatar3Id){
-                player3Territories = player3Territories + 1
-            }
-            else if(terr.owner === avatar4Id){
-                player4Territories = player4Territories + 1
-            }
         })
-
-        myTerritories = 0
 
         if(myTerritories === 0){
             setIsLooseModalOpen(true)
         }
-
-        if(player1Territories === 0){
-            tempCounter = tempCounter + 1
-        }
-        if(player2Territories === 0){
-            tempCounter = tempCounter + 1
-        }
-        if(player3Territories === 0){
-            tempCounter = tempCounter + 1
-        }
-        if(player4Territories === 0){
-            tempCounter = tempCounter + 1
-        }
-
-        if(myTerritories !==0 && tempCounter >= playerCount-1){
+        else if(myTerritories === 42){
             setIsWinModalOpen(true)
         }
     }
