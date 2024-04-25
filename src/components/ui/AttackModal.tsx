@@ -48,13 +48,19 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
 
         const attackerId = getAttackerTerritory.data.owner;
 
+        console.log("same owner?", defenderId === attackerId);
+
+        if (defenderId === attackerId){
+          // maybe make it so you can transfer as many troops as you want?
+          onClose();
+          return;
+        }
+
         const config2 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id")};
 
         const def = await api.get(`/users/${defenderId}`, {headers: config2});
         
         const atk = await api.get(`/users/${attackerId}`, {headers: config2});
-
-        const def_data = def;
 
         //console.log("defendant: ", def);
 
@@ -88,6 +94,8 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
     setGame(attackResponse.data);
     console.log("attack response:", attackResponse);
   }
+
+
 
   const Player = ({ user }: { user: User }) => (
       <div className="player cont">

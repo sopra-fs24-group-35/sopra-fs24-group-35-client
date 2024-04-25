@@ -161,7 +161,6 @@ const TitleScreen: React.FC = () => {
             for(let j = 0; j < game.players.length; j++){
 
                 if(!playerOrder) {
-                    console.log("are you here?");
                     if (playerColors.length === 0) {
                         console.log('No more colors to select');
                         break;
@@ -221,14 +220,17 @@ const TitleScreen: React.FC = () => {
     }
 
     const handleButtonClick = (id: string) => {
-        if(phase === "REINFORCEMENT"){
-            deploytroops(id);
-        }
+        const territory = game.board.territories.find(territory => territory.name === id);
         if(phase === "ATTACK"){
             attackTerritory(id);
         }
-        if(phase === "MOVE"){
-            reinforceTroops(id);
+        else if(territory.owner === currentPlayerId){
+            if(phase === "REINFORCEMENT"){
+                deploytroops(id);
+            }
+            if(phase === "MOVE"){
+                reinforceTroops(id);
+            }
         }
     }
     const deploytroops = (id: string) => {
@@ -245,6 +247,7 @@ const TitleScreen: React.FC = () => {
 
     const handleButtonClick1 = (id: string) => {
         console.log(" First Terri: " + startButton + ", Second Terri: " + id + ", drawline: " + drawingLine + ".");
+        const territory = game.board.territories.find(territory => territory.name === id);
         if (drawingLine) {
             // Draw line between start button and clicked button
             undoLine();
@@ -254,13 +257,18 @@ const TitleScreen: React.FC = () => {
             setStartButton(id);
             highlightadjbutton(id)
         }else if(startButton){
-            dehighlightadjbutton(startButton);
-            drawLine(startButton, id);
-            setDrawingLine(true); // Enable drawing line mode
-            const territory_def = id;
-            const territory_atk = startButton;
-            const cont = JSON.stringify({territory_def, territory_atk});
-            openModal(cont);
+            console.log("startButton: ", startButton);
+            console.log("is adj?", adjDict.dict[startButton].includes(id));
+            console.log("is NOT currentPlayers?", territory.owner !== currentPlayerId);
+            if(territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)){
+                dehighlightadjbutton(startButton);
+                drawLine(startButton, id);
+                setDrawingLine(true); // Enable drawing line mode
+                const territory_def = id;
+                const territory_atk = startButton;
+                const cont = JSON.stringify({territory_def, territory_atk});
+                openModal(cont);
+            }
         } else {
             setStartButton(id);
             highlightadjbutton(id);
