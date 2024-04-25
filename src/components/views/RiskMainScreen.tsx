@@ -21,6 +21,7 @@ const TitleScreen: React.FC = () => {
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [troopBonus, setTroopBonus] = useState(null);
     const [playerColors, setPlayerColors] = useState(null);
+    const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
     let playerColorsArray = ["red", "blue", "purple", "green", "orange", "brown"];
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
@@ -29,7 +30,7 @@ const TitleScreen: React.FC = () => {
     let [num, setNum] = useState(0);
     let [avatarPos, setAvatarPos] = useState(0);
     const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
-    const id = localStorage.getItem("user_id")
+    const user_id = localStorage.getItem("user_id")
     let avatarId
     const [avatar1, setAvatar1] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
     const [avatar2, setAvatar2] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
@@ -37,10 +38,8 @@ const TitleScreen: React.FC = () => {
     const [avatar4, setAvatar4] = useState("https://api.dicebear.com/8.x/shapes/svg?seed=Mittens");
     const {gameId} = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
-    const [users, setUsers] = useState<User[]>(null);
     const [anzeige, setAnzeige] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const [startButton, setStartButton] = useState<string | null>(null);
-    const [endButton, setEndButton] = useState<string | null>(null);
     const [drawingLine, setDrawingLine] = useState(false);
     const adjDict = new AdjDict();
     //reload idea
@@ -51,12 +50,6 @@ const TitleScreen: React.FC = () => {
     const [curheight, setCurHeight] = useState(0);
     const [picture, setPicture] = useState(null);
 
-    const [curstate, setCurState] = useState(1);
-    //const [buttonStateText, setButtonStateText] = useState('Go to Attack');
-    const [curTroopAmount, setCurTroopAmount] = useState(15);
-    const [PlayerColor, setPlayerColor] = useState({});
-    const Colors = ["red", "blue", "violet", "green", "orange"];
-    const [PlayerCycle, setPlayerCycle] = useState(null);
     const [curListOfValidReinforcements, setcurListOfValidReinforcements] = useState([]);
     const [CurrentHighlightedButtons, setCurrentHighlightedButtons] = useState(null);
     /*---------------Attack Modal Setup----------------*/
@@ -143,7 +136,7 @@ const TitleScreen: React.FC = () => {
             setPhase(gameResponse.data.turnCycle.currentPhase);
             setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
             setTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
-            setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
+            setIsCurrentPlayer(Number.parseInt(user_id) === gameResponse.data.turnCycle.currentPlayer.playerId);
         }
         getGame();
     }, []);
@@ -184,8 +177,72 @@ const TitleScreen: React.FC = () => {
             }
 
             setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
+
+            if(Number.parseInt(user_id) === currentPlayerId){
+                console.log("I am current player");
+                setIsCurrentPlayer(true);
+            }
+            else {
+                console.log("I'm not current player");
+                setIsCurrentPlayer(false);
+            }
         }
-    }, [game, phase, currentPlayerId]);
+    }, [game, phase, currentPlayerId, isCurrentPlayer]);
+
+    var update = null;
+
+    const territoriesAreEqual = (territories_1, territories_2) => {
+    
+        if (territories_1.length !== territories_2.length) {
+            // If number of territories is different, consider them unequal
+            return false;
+        }
+    
+        for (let i = 0; i < territories_1.length; i++) {
+            const thisTerritory = territories_1[i];
+            const otherTerritory = territories_2[i];
+    
+            // Compare territory properties
+            if (thisTerritory.name !== otherTerritory.name ||
+                thisTerritory.owner !== otherTerritory.owner ||
+                thisTerritory.troops !== otherTerritory.troops) {
+                console.log("not equal here");
+                return false; // If any property is different, consider them unequal
+            }
+        }
+    
+        // All territories are equal
+        return true;
+    }
+
+    useEffect(() => {
+        if (!isCurrentPlayer){
+            update = setInterval( async () => {
+
+                const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
+                let tempGame = gameResponse.data;
+                console.log("phase: ", game.turnCycle.currentPhase);
+                console.log("actual phase: ", tempGame.turnCycle.currentPhase);
+                if(game && game.turnCycle.currentPhase !== tempGame.turnCycle.currentPhase){
+                    setGame(tempGame);
+                    setPhase(tempGame.turnCycle.currentPhase);
+                    setCurrentPlayerId(tempGame.turnCycle.currentPlayer.playerId);
+                    setTroopBonus(tempGame.turnCycle.currentPlayer.troopBonus);
+                    setIsCurrentPlayer(tempGame.turnCycle.currentPlayer.playerId === user_id);
+                }
+            }, 1000);
+        }
+        else {
+            clearInterval(update); // Stop the interval
+        }
+    }, [isCurrentPlayer]);
+
+    useEffect(() => {
+        const interval = update;
+        return () => {
+            clearInterval(interval);
+        }
+    }, [isCurrentPlayer]);
 
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
@@ -301,7 +358,7 @@ const TitleScreen: React.FC = () => {
                 highlightadjbutton(id);
             }
         } 
-        else if (territory.owner === currentPlayerId){
+        else if (territory.owner === currentPlayerId && checkifthereareenemies(id)){
             setStartButton(id);
             highlightadjbutton(id);
         }
@@ -343,8 +400,8 @@ const TitleScreen: React.FC = () => {
 
         if (phase === "MOVE") {
             setStartButton(null);
-            setEndButton(null);
             setDrawingLine(null);
+            setIsCurrentPlayer(false);
             if(startButton){
                 dehighlightadjbutton(startButton);}
             undoLine();
@@ -354,7 +411,6 @@ const TitleScreen: React.FC = () => {
             dehighlightadjbutton(startButton);}
             undoLine();
             setStartButton(null);
-            setEndButton(null);
             setDrawingLine(null);
         }
 
@@ -364,7 +420,6 @@ const TitleScreen: React.FC = () => {
         setGame(updateGame.data);
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
-        
     }
 
     const increaseTroops = (territory_id: string) => {
@@ -390,7 +445,6 @@ const TitleScreen: React.FC = () => {
             // Draw line between start button and clicked button
             undoLine();
             setStartButton(null);
-            setEndButton(null);
             setDrawingLine(false); // Reset drawing line mode
             setStartButton(id);
             checkForAllValidReinforcements(id);}
