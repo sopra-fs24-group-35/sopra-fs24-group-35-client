@@ -12,6 +12,8 @@ import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
+import { Simulate } from "react-dom/test-utils";
+import play = Simulate.play;
 
 
 const TitleScreen: React.FC = () => {
@@ -26,7 +28,7 @@ const TitleScreen: React.FC = () => {
     const navigate = useNavigate();
     const styles = new ApiStyles;
     let [num, setNum] = useState(0);
-    let [avatarPos, setAvatarPos] = useState(0);
+    let avatarPos = 0
     const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const id = localStorage.getItem("user_id")
     let avatarId
@@ -64,7 +66,10 @@ const TitleScreen: React.FC = () => {
         territory_def: "Add territory name here",
         territory_atk: "Add territory name here",
     });
-
+    const [color1, setColor1] = useState(null)
+    const [color2, setColor2] = useState(null)
+    const [color3, setColor3] = useState(null)
+    const [color4, setColor4] = useState(null)
     const openModal = (content) => {
         setIsModalOpen(true);
         setModalContent(JSON.parse(content));
@@ -162,7 +167,7 @@ const TitleScreen: React.FC = () => {
             if(PlayerCycle !== null) {
                 for(const player of PlayerCycle){
                     PlayerwithColors[player.playerId] = Colors[x];
-                    console.log("playerid " + player.playerId + "color: " + Colors[x]);
+                    console.log("playerid " + player.playerId + " color: " + Colors[x]);
                     x++;
                 }
             }
@@ -505,7 +510,7 @@ const TitleScreen: React.FC = () => {
         borderRadius: '50%', // Makes the image circular
         overflow: 'hidden', // Hides the overflow
         marginRight: '10px', // Adjust the space between images
-        border: '4px solid red', // Red outline
+        border: '4px solid Black', // Black outline
     };
 
     const avatarStyle: React.CSSProperties = {
@@ -549,22 +554,27 @@ const TitleScreen: React.FC = () => {
 
             getUserResponse.data.forEach(user => {
                 // Access each user object here
+                console.log(user)
 
                 if(avatarPos === 0){
                     setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
+                    avatarPos = avatarPos +1
+                    setColor1(PlayerColor[user.id])
                 }
                 else if(avatarPos === 1){
                     setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
+                    avatarPos = avatarPos +1
+                    setColor2(PlayerColor[user.id])
                 }
                 else if(avatarPos === 2){
                     setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
+                    avatarPos = avatarPos +1
+                    setColor3(PlayerColor[user.id])
                 }
                 else if(avatarPos === 3){
                     setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[user.avatarId]}`)
-                    setAvatarPos(num +1)
+                    avatarPos = avatarPos +1
+                    setColor4(PlayerColor[user.id])
                 }
             });
 
@@ -722,40 +732,40 @@ const TitleScreen: React.FC = () => {
         </div>}
     </div>
     <div className="gamescreen-bottomright-container">
-        {num !== 0 ? (
-            <div style={avatarStyle}>
-                <img src={anzeige} alt="avatar" style={imageStyle}/>
+        {num !== 1 ? (
+            <div style={{...avatarStyle, border: `4px solid ${color1}`}}>
+                <img src={avatar1} alt="avatar" style={imageStyle}/>
             </div>
         ) : (
-            <div style={avatarStylePlaying}>
-                <img src={anzeige} alt="avatar" style={imageStyle}/>
+            <div style={{avatarStylePlaying}}>
+                <img src={avatar1} alt="avatar" style={imageStyle}/>
                 </div>
             )}
             {num !== 1 ? (
-                <div style={avatarStyle}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                <div style={{...avatarStyle, border: `4px solid ${color2}`}}>
+                    <img src={avatar2} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
                 <div style={avatarStylePlaying}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                    <img src={avatar2} alt="avatar" style={imageStyle}/>
                 </div>
             )}
             {num !== 2 ? (
-                <div style={avatarStyle}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                <div style={{...avatarStyle, border: `4px solid ${color3}`}}>
+                    <img src={avatar3} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
                 <div style={avatarStylePlaying}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                    <img src={avatar3} alt="avatar" style={imageStyle}/>
                 </div>
             )}
             {num !== 3 ? (
-                <div style={avatarStyle}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                <div style={{...avatarStyle, border: `4px solid ${color4}`}}>
+                    <img src={avatar4} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
                 <div style={avatarStylePlaying}>
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+                    <img src={avatar4} alt="avatar" style={imageStyle}/>
                 </div>
             )}
     </div>
