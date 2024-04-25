@@ -20,7 +20,7 @@
 .modal-content {
     border: 1px solid rgb(152, 105, 105);
     min-width: 700px;
-    min-height: 500px;
+    min-height: 400px;
     background-color: rgba(152, 105, 105, 0.929);
     border-radius: $borderRadius;
     position: absolute;
@@ -58,6 +58,9 @@
 }
 .modal-info-container {
     @include center;
+    border: 2px solid black;
+    border-radius: $borderRadius;
+    margin: 30px;
     flex-direction: row; /* Arrange children vertically */
 }
 .vs-text{
@@ -70,7 +73,8 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    border: 2px solid black;
+    //border: 2px solid black;
+    border: none;
     border-radius: $borderRadius;
     padding: 5px;
     margin: 30px;
@@ -79,8 +83,9 @@
 .defense-territory-info,
 .attack-territory-info {
     flex: 1;
-    border: 2px solid black;
-    border-radius: 0.75em;
+    //border: 2px solid black;
+    border-radius: $borderRadius;
+    border: none;
     padding: 5px;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -128,7 +133,7 @@
 .button-div {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    margin: 10px;
 }
 .player {
     &.cont {
