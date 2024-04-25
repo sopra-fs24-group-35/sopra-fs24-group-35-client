@@ -4,14 +4,17 @@ import React from 'react';
 import "styles/views/TitleScreennew.scss";
 import {Button} from "../ui/Button";
 import BaseContainer from "../ui/BaseContainer";
+let riskLogo = require("./Risk.png");
 
-const TitleScreen: React.FC = () => {
+const TitleScreen2: React.FC = () => {
     return (
         <div className="basescreen title-screen">
             <div className="basescreen overlay"></div>
             <BaseContainer>
                 <div className="basescreen form">
-                    <div className="basescreen title">Risk: Global Domination</div>
+                    <div className="basescreen title">
+                        <img src={riskLogo} alt="risk logo" />
+                    </div>
                 <div className="basescreen buttons-container" style={{gap: '30px'}}>
                     <Button
                         width="100%">
@@ -28,4 +31,4 @@ const TitleScreen: React.FC = () => {
     );
 }
 
-export default TitleScreen;
+export default TitleScreen2;
