@@ -713,7 +713,7 @@ const TitleScreen: React.FC = () => {
         return () => {
             window.removeEventListener('resize', resizeCanvas);
         };
-    }, [playerColors]);
+    }, [game]);
 
     let renderButtons = (
         buttonData.map((button) => (
