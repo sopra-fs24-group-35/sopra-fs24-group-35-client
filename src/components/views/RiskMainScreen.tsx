@@ -57,7 +57,7 @@ const TitleScreen: React.FC = () => {
     const Colors = ["red", "blue", "violet", "green", "orange"];
     const [PlayerCycle, setPlayerCycle] = useState(null);
     const [curListOfValidReinforcements, setcurListOfValidReinforcements] = useState([]);
-
+    const [CurrentHighlightedButtons, setCurrentHighlightedButtons] = useState(null);
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalContent, setModalContent] = useState({
@@ -193,8 +193,8 @@ const TitleScreen: React.FC = () => {
         button.playerid = playerid;
         setButtonData([...buttonData]);
         const curbutton = buttonRefs.current[id];
-        curbutton.style.backgroundColor = color[2];
-        }
+        curbutton.style.backgroundColor = Colors[2];
+    }
 
     const checkForAllValidReinforcements = (id: string) => {
         const playerid = currentPlayerId;
@@ -217,11 +217,38 @@ const TitleScreen: React.FC = () => {
             }
         }
         setcurListOfValidReinforcements(validbuttonid);
+        setCurrentHighlightedButtons(validbuttonid);
 
         for (const button of validbuttonid) {
             const curbutton = buttonRefs.current[button]
-            curbutton.style.border = "2px solid white";
+            if(button === id) {
+                curbutton.style.border = "2px double white";
+                curbutton.style.padding = "10px"; // Example padding
+            }
+            else {
+                curbutton.style.border= "2px solid white";}
+
         }
+    }
+
+    const checkifthereareenemies = (id: string) => {
+        for (const thisterritory of adjDict.dict[id]) {
+            const curterritory = game.board.territories.find(territory => territory.name === thisterritory);
+            if(curterritory.owner !== currentPlayerId){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    const checkifthereareneighbors = (id: string) => {
+        for (const thisterritory of adjDict.dict[id]) {
+            const curterritory = game.board.territories.find(territory => territory.name === thisterritory);
+            if(curterritory.owner === currentPlayerId){
+                return true;
+            }
+        }
+        return false;
     }
 
     const handleButtonClick = (id: string) => {
@@ -248,25 +275,30 @@ const TitleScreen: React.FC = () => {
     }
 
     const handleButtonClick1 = (id: string) => {
+        const territory = game.board.territories.find(territory => territory.name === id);
         if (drawingLine) {
             // Draw line between start button and clicked button
+        if (currentPlayerId === territory.owner && checkifthereareenemies(id)) {
             undoLine();
             setStartButton(null);
             setEndButton(null);
             setDrawingLine(false); // Reset drawing line mode
             setStartButton(id);
-            highlightadjbutton(id)
+            highlightadjbutton(id)}
         }else if(startButton){
-            dehighlightadjbutton(startButton);
-            drawLine(startButton, id);
-            setDrawingLine(true); // Enable drawing line mode
-            const territory_def = id;
-            const territory_atk = startButton;
-            const cont = JSON.stringify({territory_def, territory_atk});
-            openModal(cont);
+            if (currentPlayerId !== territory.owner && CurrentHighlightedButtons.includes(id)){
+                dehighlightadjbutton(startButton);
+                drawLine(startButton, id);
+                setDrawingLine(true); // Enable drawing line mode
+                const territory_def = id;
+                const territory_atk = startButton;
+                const cont = JSON.stringify({territory_def, territory_atk});
+                openModal(cont);}
         } else {
-            setStartButton(id);
-            highlightadjbutton(id);
+            if (currentPlayerId === territory.owner && checkifthereareenemies(id)) {
+                setStartButton(id);
+                highlightadjbutton(id);
+            }
         }
     };
 
@@ -315,52 +347,64 @@ const TitleScreen: React.FC = () => {
     }
 
     const redirectTroops = (id : string) => {
+        const territory = game.board.territories.find(territory => territory.name === id);
         if (drawingLine) {
+            if (currentPlayerId === territory.owner && territory.troops > 1 && checkifthereareneighbors(id)) {
             // Draw line between start button and clicked button
             undoLine();
             setStartButton(null);
             setEndButton(null);
             setDrawingLine(false); // Reset drawing line mode
             setStartButton(id);
-            checkForAllValidReinforcements(id);
+            checkForAllValidReinforcements(id);}
         }else if(startButton){
-            dehighlightadjbutton(startButton);
-            const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
-            const button_to = buttonData.find(button => button.id === id);
-            if (button_from && button_to) {
-                button_from.troops -= 1; // Increment the troops count
-                button_to.troops += 1;
-                setButtonData([...buttonData]); // Update the button data array in the state
+            if (currentPlayerId === territory.owner && CurrentHighlightedButtons.includes(id) && id !== startButton) {
+                dehighlightadjbutton(startButton);
+                const territory_from = game.board.territories.find(territory => territory.name === startButton);
+                const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
+                const button_to = buttonData.find(button => button.id === id);
+                if (button_from && button_to && button_from.troops > 1) {
+                    button_from.troops -= 1; // Increment the troops count
+                    button_to.troops += 1;
+                    territory.troops += 1;
+                    territory_from.troops -= 1;
+                    setButtonData([...buttonData]); // Update the button data array in the state
+                    setGame(game);
+                    drawLine(startButton, id);
+                    setDrawingLine(true); // Enable drawing line mode
+                }
             }
-            drawLine(startButton, id);
-            setDrawingLine(true); // Enable drawing line mode
         } else {
-            setStartButton(id);
-            checkForAllValidReinforcements(id);
+            if (currentPlayerId === territory.owner && checkifthereareneighbors(id) && territory.troops > 1 ) {
+                setStartButton(id);
+                checkForAllValidReinforcements(id);
+            }
         }
     }
 
     const highlightadjbutton = (startId: string) => {
         //increaseTroops(startId);
-        if(phase === "ATTACK"){
+        if (phase === "ATTACK") {
             const adjacentTerritories = adjDict.dict[startId];
             let enemyAdjacentTerritories = [];
-            for(let name of adjacentTerritories){
+            for (let name of adjacentTerritories) {
                 const territory = game.board.territories.find(territory => territory.name === name);
-                //console.log("territory: ", territory);
-                //console.log("currentPlayer:", currentPlayerId);
-                if(territory.owner !== currentPlayerId){
+                if (territory.owner !== currentPlayerId) {
                     enemyAdjacentTerritories.push(name);
                 }
             }
-            //console.log("enemy: ",enemyAdjacentTerritories);
-            for(const territory of enemyAdjacentTerritories){
+            setCurrentHighlightedButtons(enemyAdjacentTerritories);
+            for (const territory of enemyAdjacentTerritories) {
                 const button = buttonRefs.current[territory];
-                button.style.border= "2px solid white";
+                button.style.border = "2px solid white";
             }
-        }
+            const button = buttonRefs.current[startId];
+            button.style.border = "2px double white";
+            button.style.padding = "10px"; // Example padding
 
+        }
     }
+
 
     const dehighlightadjbutton = (startId: string) => {
         const adjacentTerritories = adjDict.dict[startId];
@@ -372,6 +416,10 @@ const TitleScreen: React.FC = () => {
             const button = buttonRefs.current[territory]
             button.style.border = "2px solid black";
         }
+        const button = buttonRefs.current[startButton];
+        button.style.border = "2px solid black";
+        button.style.padding = "0px"; // Example padding
+
     }
 
     const drawLine = (startId: string, endId: string) => {
