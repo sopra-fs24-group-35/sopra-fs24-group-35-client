@@ -95,7 +95,7 @@ const LobbyErstellen = () => {
         <img src={riskLogo} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', position: 'absolute', top: '0', left: '50%', transform: `translate(${-50}%, ${-10}%)` }} alt="My Image" />
       </div>
 
-      <div className="basescreen form" style={{ height: '300px', transform: `translate(${0}%, ${70}%)`}}>
+      <div className="basescreen form" style={{ height: '300px', transform: `translate(${0}%, ${60}%)`}}>
         <div className="basescreen buttons-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1, marginTop: '20px' }}>
           <Button
             width="100%"
