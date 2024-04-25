@@ -221,7 +221,8 @@ const TitleScreen: React.FC = () => {
 
     const handleButtonClick = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if(phase === "ATTACK"){
+ 
+        if (phase === "ATTACK"){
             attackTerritory(id);
         }
         else if(territory.owner === currentPlayerId){
@@ -238,21 +239,50 @@ const TitleScreen: React.FC = () => {
     }
 
     const attackTerritory = (id: string) => {
-        handleButtonClick1(id);
+        //handleButtonClick1(id);
+        const territory = game.board.territories.find(territory => territory.name === id);
+        if(startButton){
+            console.log("startButton: ", startButton);
+            console.log("is adj?", adjDict.dict[startButton].includes(id));
+            console.log("is NOT currentPlayers?", territory.owner !== currentPlayerId);
+            if(territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)){
+                dehighlightadjbutton(startButton);
+                drawLine(startButton, id);
+                //setDrawingLine(true); // Enable drawing line mode
+                const territory_def = id;
+                const territory_atk = startButton;
+                const cont = JSON.stringify({territory_def, territory_atk});
+                openModal(cont);
+                setStartButton(null);
+            }
+            else if (startButton === id){
+                setStartButton(null);
+                dehighlightadjbutton(startButton);
+            }
+            else if(territory.owner === currentPlayerId){
+                dehighlightadjbutton(startButton);
+                setStartButton(id);
+                highlightadjbutton(id);
+            }
+        } 
+        else if (territory.owner === currentPlayerId){
+            setStartButton(id);
+            highlightadjbutton(id);
+        }
     }
 
     const reinforceTroops = (id: string) => {
         redirectTroops(id)
     }
 
-    const handleButtonClick1 = (id: string) => {
+    /*const handleButtonClick1 = (id: string) => {
         console.log(" First Terri: " + startButton + ", Second Terri: " + id + ", drawline: " + drawingLine + ".");
         const territory = game.board.territories.find(territory => territory.name === id);
         if (drawingLine) {
             // Draw line between start button and clicked button
             undoLine();
             setStartButton(null);
-            setEndButton(null);
+            //setEndButton(null);
             setDrawingLine(false); // Reset drawing line mode
             setStartButton(id);
             highlightadjbutton(id)
@@ -269,11 +299,8 @@ const TitleScreen: React.FC = () => {
                 const cont = JSON.stringify({territory_def, territory_atk});
                 openModal(cont);
             }
-        } else {
-            setStartButton(id);
-            highlightadjbutton(id);
         }
-    };
+    };*/
 
     const nextState = async() => {
 
