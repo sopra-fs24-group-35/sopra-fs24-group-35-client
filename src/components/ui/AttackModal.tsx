@@ -93,7 +93,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
     const config = { Authorization: localStorage.getItem("lobbyToken") };
     const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedTroops,"repeats" : selectedAttacks});
     console.log("requestBody: ", requestBody);
-    const attackResponse = await api.post(`lobbies/${lobbyId}/game/${gameId}/attacks`, requestBody, {headers: config});
+    const attackResponse = await api.post(`lobbies/${lobbyId}/game/${gameId}/attack`, requestBody, {headers: config});
     setGame(attackResponse.data);
     console.log("attack response:", attackResponse);
   }
@@ -105,10 +105,11 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
     const now = gameResponse.data.board;
     const territory1 = now.territories.find(territory => territory.name === attackTerritory.name);
     const territory2 = now.territories.find(territory => territory.name === defenseTerritory.name);
-    territory1.troops -= number;
-    territory2.troops += number;
-    const requestBody = JSON.stringify({"board": now});
-    const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}`, requestBody, {headers: config});
+    // territory1.troops -= number;
+    // territory2.troops += number;
+    const requestBody1 = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : number});
+    const updateGame = await api.put(`lobbies/${lobbyId}/game/${gameId}/transfer`, requestBody1, {headers: config});
+    console.log("AFTER MOVING: " + updateGame.data);
     onClose(true);
 
   }
