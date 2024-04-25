@@ -752,16 +752,42 @@ const TitleScreen: React.FC = () => {
             </div>}
         </div>
         <div className="gamescreen-bottomright-container">
-            {Array.from({length: 4}, (_, index) => (
-                <div
-                    key={index}
-                    //className={num !== index ? "avatar-inactive" : "avatar-active"} // Define your class names here
-                    className={"avatar"}
-                    style={num !== index ? avatarStyle : avatarStylePlaying}
-                >
-                    <img src={anzeige} alt="avatar" style={imageStyle}/>
+            {num !== 1 ? (
+                <div style={{...avatarStyle, border: `4px solid ${color1}`}}>
+                    <img src={avatar1} alt="avatar" style={imageStyle}/>
                 </div>
-            ))}
+            ) : (
+                <div style={{avatarStylePlaying}}>
+                    <img src={avatar1} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+            {num !== 1 ? (
+                <div style={{...avatarStyle, border: `4px solid ${color2}`}}>
+                    <img src={avatar2} alt="avatar" style={imageStyle}/>
+                </div>
+            ) : (
+                <div style={avatarStylePlaying}>
+                    <img src={avatar2} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+            {num !== 2 ? (
+                <div style={{...avatarStyle, border: `4px solid ${color3}`}}>
+                    <img src={avatar3} alt="avatar" style={imageStyle}/>
+                </div>
+            ) : (
+                <div style={avatarStylePlaying}>
+                    <img src={avatar3} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
+            {num !== 3 ? (
+                <div style={{...avatarStyle, border: `4px solid ${color4}`}}>
+                    <img src={avatar4} alt="avatar" style={imageStyle}/>
+                </div>
+            ) : (
+                <div style={avatarStylePlaying}>
+                    <img src={avatar4} alt="avatar" style={imageStyle}/>
+                </div>
+            )}
         </div>
     </div>);
 
@@ -782,7 +808,7 @@ const TitleScreen: React.FC = () => {
                 {renderButtons}
             </div>
             {lowerContent}
-            
+
         </div>
     );
 }
