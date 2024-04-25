@@ -192,17 +192,17 @@ const TitleScreen: React.FC = () => {
         return button ? { xratio: button.xratio, yratio: button.yratio } : { xratio: 0, yratio: 0 }; // Return xratio and yratio if the button is found, otherwise return default values
     };
 
-    const setNewPlayerOwner = (id:string, playerid:number) => {
+    /*const setNewPlayerOwner = (id:string, playerid:number) => {
         const button = buttonData.find(button => button.id === id);
         button.playerid = playerid;
         setButtonData([...buttonData]);
         const curbutton = buttonRefs.current[id];
         curbutton.style.backgroundColor = Colors[2];
-    }
+    }*/
 
     const checkForAllValidReinforcements = (id: string) => {
         const playerid = currentPlayerId;
-        console.log("MY PLAYER ID:", playerid);
+        //console.log("MY PLAYER ID:", playerid);
         let validbuttonid = [];
         let buttonqueue = [id];
         let visited = {}; // Keep track of visited territories
@@ -401,10 +401,15 @@ const TitleScreen: React.FC = () => {
                 const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
                 const button_to = buttonData.find(button => button.id === id);
                 if (button_from && button_to && button_from.troops > 1) {
-                    button_from.troops -= 1; // Increment the troops count
+                    /*button_from.troops -= 1; // Increment the troops count
                     button_to.troops += 1;
                     territory.troops += 1;
-                    territory_from.troops -= 1;
+                    territory_from.troops -= 1;*/
+                    const territory_def = id;
+                    const territory_atk = startButton;
+                    const cont = JSON.stringify({territory_def, territory_atk});
+                    openModal(cont);
+
                     setButtonData([...buttonData]); // Update the button data array in the state
                     setGame(game);
                     drawLine(startButton, id);

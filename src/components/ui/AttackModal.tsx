@@ -23,7 +23,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
   const [attackTerritory, setAttackTerritory] = useState(null);
 
   const [selectedTroops, setSelectedTroops] = useState(3);
-  const [selectedAttacks, setSelectedAttacks] = useState(10);
+  const [selectedAttacks, setSelectedAttacks] = useState(100);
   //console.log("selectedTroops", selectedTroops);
 
   useEffect(() => {
@@ -128,37 +128,46 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
         <main className="modal-mainContents">
           <div className="modal-info-container">
             <div className="defender-info">
-              <h5 className="modal-title">DEFENDER</h5>
+              <h5 className="modal-title">{(!sameOwner) ? "DEFENDER" : "MOVING TROOPS"}</h5>
               {defender && <Player user={defender} />}
             </div>
-            <p className="vs-text">{(!sameOwner) ? "VS" : "<--"}</p>
-            <div className="attacker-info">
-              <h5 className="modal-title">ATTACKER</h5>
-              {attacker && <Player user={attacker} />}
-            </div>
+            {(!sameOwner) ?
+            (
+              <>
+                <p className="vs-text">{(!sameOwner) ? "VS" : '\u2190'}</p>
+                <div className="attacker-info">
+                  <h5 className="modal-title">ATTACKER</h5>
+                  {attacker && <Player user={attacker} />}
+                </div>
+              </>
+            ) : (null)}
           </div>
           <div className="modal-info-container">
             <div className="defense-territory-info">
               <h5 className="modal-title">{modalContent.territory_def}</h5>
-              <h5 className="troopInfo">Enemy Troops: {defenseTerritory && defenseTerritory.troops}</h5>
+              <h5 className="troopInfo">{(!sameOwner) ? "Enemy Troops:" : "Your Troops:"} {defenseTerritory && defenseTerritory.troops}</h5>
             </div>
-            <p className="vs-text">{(!sameOwner) ? "VS" : "<--"}</p>
+            <p className="vs-text">{(!sameOwner) ? "VS" : '\u2190' }</p>
             <div className="attack-territory-info">
               <h5 className="modal-title">{modalContent.territory_atk}</h5>
               <h5 className="troopInfo">Your Troops: {attackTerritory && attackTerritory.troops}</h5>
               <div className="selectables">
               {(!sameOwner) ? (
-                <label className="select-label">
+                <div>
+                  <label className="select-label">
                   Troops:
                   <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
                     <option value={3}>3</option>
                     <option value={2}>2</option>
                     <option value={1}>1</option>
                   </select>
-                </label>) : null}
-                <hr className="hr"/>
+                  </label>
+                  <hr className="hr"/>
+                </div>
+                )
+                : (null)}
                 <label className="select-label">
-                {(!sameOwner) ? "Attacks:" : "Moving Troops:"}
+                {(!sameOwner) ? "Attacks:" : "Move Troops:"}
                   <select className="select" value={selectedAttacks} onChange={e => setSelectedAttacks(e.target.value)}>
                     <option value={1}>1</option>
                     <option value={5}>5</option>
@@ -171,7 +180,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
             </div>
           </div>
           <div className="button-div">
-            {(!sameOwner) ? <Button width="50%" onClick={attack}>Attack</Button> : <Button width="50%" onClick={move}>Relocate Troops</Button>}
+            {(!sameOwner) ? <Button width="50%" onClick={attack}>Attack</Button> : <Button width="50%" onClick={move}>Move Troops</Button>}
           </div>
         </main>
       </div>
