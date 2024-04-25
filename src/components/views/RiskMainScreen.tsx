@@ -144,16 +144,32 @@ const TitleScreen: React.FC = () => {
 
     const config = {Authorization : localStorage.getItem("lobbyToken")};
 
-    useEffect (() => {
+    useEffect(() => {
+        // Define the function to fetch game data
         async function getGame() {
-            const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
-            setGame(gameResponse.data);
-            setPhase(gameResponse.data.turnCycle.currentPhase);
-            setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
-            setTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
-            setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
+            try {
+                const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config });
+                setGame(gameResponse.data);
+                setPhase(gameResponse.data.turnCycle.currentPhase);
+                setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
+                setTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
+                setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
+            } catch (error) {
+                console.error("Error fetching game data:", error);
+                // Handle error if needed
+            }
         }
+
+        // Call getGame initially
         getGame();
+
+        // Set up the interval to call getGame every 2 seconds
+        const intervalId = setInterval(() => {
+            getGame();
+        }, 2000);
+
+        // Clean up the interval when the component unmounts or when the dependency array changes
+        return () => clearInterval(intervalId);
     }, []);
 
     const order = {};
