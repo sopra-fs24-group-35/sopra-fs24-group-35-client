@@ -10,10 +10,13 @@ import game from "./Game";
 import { User } from "../../types";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
+import ModalWin from "../ui/ModalWin";
+import LooseModal from "../ui/LooseModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
 import { Simulate } from "react-dom/test-utils";
 import play = Simulate.play;
+
 
 
 const TitleScreen: React.FC = () => {
@@ -323,6 +326,7 @@ const TitleScreen: React.FC = () => {
     const nextState = async() => {
 
         if (phase === "MOVE") {
+            correctTerritories()
             setStartButton(null);
             setEndButton(null);
             setDrawingLine(null);
@@ -334,6 +338,7 @@ const TitleScreen: React.FC = () => {
         else{
             if(startButton){
             dehighlightadjbutton(startButton);}
+            correctTerritories()
             undoLine();
             setStartButton(null);
             setEndButton(null);
@@ -572,6 +577,7 @@ const TitleScreen: React.FC = () => {
                 player4Territories = player4Territories + 1
             }
         })
+
         myTerritories = 0
 
         if(myTerritories === 0){
@@ -594,8 +600,9 @@ const TitleScreen: React.FC = () => {
         if(myTerritories !==0 && tempCounter >= playerCount-1){
             setIsWinModalOpen(true)
         }
-
     }
+
+
 
     const fetchData = async () => {
         try {
@@ -867,6 +874,16 @@ const TitleScreen: React.FC = () => {
             <div className="gamescreen-innerupper-container">
                 {/*Attack Modal Section*/}
                 <section>
+                    <ModalWin
+                     isModalOpen={isWinModalOpen}
+                    onClose={closeModal}
+                    />
+
+                    <LooseModal
+                      isModalOpen={isLooseModalOpen}
+                      onClose={closeModal}
+                    />
+
                     <AttackModal
                         isModalOpen={isModalOpen}
                         modalContent={modalContent}
