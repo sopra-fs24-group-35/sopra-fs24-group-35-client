@@ -17,6 +17,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
   const [attacker, setAttacker] = useState<User>(null);
   const [defender, setDefender] = useState<User>(null);
   const [game, setGame] = useState<Game>(null);
+  const [sameOwner, setSameOwner] = useState(false);
 
   const [defenseTerritory, setDefenseTerritory] = useState(null);
   const [attackTerritory, setAttackTerritory] = useState(null);
@@ -48,13 +49,20 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
 
         const attackerId = getAttackerTerritory.data.owner;
 
+        console.log("same owner?", defenderId === attackerId);
+
+        if (defenderId === attackerId){
+          // maybe make it so you can transfer as many troops as you want?
+          // onClose();
+          //return;
+          setSameOwner(true);
+        }
+
         const config2 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id")};
 
         const def = await api.get(`/users/${defenderId}`, {headers: config2});
         
         const atk = await api.get(`/users/${attackerId}`, {headers: config2});
-
-        const def_data = def;
 
         //console.log("defendant: ", def);
 
@@ -89,6 +97,16 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
     console.log("attack response:", attackResponse);
   }
 
+  const move = async() => {
+    const config = { Authorization: localStorage.getItem("lobbyToken") };
+    const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedAttacks});
+    console.log("requestBody: ", requestBody);
+    const moveResponse = await api.put(`lobbies/${lobbyId}/game/${gameId}/transfer`, requestBody, {headers: config});
+    setGame(moveResponse.data);
+    console.log("move response:", moveResponse);
+  }
+
+
   const Player = ({ user }: { user: User }) => (
       <div className="player cont">
         <img className="player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
@@ -100,8 +118,6 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
   Player.propTypes = {
   user: PropTypes.object,
   };
-
-  let numberOfTroops = 3; 
 
   return (
     <div className="modal" onClick={onClose}>
@@ -115,7 +131,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
               <h5 className="modal-title">DEFENDER</h5>
               {defender && <Player user={defender} />}
             </div>
-            <p className="vs-text">VS</p>
+            <p className="vs-text">{(!sameOwner) ? "VS" : "<--"}</p>
             <div className="attacker-info">
               <h5 className="modal-title">ATTACKER</h5>
               {attacker && <Player user={attacker} />}
@@ -126,11 +142,12 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
               <h5 className="modal-title">{modalContent.territory_def}</h5>
               <h5 className="troopInfo">Enemy Troops: {defenseTerritory && defenseTerritory.troops}</h5>
             </div>
-            <p className="vs-text">VS</p>
+            <p className="vs-text">{(!sameOwner) ? "VS" : "<--"}</p>
             <div className="attack-territory-info">
               <h5 className="modal-title">{modalContent.territory_atk}</h5>
               <h5 className="troopInfo">Your Troops: {attackTerritory && attackTerritory.troops}</h5>
               <div className="selectables">
+              {(!sameOwner) ? (
                 <label className="select-label">
                   Troops:
                   <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
@@ -138,10 +155,10 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
                     <option value={2}>2</option>
                     <option value={1}>1</option>
                   </select>
-                </label>
+                </label>) : null}
                 <hr className="hr"/>
                 <label className="select-label">
-                  Attacks:
+                {(!sameOwner) ? "Attacks:" : "Moving Troops:"}
                   <select className="select" value={selectedAttacks} onChange={e => setSelectedAttacks(e.target.value)}>
                     <option value={1}>1</option>
                     <option value={5}>5</option>
@@ -154,7 +171,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, lobbyId, gameId }) =>
             </div>
           </div>
           <div className="button-div">
-            <Button width="50%" onClick={attack}>Attack</Button>
+            {(!sameOwner) ? <Button width="50%" onClick={attack}>Attack</Button> : <Button width="50%" onClick={move}>Relocate Troops</Button>}
           </div>
         </main>
       </div>
