@@ -43,6 +43,9 @@ const TitleScreen: React.FC = () => {
     const [avatar2Id, setAvatar2Id] = useState(null);
     const [avatar3Id, setAvatar3Id] = useState(null);
     const [avatar4Id, setAvatar4Id] = useState(null);
+    const CasualAvatar = "https://api.dicebear.com/8.x/shapes/svg?seed=Mittens";
+    const [AllIDwithAvatar, setAllIDwithAvatar] = useState({});
+
     const {gameId} = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
     const [users, setUsers] = useState<User[]>(null);
@@ -602,8 +605,6 @@ const TitleScreen: React.FC = () => {
         }
     }
 
-
-
     const fetchData = async () => {
         try {
             const config = { Authorization: localStorage.getItem("lobbyToken") };
@@ -614,61 +615,25 @@ const TitleScreen: React.FC = () => {
             // set the userIdList to an array of longs consisting of all the user IDs in the lobby
             let userIdList = lobbyData.players;
 
-            const requestBody = JSON.stringify({ userIdList })
-            const getUserResponse = await api.post("users/lobbies", requestBody);
+            let playeridwithavatar = {};
+            const config1 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
 
-            // Set the state after fetching data
-            let requestBodyGame =JSON.stringify({lobbyId})
-            const getGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config }, requestBodyGame)
+            if(PlayerCycle !== null) {
+                for (const playerid of PlayerCycle) {
+                    playeridwithavatar[playerid.playerId] = null;
+                }
 
-            getUserResponse.data.forEach(user => {
-                // Access each user object here
-                console.log(user)
-                if(avatarPos === 0){
-                    setAvatar1(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[user.avatarId]}`)
-                    setAvatar1Id(user.id)
-                    getGame.data.board.territories.forEach(terr => {
-                        if(terr.owner === user.id){
-                            player1Territories = player1Territories + 1
-                        }
-                    })
-                    setColor1(PlayerColor[user.id])
-                    avatarPos = avatarPos +1
+                for (const player of userIdList) {
+                    const playerresponse = await api.get("/users/" + player, {headers: config1});
+                    playeridwithavatar[playerresponse.data.id] = `https://api.dicebear.com/8.x/thumbs/svg?seed=${playerresponse.data.avatarId}`;
                 }
-                else if(avatarPos === 1){
-                    setAvatar2(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[user.avatarId]}`)
-                    setAvatar2Id(user.id)
-                    getGame.data.board.territories.forEach(terr => {
-                        if(terr.owner === user.id){
-                            player2Territories = player2Territories + 1
-                        }
-                    })
-                    setColor2(PlayerColor[user.id])
-                    avatarPos = avatarPos +1
+                let xnumber = -3;
+                while (Object.keys(playeridwithavatar).length < 4) {
+                    playeridwithavatar[xnumber] = CasualAvatar;
+                    xnumber++;
                 }
-                else if(avatarPos === 2){
-                    setAvatar3(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[user.avatarId]}`)
-                    setAvatar3Id(user.id)
-                    getGame.data.board.territories.forEach(terr => {
-                        if(terr.owner === user.id){
-                            player3Territories = player3Territories + 1
-                        }
-                    })
-                    setColor3(PlayerColor[user.id])
-                    avatarPos = avatarPos +1
-                }
-                else if(avatarPos === 3){
-                    setAvatar4(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[user.avatarId]}`)
-                    setAvatar4Id(user.id)
-                    getGame.data.board.territories.forEach(terr => {
-                        if(terr.owner === user.id){
-                            player4Territories = player4Territories + 1
-                        }
-                    })
-                    setColor4(PlayerColor[user.id])
-                    avatarPos = avatarPos +1
-                }
-            });
+                setAllIDwithAvatar(playeridwithavatar);
+            }
 
         } catch (error) {
             alert(`Something went wrong with fetching the user data: \n${handleError(error)}`);
@@ -730,6 +695,9 @@ const TitleScreen: React.FC = () => {
                 (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
                 (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
             }
+            console.log("HJHSAJHSJAIJJIjsa");
+            console.log(getAvatarColor(0));
+            console.log(getcurrentAvatarColor(0))
 
 
         };
@@ -797,6 +765,32 @@ const TitleScreen: React.FC = () => {
             </button>
         ))
     );
+    function getAvatarSrc(x : number) {
+        if(PlayerCycle !== null && PlayerCycle.length > x){
+            return AllIDwithAvatar[PlayerCycle[x].playerId];
+        } else{
+            return CasualAvatar;
+        }
+    }
+
+    function getcurrentAvatarColor(x) {
+        if(PlayerCycle !== null && PlayerCycle.length > x && PlayerCycle[x].playerId === currentPlayerId) {
+            return `2px solid black`;
+        } else {
+            return "2px solid transparent"; // Return empty string if x is out of bounds or PlayerCycle[x] is falsy
+        }
+    }
+
+    function getAvatarColor(x) {
+        if(PlayerCycle !== null && PlayerCycle.length > x) {
+            if(PlayerCycle[x].playerId === currentPlayerId) {
+                return `6px double ${PlayerColor[PlayerCycle[x].playerId]}`;
+            } else{
+            return `4px solid ${PlayerColor[PlayerCycle[x].playerId]}`;}
+        } else {
+            return "2px solid transparent"; // Return empty string if x is out of bounds or PlayerCycle[x] is falsy
+        }
+    }
 
     let lowerContent = (<div className="gamescreen-innerlower-container">
         <div className="gamescreen-bottomleft-container">
@@ -830,40 +824,40 @@ const TitleScreen: React.FC = () => {
             </div>}
         </div>
         <div className="gamescreen-bottomright-container">
-            {currentPlayerId !== avatar1Id ? (
-                <div style={{...avatarStyle, border: `4px solid ${color1}`}}>
-                    <img src={avatar1} alt="avatar" style={imageStyle}/>
+            {num !== 1 ? (
+                <div className="avatar" id={'avatar0'} style={{ ...avatarStyle, border: `${getAvatarColor(0)}` }}>
+                    <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div style={{avatarStylePlaying}}>
-                    <img src={avatar1} alt="avatar" style={imageStyle}/>
+                <div className="avatar" style={{avatarStylePlaying}}>
+                    <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
                 </div>
             )}
-            {currentPlayerId !== avatar2Id ? (
-                <div style={{...avatarStyle, border: `4px solid ${color2}`}}>
-                    <img src={avatar2} alt="avatar" style={imageStyle}/>
+            {num !== 1 ? (
+                <div className="avatar" id={'avatar1'} style={{...avatarStyle, border: `${getAvatarColor(1)}`}}>
+                    <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div style={avatarStylePlaying}>
-                    <img src={avatar2} alt="avatar" style={imageStyle}/>
+                <div className="avatar" style={avatarStylePlaying}>
+                    <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
                 </div>
             )}
-            {currentPlayerId !== avatar3Id ? (
-                <div style={{...avatarStyle, border: `4px solid ${color3}`}}>
-                    <img src={avatar3} alt="avatar" style={imageStyle}/>
+            {num !== 2 ? (
+                <div className="avatar" id={'avatar2'} style={{...avatarStyle, border: `${getAvatarColor(2)}`}}>
+                    <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div style={avatarStylePlaying}>
-                    <img src={avatar3} alt="avatar" style={imageStyle}/>
+                <div className="avatar" style={avatarStylePlaying}>
+                    <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
                 </div>
             )}
-            {currentPlayerId !== avatar4Id ? (
-                <div style={{...avatarStyle, border: `4px solid ${color4}`}}>
-                    <img src={avatar4} alt="avatar" style={imageStyle}/>
+            {num !== 3 ? (
+                <div className="avatar" id={'avatar3'} style={{...avatarStyle, border: `${getAvatarColor(3)}`}}>
+                    <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div style={avatarStylePlaying}>
-                    <img src={avatar4} alt="avatar" style={imageStyle}/>
+                <div className="avatar" style={avatarStylePlaying}>
+                    <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
                 </div>
             )}
         </div>

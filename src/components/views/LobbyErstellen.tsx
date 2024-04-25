@@ -87,7 +87,7 @@ const LobbyErstellen = () => {
               width="100%"
               onClick={() => doLobbyCreate()}>
 
-              Crate Lobby
+              Create Lobby
             </Button>
           </div>
         </div>
