@@ -189,6 +189,8 @@ const TitleScreen: React.FC = () => {
                 // console.log("buttonTroops", button.troops);
                 setButtonData([...buttonData]);
             }
+
+            setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
         }
     }, [game, phase, currentPlayerId]);
 
@@ -298,7 +300,6 @@ const TitleScreen: React.FC = () => {
             if(startButton){
                 dehighlightadjbutton(startButton);}
             undoLine();
-            setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
         }
         else{
             if(startButton){
@@ -315,6 +316,7 @@ const TitleScreen: React.FC = () => {
         setGame(updateGame.data);
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
+        
     }
 
     const increaseTroops = (territory_id: string) => {
