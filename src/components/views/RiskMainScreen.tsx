@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useLayoutEffect} from "react";
 //import React, { useEffect } from 'react';
 import "styles/views/GameScreen.scss";
 import { api, handleError } from "helpers/api";
@@ -631,22 +631,134 @@ const TitleScreen: React.FC = () => {
         }
     };
     const nextSate = document.getElementById('nextState');
-    
-    useEffect(() => {
-        async function gettheUser(id) {
-            try {
-                const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
-                const response = await api.get("/users/"+id, {headers: config});
-                avatarId = response.data.avatarId
-                setAnzeige(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[avatarId]}`);
-            } catch (error) {
-                alert(
-                    `Something went wrong with fetching the user data: \n${handleError(error)}`
-                );
-            }
+
+    useLayoutEffect(() => {
+        if(currentPlayerId !== localStorage.getItem("user_id")){
+        // Function to preload the image
+        const preloadImage = (url) => {
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = reject;
+                image.src = url;
+            });
         };
 
-        fetchData()
+        // Preload the image
+        const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
+        preloadImage(imageSrc).then((image: HTMLImageElement) => {
+            // Once the image is fully loaded, update the canvas
+            fetchData();
+            const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+            const ctx = canvas.getContext('2d');
+
+            const resizeCanvas = () => {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+                let aspectRatio = 0
+
+                aspectRatio = image.width / image.height;
+                let drawWidth = canvas.width;
+                let drawHeight = canvas.height;
+
+                // Adjust the size of the image to maintain aspect ratio
+                if (drawWidth / drawHeight > aspectRatio) {
+                    drawWidth = drawHeight * aspectRatio;
+                } else {
+                    drawHeight = drawWidth / aspectRatio;
+                }
+
+                const x = (canvas.width - drawWidth) / 2;
+                const y = (canvas.height - drawHeight) / 2;
+
+                setCurHeight(drawHeight);
+                setCurWidth(drawWidth);
+                setX(x);
+                setY(y);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(image, x, y, drawWidth, drawHeight);
+                resizeButtons(x, y, drawWidth, drawHeight);
+            };
+
+            const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
+                const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
+                const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
+
+                Object.keys(buttonRefs.current).forEach((buttonId: string) => {
+                    const button = buttonRefs.current[buttonId];
+                    const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
+
+                    button.style.left = `${x}px`;
+                    button.style.top = `${y}px`;
+                    button.style.width = `${buttonWidth}px`;
+                    button.style.height = `${buttonHeight}px`;
+                    button.style.fontSize = `${buttonHeight*0.35}px`;
+
+
+                    if(game !== null){
+                        const territory = game.board.territories.find(territory => territory.name === buttonId);
+                        button.style.backgroundColor = PlayerColor[territory.owner];
+                    }
+
+                });
+
+                //Dynamically Adjust heigh and Widgt of the lower Textboxes
+                //const troopAmountDiv = document.getElementById('nextState');
+                let allbuttons = document.querySelectorAll('.dynbut');
+                let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                for (const but of buttonsArray) {
+                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
+                    (but as HTMLButtonElement).style.width = `${buttonWidth*9}px`;
+                    (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.35*2.5}px`;
+                }
+
+                allbuttons = document.querySelectorAll('.avatar');
+                buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                for (const but of buttonsArray) {
+                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
+                    (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
+                }
+
+            };
+
+            const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
+                const {xratio, yratio} = getButtonRatiosById(buttonId)
+                let x = startx + drawWidth * xratio; // Default left position
+                let y = starty + drawHeight * yratio; // Default top position
+
+                return { x, y };
+            };
+
+            // Initial setup
+            resizeCanvas();
+
+            // Handle resize event
+            window.addEventListener('resize', resizeCanvas);
+
+            return () => {
+                window.removeEventListener('resize', resizeCanvas);
+            };
+        }
+        )};
+
+    }, [PlayerColor]);
+
+
+
+ /*   useLayoutEffect(() => {
+        // Function to preload the image
+        const preloadImage = (url) => {
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = reject;
+                image.src = url;
+            });
+        };
+        preloadImage(require('../../styles/views/Pictures/RiskMap21.png'));
+
+        fetchData();
         // Canvas setup
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
@@ -660,54 +772,54 @@ const TitleScreen: React.FC = () => {
             image.src = imageSrc;
             setPicture(image);
 
-        const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
-            const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
-            const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
+            const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
+                const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
+                const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
 
-            Object.keys(buttonRefs.current).forEach((buttonId: string) => {
-                const button = buttonRefs.current[buttonId];
-                const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
+                Object.keys(buttonRefs.current).forEach((buttonId: string) => {
+                    const button = buttonRefs.current[buttonId];
+                    const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
 
-                button.style.left = `${x}px`;
-                button.style.top = `${y}px`;
-                button.style.width = `${buttonWidth}px`;
-                button.style.height = `${buttonHeight}px`;
-                button.style.fontSize = `${buttonHeight*0.35}px`;
+                    button.style.left = `${x}px`;
+                    button.style.top = `${y}px`;
+                    button.style.width = `${buttonWidth}px`;
+                    button.style.height = `${buttonHeight}px`;
+                    button.style.fontSize = `${buttonHeight*0.35}px`;
 
 
-                if(game !== null){
-                    const territory = game.board.territories.find(territory => territory.name === buttonId);
-                    button.style.backgroundColor = PlayerColor[territory.owner];
+                    if(game !== null){
+                        const territory = game.board.territories.find(territory => territory.name === buttonId);
+                        button.style.backgroundColor = PlayerColor[territory.owner];
+                    }
+
+                });
+
+                //Dynamically Adjust heigh and Widgt of the lower Textboxes
+                //const troopAmountDiv = document.getElementById('nextState');
+                let allbuttons = document.querySelectorAll('.dynbut');
+                let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                for (const but of buttonsArray) {
+                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
+                    (but as HTMLButtonElement).style.width = `${buttonWidth*9}px`;
+                    (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.35*2.5}px`;
                 }
 
-            });
+                allbuttons = document.querySelectorAll('.avatar');
+                buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                for (const but of buttonsArray) {
+                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
+                    (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
+                }
 
-            //Dynamically Adjust heigh and Widgt of the lower Textboxes
-            //const troopAmountDiv = document.getElementById('nextState');
-            let allbuttons = document.querySelectorAll('.dynbut');
-            let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-            for (const but of buttonsArray) {
-                (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                (but as HTMLButtonElement).style.width = `${buttonWidth*9}px`;
-                (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.35*2.5}px`;
-            }
+            };
 
-            allbuttons = document.querySelectorAll('.avatar');
-            buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-            for (const but of buttonsArray) {
-                (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
-            }
+            const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
+                const {xratio, yratio} = getButtonRatiosById(buttonId)
+                let x = startx + drawWidth * xratio; // Default left position
+                let y = starty + drawHeight * yratio; // Default top position
 
-        };
-
-        const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
-            const {xratio, yratio} = getButtonRatiosById(buttonId)
-            let x = startx + drawWidth * xratio; // Default left position
-            let y = starty + drawHeight * yratio; // Default top position
-
-            return { x, y };
-        };
+                return { x, y };
+            };
             image.onload = () => {
                 const aspectRatio = image.width / image.height;
                 let drawWidth = canvas.width;
@@ -746,30 +858,8 @@ const TitleScreen: React.FC = () => {
         return () => {
             window.removeEventListener('resize', resizeCanvas);
         };
-    }, [PlayerColor]);
+    }, [PlayerColor]);*/
 
-
-    // useEffect (() => {
-    //     let x = 0;
-    //     async function UpdatecurrentPlayer() {
-    //         if (PlayerCycle !== null){
-    //             for (const player of PlayerCycle){
-    //                 if(player.playerId === currentPlayerId){
-    //                     break;
-    //                 } else{
-    //                     x++;
-    //                 }
-    //             }
-    //         }
-    //         console.log(x);
-    //         const avatarElement = document.getElementById('avatar' + x);
-    //         if(avatarElement !== null){
-    //         console.log("JNSJNSJNSAJJANJSNJASNJNJNJA" + avatarElement);
-    //         avatarElement.style.border = `4px solid black`;}
-    //     }
-    //
-    //     UpdatecurrentPlayer();
-    // }, [currentPlayerId]);
 
     let renderButtons = (
         buttonData.map((button) => (
