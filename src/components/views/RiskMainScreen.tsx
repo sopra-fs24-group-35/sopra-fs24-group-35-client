@@ -70,13 +70,16 @@ const TitleScreen: React.FC = () => {
         setModalContent(JSON.parse(content));
     };
 
-    const closeModal = () => {
+    
+    const closeModal = async () => {
+        const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
+        setGame(updatedGame.data);
         setIsModalOpen(false);
-        window.location.reload();
+        undoLine();
     };
 
     useEffect(() => {
-        console.log("isModalOpen", isModalOpen);
+        //console.log("isModalOpen", isModalOpen);
     }, [isModalOpen]);
     /*-------------------------------------------------*/
 
@@ -190,9 +193,8 @@ const TitleScreen: React.FC = () => {
         button.playerid = playerid;
         setButtonData([...buttonData]);
         const curbutton = buttonRefs.current[id];
-        curbutton.style.backgroundColor = Colors[2];
-
-    }
+        curbutton.style.backgroundColor = color[2];
+        }
 
     const checkForAllValidReinforcements = (id: string) => {
         const playerid = currentPlayerId;
@@ -340,11 +342,24 @@ const TitleScreen: React.FC = () => {
 
     const highlightadjbutton = (startId: string) => {
         //increaseTroops(startId);
-        const adjacentTerritories = adjDict.dict[startId];
-        for(const territory of adjacentTerritories){
-            const button = buttonRefs.current[territory]
-            button.style.border= "2px solid white";
+        if(phase === "ATTACK"){
+            const adjacentTerritories = adjDict.dict[startId];
+            let enemyAdjacentTerritories = [];
+            for(let name of adjacentTerritories){
+                const territory = game.board.territories.find(territory => territory.name === name);
+                //console.log("territory: ", territory);
+                //console.log("currentPlayer:", currentPlayerId);
+                if(territory.owner !== currentPlayerId){
+                    enemyAdjacentTerritories.push(name);
+                }
+            }
+            //console.log("enemy: ",enemyAdjacentTerritories);
+            for(const territory of enemyAdjacentTerritories){
+                const button = buttonRefs.current[territory];
+                button.style.border= "2px solid white";
+            }
         }
+
     }
 
     const dehighlightadjbutton = (startId: string) => {
@@ -712,9 +727,9 @@ const TitleScreen: React.FC = () => {
                     />
                 </section>
                 <canvas id="myCanvas"></canvas>
-                {isModalOpen ? (null) : renderButtons}
+                {renderButtons}
             </div>
-            {isModalOpen ? (null) : lowerContent}
+            {lowerContent}
             
         </div>
     );
