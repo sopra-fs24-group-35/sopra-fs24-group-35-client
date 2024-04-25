@@ -20,7 +20,8 @@ const TitleScreen: React.FC = () => {
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [troopBonus, setTroopBonus] = useState(null);
-    const [playerOrder, setPlayerOrder] = useState(null);
+    const [playerColors, setPlayerColors] = useState(null);
+    let playerColorsArray = ["red", "blue", "purple", "green", "orange", "brown"];
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -155,18 +156,19 @@ const TitleScreen: React.FC = () => {
             console.log("current phase: ", phase);
             console.log("current player id: ", currentPlayerId);
             console.log("current troop bonus: ", troopBonus);
-            console.log("playerCycle:", PlayerCycle);
 
-            let PlayerwithColors = {};
-            let x = 0;
-            if(PlayerCycle !== null) {
-                for(const player of PlayerCycle){
-                    PlayerwithColors[player.playerId] = Colors[x];
-                    console.log("playerid " + player.playerId + "color: " + Colors[x]);
-                    x++;
+            console.log("playerOrder:", playerColors);
+
+            if(!playerColors) {
+                for(let j = 0; j < game.players.length; j++){
+
+                    order[game.players[j].playerId] = playerColorsArray[j];
+                    setPlayerColors(order);
+                
+                    // console.log("playerId: ", game.players[j].playerId);
+                    // console.log("color: ", order[game.players[j].playerId]);
                 }
             }
-            setPlayerColor(PlayerwithColors);
 
             for(let i = 0; i < buttonData.length; i++){
                 const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
@@ -180,6 +182,8 @@ const TitleScreen: React.FC = () => {
                 }
                 setButtonData([...buttonData]);
             }
+
+            setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
         }
     }, [game, phase, currentPlayerId]);
 
@@ -252,14 +256,18 @@ const TitleScreen: React.FC = () => {
     }
 
     const handleButtonClick = (id: string) => {
-        if(phase === "REINFORCEMENT"){
-            deploytroops(id);
-        }
-        if(phase === "ATTACK"){
+        const territory = game.board.territories.find(territory => territory.name === id);
+ 
+        if (phase === "ATTACK"){
             attackTerritory(id);
         }
-        if(phase === "MOVE"){
-            reinforceTroops(id);
+        else if(territory.owner === currentPlayerId){
+            if(phase === "REINFORCEMENT"){
+                deploytroops(id);
+            }
+            if(phase === "MOVE"){
+                reinforceTroops(id);
+            }
         }
     }
     const deploytroops = (id: string) => {
@@ -267,40 +275,69 @@ const TitleScreen: React.FC = () => {
     }
 
     const attackTerritory = (id: string) => {
-        handleButtonClick1(id);
+        //handleButtonClick1(id);
+        const territory = game.board.territories.find(territory => territory.name === id);
+        if(startButton){
+            console.log("startButton: ", startButton);
+            console.log("is adj?", adjDict.dict[startButton].includes(id));
+            console.log("is NOT currentPlayers?", territory.owner !== currentPlayerId);
+            if(territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)){
+                dehighlightadjbutton(startButton);
+                drawLine(startButton, id);
+                //setDrawingLine(true); // Enable drawing line mode
+                const territory_def = id;
+                const territory_atk = startButton;
+                const cont = JSON.stringify({territory_def, territory_atk});
+                openModal(cont);
+                setStartButton(null);
+            }
+            else if (startButton === id){
+                setStartButton(null);
+                dehighlightadjbutton(startButton);
+            }
+            else if(territory.owner === currentPlayerId){
+                dehighlightadjbutton(startButton);
+                setStartButton(id);
+                highlightadjbutton(id);
+            }
+        } 
+        else if (territory.owner === currentPlayerId){
+            setStartButton(id);
+            highlightadjbutton(id);
+        }
     }
 
     const reinforceTroops = (id: string) => {
         redirectTroops(id)
     }
 
-    const handleButtonClick1 = (id: string) => {
+    /*const handleButtonClick1 = (id: string) => {
+        console.log(" First Terri: " + startButton + ", Second Terri: " + id + ", drawline: " + drawingLine + ".");
         const territory = game.board.territories.find(territory => territory.name === id);
         if (drawingLine) {
             // Draw line between start button and clicked button
         if (currentPlayerId === territory.owner && checkifthereareenemies(id)) {
             undoLine();
             setStartButton(null);
-            setEndButton(null);
+            //setEndButton(null);
             setDrawingLine(false); // Reset drawing line mode
             setStartButton(id);
             highlightadjbutton(id)}
         }else if(startButton){
-            if (currentPlayerId !== territory.owner && CurrentHighlightedButtons.includes(id)){
+            console.log("startButton: ", startButton);
+            console.log("is adj?", adjDict.dict[startButton].includes(id));
+            console.log("is NOT currentPlayers?", territory.owner !== currentPlayerId);
+            if(territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)){
                 dehighlightadjbutton(startButton);
                 drawLine(startButton, id);
                 setDrawingLine(true); // Enable drawing line mode
                 const territory_def = id;
                 const territory_atk = startButton;
                 const cont = JSON.stringify({territory_def, territory_atk});
-                openModal(cont);}
-        } else {
-            if (currentPlayerId === territory.owner && checkifthereareenemies(id)) {
-                setStartButton(id);
-                highlightadjbutton(id);
+                openModal(cont);
             }
         }
-    };
+    };*/
 
     const nextState = async() => {
 
@@ -311,7 +348,6 @@ const TitleScreen: React.FC = () => {
             if(startButton){
                 dehighlightadjbutton(startButton);}
             undoLine();
-            setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
         }
         else{
             if(startButton){
@@ -328,6 +364,7 @@ const TitleScreen: React.FC = () => {
         setGame(updateGame.data);
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
+        
     }
 
     const increaseTroops = (territory_id: string) => {
@@ -617,9 +654,15 @@ const TitleScreen: React.FC = () => {
                 button.style.fontSize = `${buttonHeight*0.35}px`;
 
 
-                if(game !== null){
+                // had to do an extremely ugly work around because of the async behaviour of useState, but it works :)
+                if(playerColors !== null){
+                    console.log("hello?");
                     const territory = game.board.territories.find(territory => territory.name === buttonId);
-                    button.style.backgroundColor = PlayerColor[territory.owner];
+                    button.style.backgroundColor = playerColors[territory.owner];
+                }
+                else if (game !== null){
+                    const territory = game.board.territories.find(territory => territory.name === buttonId);
+                    button.style.backgroundColor = order[territory.owner];
                 }
 
             });
@@ -670,7 +713,7 @@ const TitleScreen: React.FC = () => {
         return () => {
             window.removeEventListener('resize', resizeCanvas);
         };
-    }, [PlayerColor]);
+    }, [playerColors]);
 
     let renderButtons = (
         buttonData.map((button) => (
