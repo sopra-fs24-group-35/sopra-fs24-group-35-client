@@ -60,6 +60,7 @@ const TitleScreen: React.FC = () => {
     const NameCycle = ["Go to Attack", "Go to Troop Movement", "End The Turn"];
     const [Cyclecount, setCyclecount] = useState(0);
     const [CurrentText, setCurrentText] = useState("Go To Attack");
+    const [hasMoved, setHasMoved] = useState(false);
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -71,6 +72,11 @@ const TitleScreen: React.FC = () => {
     const openModal = (content) => {
         setIsModalOpen(true);
         setModalContent(JSON.parse(content));
+        const onCloseCallback = (value) => {
+            console.log("Received value from modal:", value);
+            // Handle the value received from the modal
+        };
+        return onCloseCallback; // Return the callback function
     };
 
     
@@ -285,6 +291,7 @@ const TitleScreen: React.FC = () => {
             console.log("is adj?", adjDict.dict[startButton].includes(id));
             console.log("is NOT currentPlayers?", territory.owner !== currentPlayerId);
             if(territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)){
+                setHasMoved(false);
                 dehighlightadjbutton(startButton);
                 drawLine(startButton, id);
                 //setDrawingLine(true); // Enable drawing line mode
@@ -388,7 +395,7 @@ const TitleScreen: React.FC = () => {
     const redirectTroops = (id : string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
         if (drawingLine) {
-            if (currentPlayerId === territory.owner && territory.troops > 1 && checkifthereareneighbors(id)) {
+            if (currentPlayerId === territory.owner && territory.troops > 1 && checkifthereareneighbors(id) && hasMoved === false) {
             // Draw line between start button and clicked button
             undoLine();
             setStartButton(null);
@@ -409,8 +416,10 @@ const TitleScreen: React.FC = () => {
                     const territory_def = id;
                     const territory_atk = startButton;
                     const cont = JSON.stringify({territory_def, territory_atk});
-                    openModal(cont);
+                    const onCloseCallback = openModal(cont);
+                    //onCloseCallback(value);
 
+                    setHasMoved(true);
                     setButtonData([...buttonData]); // Update the button data array in the state
                     setGame(game);
                     drawLine(startButton, id);
