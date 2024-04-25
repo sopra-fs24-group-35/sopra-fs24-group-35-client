@@ -529,7 +529,7 @@ const TitleScreen: React.FC = () => {
         overflow: 'hidden', // Hides the overflow
         marginRight: '5px',
         marginLeft: '5px', // Adjust the space between images
-        border: '4px solid Green', // Red outline
+        border: '4px solid Yellow', // Red outline
     };
 
     const avatarStyle: React.CSSProperties = {
@@ -577,8 +577,6 @@ const TitleScreen: React.FC = () => {
                 player4Territories = player4Territories + 1
             }
         })
-
-        myTerritories = 0
 
         if(myTerritories === 0){
             setIsLooseModalOpen(true)
