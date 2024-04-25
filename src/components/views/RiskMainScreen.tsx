@@ -20,8 +20,8 @@ const TitleScreen: React.FC = () => {
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [troopBonus, setTroopBonus] = useState(null);
-    const [playerOrder, setPlayerOrder] = useState(null);
-    let playerColors = ["red", "blue", "purple", "green", "orange", "brown"];
+    const [playerColors, setPlayerColors] = useState(null);
+    let playerColorsArray = ["red", "blue", "purple", "green", "orange", "brown"];
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -156,30 +156,17 @@ const TitleScreen: React.FC = () => {
             console.log("current player id: ", currentPlayerId);
             console.log("current troop bonus: ", troopBonus);
 
-            console.log("playerOrder:", playerOrder);
+            console.log("playerOrder:", playerColors);
 
-            for(let j = 0; j < game.players.length; j++){
+            if(!playerColors) {
+                for(let j = 0; j < game.players.length; j++){
 
-                if(!playerOrder) {
-                    if (playerColors.length === 0) {
-                        console.log('No more colors to select');
-                        break;
-                        }
-
-                    // Get a random index from the remaining values array
-                    const randomIndex = Math.floor(Math.random() * playerColors.length);
-
-                    // Get the random value from the remaining values array
-                    const randomValue = playerColors[randomIndex];
-
-                    // Remove the selected value from the remaining values array
-                    const updatedPlayerColors = playerColors.filter((value, index) => index !== randomIndex);
-                    playerColors = updatedPlayerColors;
-                    order[game.players[j].playerId] = randomValue;
-                    setPlayerOrder(order);
+                    order[game.players[j].playerId] = playerColorsArray[j];
+                    setPlayerColors(order);
+                
+                    // console.log("playerId: ", game.players[j].playerId);
+                    // console.log("color: ", order[game.players[j].playerId]);
                 }
-                // console.log("playerId: ", game.players[j].playerId);
-                // console.log("color: ", order[game.players[j].playerId]);
             }
 
             for(let i = 0; i < buttonData.length; i++){
@@ -604,10 +591,10 @@ const TitleScreen: React.FC = () => {
                 //console.log("playerOrder:", playerOrder);
 
                 // had to do an extremely ugly work around because of the async behaviour of useState, but it works :)
-                if(playerOrder !== null){
+                if(playerColors !== null){
                     console.log("hello?");
                     const territory = game.board.territories.find(territory => territory.name === buttonId);
-                    button.style.backgroundColor = playerOrder[territory.owner];
+                    button.style.backgroundColor = playerColors[territory.owner];
                 }
                 else if (game !== null){
                     const territory = game.board.territories.find(territory => territory.name === buttonId);
