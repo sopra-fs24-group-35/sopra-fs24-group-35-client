@@ -22,7 +22,6 @@ const TitleScreen: React.FC = () => {
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [troopBonus, setTroopBonus] = useState(null);
-    const [playerOrder, setPlayerOrder] = useState(null);
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -38,10 +37,8 @@ const TitleScreen: React.FC = () => {
 
     const {gameId} = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
-    const [users, setUsers] = useState<User[]>(null);
     const [anzeige, setAnzeige] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const [startButton, setStartButton] = useState<string | null>(null);
-    const [endButton, setEndButton] = useState<string | null>(null);
     const [drawingLine, setDrawingLine] = useState(false);
     const adjDict = new AdjDict();
     //reload idea
@@ -68,10 +65,7 @@ const TitleScreen: React.FC = () => {
         territory_def: "Add territory name here",
         territory_atk: "Add territory name here",
     });
-    const [color1, setColor1] = useState(null)
-    const [color2, setColor2] = useState(null)
-    const [color3, setColor3] = useState(null)
-    const [color4, setColor4] = useState(null)
+
     const openModal = (content) => {
         setIsModalOpen(true);
         setModalContent(JSON.parse(content));
@@ -194,17 +188,16 @@ const TitleScreen: React.FC = () => {
         return button ? { xratio: button.xratio, yratio: button.yratio } : { xratio: 0, yratio: 0 }; // Return xratio and yratio if the button is found, otherwise return default values
     };
 
-    const setNewPlayerOwner = (id:string, playerid:number) => {
+    /*const setNewPlayerOwner = (id:string, playerid:number) => {
         const button = buttonData.find(button => button.id === id);
         button.playerid = playerid;
         setButtonData([...buttonData]);
         const curbutton = buttonRefs.current[id];
         curbutton.style.backgroundColor = Colors[2];
-    }
+    }*/
 
     const checkForAllValidReinforcements = (id: string) => {
         const playerid = currentPlayerId;
-        console.log("MY PLAYER ID:", playerid);
         let validbuttonid = [];
         let buttonqueue = [id];
         let visited = {}; // Keep track of visited territories
@@ -258,6 +251,7 @@ const TitleScreen: React.FC = () => {
     }
 
     const handleButtonClick = (id: string) => {
+        const territory = game.board.territories.find(territory => territory.name === id);
         if(phase === "REINFORCEMENT"){
             deploytroops(id);
         }
@@ -273,14 +267,43 @@ const TitleScreen: React.FC = () => {
     }
 
     const attackTerritory = (id: string) => {
-        handleButtonClick1(id);
+        const territory = game.board.territories.find(territory => territory.name === id);
+        if(startButton){
+            console.log("startButton: ", startButton);
+            console.log("is adj?", adjDict.dict[startButton].includes(id));
+            console.log("is NOT currentPlayers?", territory.owner !== currentPlayerId);
+            if(territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)){
+                dehighlightadjbutton(startButton);
+                drawLine(startButton, id);
+                //setDrawingLine(true); // Enable drawing line mode
+                const territory_def = id;
+                const territory_atk = startButton;
+                const cont = JSON.stringify({territory_def, territory_atk});
+                openModal(cont);
+                setStartButton(null);
+            }
+            else if (startButton === id){
+                setStartButton(null);
+                dehighlightadjbutton(startButton);
+            }
+            else if(territory.owner === currentPlayerId){
+                dehighlightadjbutton(startButton);
+                setStartButton(id);
+                highlightadjbutton(id);
+            }
+        }
+        else if (territory.owner === currentPlayerId && checkifthereareenemies(id)){
+            setStartButton(id);
+            highlightadjbutton(id);
+        }
     }
 
     const reinforceTroops = (id: string) => {
         redirectTroops(id)
     }
 
-    const handleButtonClick1 = (id: string) => {
+    /*const handleButtonClick1 = (id: string) => {
+        console.log(" First Terri: " + startButton + ", Second Terri: " + id + ", drawline: " + drawingLine + ".");
         const territory = game.board.territories.find(territory => territory.name === id);
         if (drawingLine) {
             // Draw line between start button and clicked button
@@ -306,13 +329,12 @@ const TitleScreen: React.FC = () => {
                 highlightadjbutton(id);
             }
         }
-    };
+    };*/
 
     const nextState = async() => {
 
         if (phase === "MOVE") {
             setStartButton(null);
-            setEndButton(null);
             setDrawingLine(null);
             if(startButton){
                 dehighlightadjbutton(startButton);}
@@ -324,7 +346,6 @@ const TitleScreen: React.FC = () => {
             dehighlightadjbutton(startButton);}
             undoLine();
             setStartButton(null);
-            setEndButton(null);
             setDrawingLine(null);
         }
 
@@ -359,7 +380,6 @@ const TitleScreen: React.FC = () => {
             // Draw line between start button and clicked button
             undoLine();
             setStartButton(null);
-            setEndButton(null);
             setDrawingLine(false); // Reset drawing line mode
             setStartButton(id);
             checkForAllValidReinforcements(id);}
@@ -370,10 +390,15 @@ const TitleScreen: React.FC = () => {
                 const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
                 const button_to = buttonData.find(button => button.id === id);
                 if (button_from && button_to && button_from.troops > 1) {
-                    button_from.troops -= 1; // Increment the troops count
+                    /*button_from.troops -= 1; // Increment the troops count
                     button_to.troops += 1;
                     territory.troops += 1;
-                    territory_from.troops -= 1;
+                    territory_from.troops -= 1;*/
+                    const territory_def = id;
+                    const territory_atk = startButton;
+                    const cont = JSON.stringify({territory_def, territory_atk});
+                    openModal(cont);
+
                     setButtonData([...buttonData]); // Update the button data array in the state
                     setGame(game);
                     drawLine(startButton, id);
@@ -640,10 +665,6 @@ const TitleScreen: React.FC = () => {
                 (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
                 (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
             }
-            console.log("HJHSAJHSJAIJJIjsa");
-            console.log(getAvatarColor(0));
-            console.log(getcurrentAvatarColor(0))
-
 
         };
 
