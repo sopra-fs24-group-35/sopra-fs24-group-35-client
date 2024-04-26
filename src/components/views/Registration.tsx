@@ -5,6 +5,8 @@ import {useNavigate} from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "styles/views/Registration.scss";
 import BaseContainer from "components/ui/BaseContainer";
+import FormField from "../ui/FormField";
+import FormFieldPassword from "../ui/FormFieldPassword";
 import PropTypes from "prop-types";
 
 /*
@@ -13,35 +15,30 @@ however be sure not to clutter your files with an endless amount!
 As a rule of thumb, use one file per component and only add small,
 specific components that belong to the main one in the same file.
  */
-const FormField = (props) => {
-  return (
-    <div className="registration field">
-      <label className="registration label">{props.label}</label>
-      <input
-        className="registration input"
-        placeholder="enter here.."
-        value={props.value}
-        onChange={(e) => props.onChange(e.target.value)}
-        type={props.value==="password" ? "password" : "text"}
-      />
-    </div>
-  );
-};
-
-FormField.propTypes = {
-  label: PropTypes.string,
-  value: PropTypes.string,
-  onChange: PropTypes.func,
-};
 
 const Registration = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
+  const styles = ["Buddy", "Tinkerbell", "leo", "kiki", "Loki", "Gizmo", "Cali", "Missy", "Sasha", "Rascal", "Nala", "Max", "Harley", "Dusty", "Smokey", "Chester", "Callie", "Oliver", "Snicker"];
+  const [num, setNum] = useState(0);
+  const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
+  const [avatarId, setAvatar] = useState(0);
+
+
+  const AvatarCreation = () => {
+    let newNum = num + 1;
+    if (newNum >= styles.length) {
+      newNum = 0;
+    }
+    setNum(newNum);
+    setAvatar(newNum);
+    setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
+  }
 
   const doRegistration = async () => {
     try {
-      const requestBody = JSON.stringify({ username, password });
+      const requestBody = JSON.stringify({ username, password, avatarId });
       const response = await loginapi.post("/users/registration", requestBody);
       console.log("response: " + JSON.stringify(response));
       // for some technical reasons, "authorization must be written lowercase"
@@ -65,33 +62,38 @@ const Registration = () => {
   };
 
   return (
-    <BaseContainer>
-      <div className="registration container">
-        <div className="registration form">
-          <h3> Registration </h3>
-          <FormField
-            label="Enter your username:"
-            value={username}
-            onChange={(un: string) => setUsername(un)}
-          />
-          <FormField
-            label="Enter your password:"
-            value={password}
-            onChange={(n) => setPassword(n)}
-          />
-          <label style={{fontSize: "0.75em"}}> (Your password needs to be at least 8 characters long.) </label>
-          <div className="login button-container">
-            <Button
-              disabled={!username || (!password || password.length < 8)}
-              width="100%"
-              onClick={() => doRegistration()}
-            >
-              Register now!
-            </Button>
+    <div className="basescreen title-screen">
+      <div className="basescreen overlay"></div>
+      <BaseContainer>
+        <div className="registration container">
+          <div className="registration form">
+            <h3> Registration </h3>
+            <FormField
+              label="Enter your username:"
+              value={username}
+              onChange={(un: string) => setUsername(un)}
+            />
+            <FormFieldPassword
+              label="Enter your password:"
+              value={password}
+              onChange={(n) => setPassword(n)}
+            />
+            <img style={{ marginBottom: '10px' }} width="50%" src={gesamt} alt="avatar" />
+            <Button style={{ marginBottom: '10px' }} width="50%" onClick={AvatarCreation}>Switch</Button>
+            <label style={{ fontSize: "0.75em" }}> (Your password needs to be at least 8 characters long.) </label>
+            <div className="login button-container">
+              <Button
+                disabled={!username || (!password || password.length < 8)}
+                width="100%"
+                onClick={() => doRegistration()}
+              >
+                Register now!
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    </BaseContainer>
+      </BaseContainer>
+    </div>
   );
 };
 
