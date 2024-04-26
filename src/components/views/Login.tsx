@@ -5,33 +5,10 @@ import {useNavigate} from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "styles/views/Login.scss";
 import BaseContainer from "components/ui/BaseContainer";
-import PropTypes from "prop-types";
+import FormField from "../ui/FormField";
+import FormFieldPassword from "../ui/FormFieldPassword";
+let riskLogo = require("./Risk.png");
 
-/*
-It is possible to add multiple components inside a single file,
-however be sure not to clutter your files with an endless amount!
-As a rule of thumb, use one file per component and only add small,
-specific components that belong to the main one in the same file.
- */
-const FormField = (props) => {
-  return (
-    <div className="login field">
-      <label className="login label">{props.label}</label>
-      <input type={props.label === "Password" ? "password" : ""}
-        className="login input"
-        placeholder="enter here.."
-        value={props.value}
-        onChange={(e) => props.onChange(e.target.value)}
-      />
-    </div>
-  );
-};
-
-FormField.propTypes = {
-  label: PropTypes.string,
-  value: PropTypes.string,
-  onChange: PropTypes.func,
-};
 
 const Login = () => {
   const navigate = useNavigate();
@@ -66,41 +43,49 @@ const Login = () => {
   };
 
   return (
-    <BaseContainer>
-      <div className="login container">
-        <div className="login form">
-          <h3> Login </h3>
-          <FormField
-            label="Username"
-            value={username}
-            onChange={(un: string) => setUsername(un)}
-          />
-          <FormField
-            label="Password"
-            value={password}
-            onChange = {(n) => setPassword(n)}
-          />
-          <div className="login button-container">
-            <Button
-              disabled={!username || !password}
-              width="100%"
-              onClick={() => doLogin()}
-            >
-              Login
-            </Button>
-          </div>
-          <div className="login button-container">
-            <Button
-              width="100%"
-              onClick={() => gotoRegistration()}
-            >
-              Register
-            </Button>
+    <div className="basescreen title-screen">
+      <div className="basescreen overlay"></div>
+      <div className="basescreen title" style={{ marginBottom: '50px', width: '100px', opacity: '0', animation: 'fadeIn 2s forwards' }}>
+        <img src={riskLogo} style={{ maxWidth: '50%', maxHeight: '50%', width: 'auto', height: 'auto', position: 'absolute', top: '0', left: '50%', transform: `translate(${-50}%, ${-20}%)` }} alt="My Image" />
+      </div>
+      <BaseContainer>
+        <div className="login container">
+          <div className="login form">
+            <h3> Login </h3>
+            <FormField
+              label="Username"
+              value={username}
+              onChange={(un: string) => setUsername(un)}
+            />
+            <FormFieldPassword
+              label="Password"
+              value={password}
+              onChange={(n) => setPassword(n)}
+            />
+            <div className="login button-container">
+              <Button
+                disabled={!username || !password}
+                width="100%"
+                onClick={() => doLogin()}
+              >
+                Login
+              </Button>
+            </div>
+            <div className="login button-container">
+              <Button
+                width="100%"
+                onClick={() => gotoRegistration()}
+              >
+                Register
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    </BaseContainer>
+      </BaseContainer>
+    </div>
   );
+
+
 };
 
 /**

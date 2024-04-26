@@ -7,6 +7,7 @@ import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import { User } from "types";
+import FormFieldID from "../ui/FormField";
 
 const Game = () => {
   // use react-router-dom's hook to access navigation, more info: https://reactrouter.com/en/main/hooks/use-navigate 
@@ -18,6 +19,12 @@ const Game = () => {
   // a component can have as many state variables as you like.
   // more information can be found under https://react.dev/learn/state-a-components-memory and https://react.dev/reference/react/useState 
   const [users, setUsers] = useState<User[]>(null);
+
+  useEffect(() => {
+    if (localStorage.getItem("lobbyId") !== null){
+      navigate(`/lobby/${localStorage.getItem("lobbyId")}`);
+    }
+  }, [])
 
   const logout = async () => {
     try {
@@ -35,6 +42,8 @@ const Game = () => {
     }
   };
 
+  
+
   // the effect hook can be used to react to change in your component.
   // in this case, the effect hook is only run once, the first time the component is mounted
   // this can be achieved by leaving the second argument an empty array.
@@ -44,30 +53,6 @@ const Game = () => {
     async function fetchData() {
       try {
         const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
-        //console.log(config);
-        //const username = localStorage.getItem("username");
-        //const requestBody = JSON.stringify({});
-        //console.log(requestBody);
-        
-        const response = await api.get("/users", {headers: config});
-
-        // delays continuous execution of an async operation for 1 second.
-        // This is just a fake async call, so that the spinner can be displayed
-        // feel free to remove it :)
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Get the returned users and update the state.
-        setUsers(response.data);
-
-        // This is just some data for you to see what is available.
-        // Feel free to remove it.
-        console.log("request to:", response.request.responseURL);
-        console.log("status code:", response.status);
-        console.log("status text:", response.statusText);
-        console.log("requested data:", response.data);
-
-        // See here to get more data.
-        console.log(response);
       } catch (error) {
         console.error(
           `Something went wrong while fetching the users: \n${handleError(
@@ -82,49 +67,39 @@ const Game = () => {
     }
 
     fetchData();
+    navigate("/lobby");
   }, []);
-
-  const enterProfile = (id) => {
-    navigate("/users/"+id);
-  }
-
-  const Player = ({ user }: { user: User }) => (
-    <div className="player container" onClick={() => enterProfile(user.id)}>
-      <div className="player username">{user.username}</div>
-      <div className="player id">
-      </div>
+  
+  let content = (
+    <div className="game">
+      {/*
+      <ul className="game user-list">
+        {users.map((user: User) => (
+          <li key={user.id}>
+            <Player user={user} />
+          </li>
+        ))}
+        </ul>*/}
+        <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => navigate("/lobby")}>
+          Lobby Options
+        </Button>
+        <Button width="100%" style={{ marginBottom: '10px' }}  onClick={() => navigate("/avatar")}>
+          Avatar Screen
+        </Button>
+        <Button width="100%" style={{ marginBottom: '10px' }} onClick={() => logout()}>
+          Logout
+        </Button>
     </div>
   );
   
-  Player.propTypes = {
-    user: PropTypes.object,
-  };
-
-  let content = <Spinner />;
-
-  if (users) {
-    content = (
-      <div className="game">
-        <ul className="game user-list">
-          {users.map((user: User) => (
-            <li key={user.id}>
-              <Player user={user} />
-            </li>
-          ))}
-        </ul>
-        <Button width="100%" onClick={() => logout()}>
-          Logout
-        </Button>
-      </div>
-    );
-  }
 
   return (
-    <div>
+    <div className="basescreen title-screen">
+      <div className="basescreen overlay"></div>
       <BaseContainer className="game container">
         <h2>Hello, {localStorage.username}!</h2>
         <p className="game paragraph">
-          List of users:
+          {/*List of users:*/}
         </p>
         {content}
       </BaseContainer>

@@ -168,24 +168,24 @@ const UserProfile = () => {
           
         </div>
         {(isMyProfile && !editMode) ? (
-          <Button width="100%" onClick={() => enterEditMode()}>
+          <Button width="100%" style={{ marginBottom: '10px' }} onClick={() => enterEditMode()}>
           edit profile
           </Button>
         ) : (<></>)}
 
         {(isMyProfile && editMode) ? (
           <div>
-            <Button width="100%" onClick={() => exitEditMode(true)}>
+            <Button width="100%" style={{ marginBottom: '10px' }} onClick={() => exitEditMode(true)}>
             Confirm changes
             </Button>
-            <Button width="100%" onClick={() => exitEditMode(false)}>
+            <Button width="100%" style={{ marginBottom: '10px' }} onClick={() => exitEditMode(false)}>
             Return without changes
             </Button>
           </div> 
         ) : (<></>)}
 
         {!editMode ? (
-          <Button width="100%" onClick={() => navigate("/game")}>
+          <Button width="100%" style={{ marginBottom: '10px' }} onClick={() => navigate("/game")}>
           back
           </Button>
         ) : (<></>)}
@@ -197,9 +197,12 @@ const UserProfile = () => {
   }
 
   return(
+    <div className="basescreen title-screen">
+      <div className="basescreen overlay"></div>
     <BaseContainer className="profile container">
       {content}
     </BaseContainer>
+    </div>
   )    
 }
 

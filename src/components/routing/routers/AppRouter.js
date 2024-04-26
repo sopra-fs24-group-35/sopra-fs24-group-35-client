@@ -7,6 +7,12 @@ import Login from "../../views/Login";
 import {RegistrationGuard} from "../routeProtectors/RegistrationGuard";
 import Registration from "../../views/Registration";
 import UserProfile from "../../views/UserProfile";
+import LobbyErstellen from "../../views/LobbyErstellen";
+import RiskMainScreen from "../../views/RiskMainScreen";
+import RiskMainScreencopy from "../../views/RiskMainScreencopy";
+import JoinScreen from "../../views/joinScreen";
+import LobbyScreen from "../../views/LobbyScreen";
+import AvatarPage from "../../views/AvatarPage";
 
 
 /**
@@ -27,6 +33,18 @@ const AppRouter = () => {
           <Route path="/game/*" element={<GameRouter base="/game"/>} />
         </Route>
 
+        <Route path="/risk/:gameId" element={<GameGuard />}>
+          <Route path="/risk/:gameId" element={<RiskMainScreen/>} />
+        </Route>
+
+{/*        <Route path="/risk/*" element={<GameGuard />}>
+          <Route path="/risk/*" element={<RiskMainScreen/>} />
+        </Route>*/}
+
+        <Route path="/avatar" element={<GameGuard />}>
+          <Route path="/avatar" element={<AvatarPage/>} />
+        </Route>
+
         <Route path="/login" element={<LoginGuard />}>
           <Route path="/login" element={<Login/>} />
         </Route>
@@ -37,6 +55,19 @@ const AppRouter = () => {
 
         <Route path="/users/:id" element={<GameGuard />}>
           <Route path="/users/:id" element={<UserProfile />} />
+        </Route>
+
+        <Route path="/lobby" element={<GameGuard />}>
+          <Route path="/lobby" element={<LobbyErstellen />} />
+        </Route>
+
+        <Route path="/join" element={<GameGuard />}>
+          <Route path="/join" element={<JoinScreen/>} />
+        </Route>
+
+
+        <Route path="/lobby/:lobbyId" element={<GameGuard />}>
+          <Route path="/lobby/:lobbyId" element={<LobbyScreen />} />
         </Route>
         
         <Route path="/" element={
