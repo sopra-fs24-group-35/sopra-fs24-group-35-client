@@ -386,7 +386,7 @@ const TitleScreen: React.FC = () => {
         let won = true;
         let loose = true;
         if(game !== null) {
-            for (const x of game.board.territories()) {
+            for (const x of game.board.territories) {
                 if (x.owner !== parseInt(localStorage.getItem("user_id"))) {
                     won = false;
                 } else if (x.owner === parseInt(localStorage.getItem("user_id"))) {
