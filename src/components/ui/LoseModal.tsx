@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { api, handleError } from "helpers/api";
 import { User } from "types";
 import ApiStyles from "helpers/avatarApiStyles";
-import {Button} from "../ui/Button";
+import {Button} from "./Button";
 
 const LooseModal = ({ isModalOpen, onClose}) => {
   if (!isModalOpen) {
@@ -19,7 +19,7 @@ const LooseModal = ({ isModalOpen, onClose}) => {
           &times;
         </button>
         <main className="modal-mainContents">
-          <h1>You Loose!</h1>
+          <h1>You Lose!</h1>
           <button className="centered-button"
                   onClick={console.log("hallo")}>
             Leave Game
