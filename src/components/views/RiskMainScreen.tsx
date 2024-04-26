@@ -22,6 +22,10 @@ const TitleScreen: React.FC = () => {
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [troopBonus, setTroopBonus] = useState(null);
+    const [playerColors, setPlayerColors] = useState(null);
+    const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
+    let playerColorsArray = ["red", "blue", "purple", "green", "orange", "brown"];
+    const user_id = localStorage.getItem("user_id");
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -163,16 +167,6 @@ const TitleScreen: React.FC = () => {
         // Call getGame initially
         getGame();
 
-        // Set up the interval to call getGame every 2 seconds
-        const intervalId = setInterval(() => {
-            if(currentPlayerId !== null){
-            if(parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))){
-                console.log(currentPlayerId+ "              ------------   " + parseInt(localStorage.getItem("user_id")));
-            getGame();}}
-        }, 2000);
-
-        // Clean up the interval when the component unmounts or when the dependency array changes
-        return () => clearInterval(intervalId);
     }, []);
 
     const order = {};
@@ -183,17 +177,15 @@ const TitleScreen: React.FC = () => {
             console.log("current phase: ", phase);
             console.log("current player id: ", currentPlayerId);
             console.log("current troop bonus: ", troopBonus);
-            console.log("playerCycle:", PlayerCycle);
+            console.log("playerOrder:", playerColors);
 
-            let PlayerwithColors = {};
-            let x = 0;
-            if(PlayerCycle !== null) {
-                for(const player of PlayerCycle){
-                    PlayerwithColors[player.playerId] = Colors[x];
-                    x++;
+            if(!playerColors) {
+                for(let j = 0; j < game.players.length; j++){
+
+                    order[game.players[j].playerId] = playerColorsArray[j];
+                    setPlayerColors(order);
                 }
             }
-            setPlayerColor(PlayerwithColors);
 
             for(let i = 0; i < buttonData.length; i++){
                 const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
@@ -217,21 +209,54 @@ const TitleScreen: React.FC = () => {
                 setCurrentText(NameCycle[2]);
             }
 
+            setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
+
+            if(Number.parseInt(user_id) === currentPlayerId){
+                console.log("I am current player");
+                setIsCurrentPlayer(true);
+            }
+            else {
+                console.log("I'm not current player");
+                setIsCurrentPlayer(false);
+            }
         }
-    }, [game, phase, currentPlayerId]);
+    }, [game, phase, currentPlayerId, isCurrentPlayer]);
+
+    var update = null;
+
+    useEffect(() => {
+        if (!isCurrentPlayer){
+            update = setInterval( async () => {
+
+                const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
+                let tempGame = gameResponse.data;
+                //console.log("phase: ", game.turnCycle.currentPhase);
+                console.log("actual phase: ", tempGame.turnCycle.currentPhase);
+                if(game && game.turnCycle.currentPhase !== tempGame.turnCycle.currentPhase){
+                    setGame(tempGame);
+                    setPhase(tempGame.turnCycle.currentPhase);
+                    setCurrentPlayerId(tempGame.turnCycle.currentPlayer.playerId);
+                    setTroopBonus(tempGame.turnCycle.currentPlayer.troopBonus);
+                    setIsCurrentPlayer(tempGame.turnCycle.currentPlayer.playerId === user_id);
+                }
+            }, 1000);
+        }
+        else {
+            clearInterval(update); // Stop the interval
+        }
+    }, [isCurrentPlayer, game]);
+
+    useEffect(() => {
+        const interval = update;
+        return () => {
+            clearInterval(interval);
+        }
+    }, [isCurrentPlayer, game]);
 
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
         return button ? { xratio: button.xratio, yratio: button.yratio } : { xratio: 0, yratio: 0 }; // Return xratio and yratio if the button is found, otherwise return default values
     };
-
-    /*const setNewPlayerOwner = (id:string, playerid:number) => {
-        const button = buttonData.find(button => button.id === id);
-        button.playerid = playerid;
-        setButtonData([...buttonData]);
-        const curbutton = buttonRefs.current[id];
-        curbutton.style.backgroundColor = Colors[2];
-    }*/
 
     const checkForAllValidReinforcements = (id: string) => {
         const playerid = currentPlayerId;
@@ -289,14 +314,16 @@ const TitleScreen: React.FC = () => {
 
     const handleButtonClick = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if(phase === "REINFORCEMENT"){
-            deploytroops(id);
-        }
-        if(phase === "ATTACK"){
+        if (phase === "ATTACK"){
             attackTerritory(id);
         }
-        if(phase === "MOVE"){
-            reinforceTroops(id);
+        else if(territory.owner === currentPlayerId){
+            if(phase === "REINFORCEMENT"){
+                deploytroops(id);
+            }
+            if(phase === "MOVE"){
+                reinforceTroops(id);
+            }
         }
     }
     const deploytroops = (id: string) => {
@@ -313,7 +340,6 @@ const TitleScreen: React.FC = () => {
                 setHasMoved(false);
                 dehighlightadjbutton(startButton);
                 drawLine(startButton, id);
-                //setDrawingLine(true); // Enable drawing line mode
                 const territory_def = id;
                 const territory_atk = startButton;
                 const cont = JSON.stringify({territory_def, territory_atk});
@@ -340,44 +366,17 @@ const TitleScreen: React.FC = () => {
         redirectTroops(id)
     }
 
-    /*const handleButtonClick1 = (id: string) => {
-        console.log(" First Terri: " + startButton + ", Second Terri: " + id + ", drawline: " + drawingLine + ".");
-        const territory = game.board.territories.find(territory => territory.name === id);
-        if (drawingLine) {
-            // Draw line between start button and clicked button
-        if (currentPlayerId === territory.owner && checkifthereareenemies(id)) {
-            undoLine();
-            setStartButton(null);
-            setEndButton(null);
-            setDrawingLine(false); // Reset drawing line mode
-            setStartButton(id);
-            highlightadjbutton(id)}
-        }else if(startButton){
-            if (currentPlayerId !== territory.owner && CurrentHighlightedButtons.includes(id)){
-                dehighlightadjbutton(startButton);
-                drawLine(startButton, id);
-                setDrawingLine(true); // Enable drawing line mode
-                const territory_def = id;
-                const territory_atk = startButton;
-                const cont = JSON.stringify({territory_def, territory_atk});
-                openModal(cont);}
-        } else {
-            if (currentPlayerId === territory.owner && checkifthereareenemies(id)) {
-                setStartButton(id);
-                highlightadjbutton(id);
-            }
-        }
-    };*/
-
     const nextState = async() => {
 
         if (phase === "MOVE") {
             setStartButton(null);
             setDrawingLine(null);
+            setIsCurrentPlayer(false);
             if(startButton){
                 dehighlightadjbutton(startButton);}
             undoLine();
-            setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
+            //TODO
+            //setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
         }
         else{
             if(startButton){
@@ -748,125 +747,8 @@ const TitleScreen: React.FC = () => {
         }
         );
 
-    }, [PlayerColor]);
+    }, [game]);
 
-    //PlayerColor
-
-
-
- /*   useLayoutEffect(() => {
-        // Function to preload the image
-        const preloadImage = (url) => {
-            return new Promise((resolve, reject) => {
-                const image = new Image();
-                image.onload = () => resolve(image);
-                image.onerror = reject;
-                image.src = url;
-            });
-        };
-        preloadImage(require('../../styles/views/Pictures/RiskMap21.png'));
-
-        fetchData();
-        // Canvas setup
-        const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-        const ctx = canvas.getContext('2d');
-        const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
-
-        const resizeCanvas = () => {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-
-            const image = new Image();
-            image.src = imageSrc;
-            setPicture(image);
-
-            const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
-                const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
-                const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
-
-                Object.keys(buttonRefs.current).forEach((buttonId: string) => {
-                    const button = buttonRefs.current[buttonId];
-                    const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
-
-                    button.style.left = `${x}px`;
-                    button.style.top = `${y}px`;
-                    button.style.width = `${buttonWidth}px`;
-                    button.style.height = `${buttonHeight}px`;
-                    button.style.fontSize = `${buttonHeight*0.35}px`;
-
-
-                    if(game !== null){
-                        const territory = game.board.territories.find(territory => territory.name === buttonId);
-                        button.style.backgroundColor = PlayerColor[territory.owner];
-                    }
-
-                });
-
-                //Dynamically Adjust heigh and Widgt of the lower Textboxes
-                //const troopAmountDiv = document.getElementById('nextState');
-                let allbuttons = document.querySelectorAll('.dynbut');
-                let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                for (const but of buttonsArray) {
-                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                    (but as HTMLButtonElement).style.width = `${buttonWidth*9}px`;
-                    (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.35*2.5}px`;
-                }
-
-                allbuttons = document.querySelectorAll('.avatar');
-                buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                for (const but of buttonsArray) {
-                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                    (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
-                }
-
-            };
-
-            const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
-                const {xratio, yratio} = getButtonRatiosById(buttonId)
-                let x = startx + drawWidth * xratio; // Default left position
-                let y = starty + drawHeight * yratio; // Default top position
-
-                return { x, y };
-            };
-            image.onload = () => {
-                const aspectRatio = image.width / image.height;
-                let drawWidth = canvas.width;
-                let drawHeight = canvas.height;
-
-                // Adjust the size of the image to maintain aspect ratio
-                if (drawWidth / drawHeight > aspectRatio) {
-                    drawWidth = drawHeight * aspectRatio;
-                } else {
-                    drawHeight = drawWidth / aspectRatio;
-                }
-
-                // Center the image on the canvas
-                const x = (canvas.width - drawWidth) / 2;
-                const y = (canvas.height - drawHeight) / 2;
-
-                setCurHeight(drawHeight);
-                setCurWidth(drawWidth);
-                setX(x);
-                setY(y);
-
-
-                // Clear the canvas and draw the image
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(image, x, y, drawWidth, drawHeight);
-                resizeButtons(x, y, drawWidth, drawHeight);
-            };
-        };
-
-        // Initial setup
-        resizeCanvas();
-
-        // Handle resize event
-        window.addEventListener('resize', resizeCanvas);
-
-        return () => {
-            window.removeEventListener('resize', resizeCanvas);
-        };
-    }, [PlayerColor]);*/
 
 
     let renderButtons = (
