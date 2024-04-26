@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import game from "./Game";
 import { User } from "../../types";
 import ModalWin from "../ui/ModalWin";
-import LoseModal from "../ui/LooseModal";
+import LoseModal from "../ui/LoseModal";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
 import Game from "models/Game";
