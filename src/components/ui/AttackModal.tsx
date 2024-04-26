@@ -23,7 +23,7 @@ const AttackModal = ({isModalOpen, modalContent, onClose, lobbyId, gameId}) => {
   const [attackTerritory, setAttackTerritory] = useState(null);
 
   const [selectedTroops, setSelectedTroops] = useState(3);
-  const [selectedAttacks, setSelectedAttacks] = useState(1);
+  const [selectedAttacks, setSelectedAttacks] = useState(100);
   const [MoveTroops, setMoveTroops] = useState();
   //console.log("selectedTroops", selectedTroops);
 
@@ -211,14 +211,14 @@ const AttackModal = ({isModalOpen, modalContent, onClose, lobbyId, gameId}) => {
                         </label>:
                         <label className="select-label"> Attack:
                           <select className="select" value={selectedTroops}
-                            onChange={e => setSelectedTroops(e.target.value)}>
-                      <option value={1}>1</option>
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
-                  </label>}
+                                  onChange={e => setSelectedAttacks(e.target.value)}>
+                            <option value={100}>100</option>
+                            <option value={50}>50</option>
+                            <option value={10}>10</option>
+                            <option value={5}>5</option>
+                            <option value={1}>1</option>
+                          </select>
+                        </label>}
                 </div>
               </div>
             </div>
