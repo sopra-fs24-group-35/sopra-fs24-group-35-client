@@ -1,3 +1,5 @@
+@import "../theme";
+
 .button:hover {
   transform: scale(1.1);
   transition: transform 0.2s ease;
@@ -67,27 +69,29 @@
   background-size: contain; /* Scale the background image to fit entirely within the container */
   background-position: center; /* Center the background image within the container */
   background-repeat: no-repeat; /* Prevent the background image from repeating */
-  background-color: beige;
+  background-color: rgb(193, 180, 162);
 }
 .gamescreen-innerlower-container{
   position: relative;
   height: 20%; /* Use viewport height to fill the entire screen */
   width: 100vw; /* Use viewport width to fill the entire screen */
-  background-color: aqua;
+  background-color: rgb(193, 180, 162);
   display: flex;
 }
 
 .gamescreen-bottomleft-container{
   position: relative;
+  border-radius: $borderRadius;
   height: 100%; /* Use viewport height to fill the entire screen */
   width: 65%; /* Use viewport width to fill the entire screen */
-  background-color: #dfe5e5;
+  background-color: #9d8963;
 }
 .gamescreen-bottomright-container{
   position: relative;
+  border-radius: $borderRadius;
   height: 100%; /* Use viewport height to fill the entire screen */
   width: 35%; /* Use viewport width to fill the entire screen */
-  background-color: #9ea2a2;
+  background-color: #545454;
   justify-content: center;
   align-items: center;
   display: flex;
