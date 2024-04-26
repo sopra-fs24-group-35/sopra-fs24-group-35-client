@@ -61,6 +61,7 @@ const TitleScreen: React.FC = () => {
     const [Cyclecount, setCyclecount] = useState(0);
     const [CurrentText, setCurrentText] = useState("Go To Attack");
     const [hasMoved, setHasMoved] = useState(false);
+    const [LooseList, setLooseList] = useState([]);
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -79,7 +80,7 @@ const TitleScreen: React.FC = () => {
         return onCloseCallback; // Return the callback function
     };
 
-    
+
     const closeModal = async () => {
         const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
         setGame(updatedGame.data);
@@ -93,62 +94,206 @@ const TitleScreen: React.FC = () => {
     /*-------------------------------------------------*/
 
     const [buttonData, setButtonData] = useState([
-        { id: 'Alaska', refKey: 'Alaska', text: 'Alaska', xratio: 0.08, yratio:0.14, troops : 0, playerid : 0},
-        { id: 'Northwest Territory', refKey: 'Northwest Territory', text: 'Northwest Territory', xratio: 0.18, yratio:0.145, troops : 0, playerid : 0},
-        { id: 'Greenland', refKey: 'Greenland', text: 'Greenland', xratio: 0.35, yratio:0.1, troops : 0 , playerid : 0},
-        { id: 'Quebec', refKey: 'Quebec', text: 'Quebec', xratio: 0.3, yratio:0.24, troops : 0 , playerid : 0},
-        { id: 'Ontario', refKey: 'Ontario', text: 'Ontario', xratio: 0.23, yratio:0.24, troops : 0 , playerid : 0},
-        { id: 'Alberta', refKey: 'Alberta', text: 'Alberta', xratio: 0.16, yratio:0.23, troops : 0, playerid : 0},
-        { id: 'Western US', refKey: 'Western US', text: 'Western US', xratio: 0.18, yratio:0.335, troops : 0 , playerid : 0},
-        { id: 'Eastern US', refKey: 'Eastern US', text: 'Eastern US', xratio: 0.24, yratio:0.37, troops : 0 , playerid : 0},
-        { id: 'Central America', refKey: 'Central America', text: 'Central America', xratio: 0.185, yratio:0.455, troops : 0 , playerid : 0},
+        {id: 'Alaska', refKey: 'Alaska', text: 'Alaska', xratio: 0.08, yratio: 0.14, troops: 0, playerid: 0},
+        {
+            id: 'Northwest Territory',
+            refKey: 'Northwest Territory',
+            text: 'Northwest Territory',
+            xratio: 0.18,
+            yratio: 0.145,
+            troops: 0,
+            playerid: 0
+        },
+        {id: 'Greenland', refKey: 'Greenland', text: 'Greenland', xratio: 0.35, yratio: 0.1, troops: 0, playerid: 0},
+        {id: 'Quebec', refKey: 'Quebec', text: 'Quebec', xratio: 0.3, yratio: 0.24, troops: 0, playerid: 0},
+        {id: 'Ontario', refKey: 'Ontario', text: 'Ontario', xratio: 0.23, yratio: 0.24, troops: 0, playerid: 0},
+        {id: 'Alberta', refKey: 'Alberta', text: 'Alberta', xratio: 0.16, yratio: 0.23, troops: 0, playerid: 0},
+        {
+            id: 'Western US',
+            refKey: 'Western US',
+            text: 'Western US',
+            xratio: 0.18,
+            yratio: 0.335,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'Eastern US',
+            refKey: 'Eastern US',
+            text: 'Eastern US',
+            xratio: 0.24,
+            yratio: 0.37,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'Central America',
+            refKey: 'Central America',
+            text: 'Central America',
+            xratio: 0.185,
+            yratio: 0.455,
+            troops: 0,
+            playerid: 0
+        },
 
-        { id: 'Venezuela', refKey: 'Venezuela', text: 'Venezuela', xratio: 0.26, yratio:0.55, troops : 0 , playerid : 0},
-        { id: 'Brazil', refKey: 'Brazil', text: 'Brazil', xratio: 0.31, yratio:0.63, troops : 0 , playerid : 0},
-        { id: 'Peru', refKey: 'Peru', text: 'Peru', xratio: 0.27, yratio:0.676, troops : 0 , playerid : 0},
-        { id: 'Argentina', refKey: 'Argentina', text: 'Argentina', xratio: 0.28, yratio:0.79, troops : 0 , playerid : 0},
+        {id: 'Venezuela', refKey: 'Venezuela', text: 'Venezuela', xratio: 0.26, yratio: 0.55, troops: 0, playerid: 0},
+        {id: 'Brazil', refKey: 'Brazil', text: 'Brazil', xratio: 0.31, yratio: 0.63, troops: 0, playerid: 0},
+        {id: 'Peru', refKey: 'Peru', text: 'Peru', xratio: 0.27, yratio: 0.676, troops: 0, playerid: 0},
+        {id: 'Argentina', refKey: 'Argentina', text: 'Argentina', xratio: 0.28, yratio: 0.79, troops: 0, playerid: 0},
 
-        { id: 'Ukraine', refKey: 'Ukraine', text: 'Ukraine', xratio: 0.582, yratio:0.275, troops : 0 , playerid : 0},
-        { id: 'Northern Europe', refKey: 'Northern Europe', text: 'Northern Europe', xratio: 0.50, yratio:0.33, troops : 0 , playerid : 0},
-        { id: 'Southern Europe', refKey: 'Southern Europe', text: 'Southern Europe', xratio: 0.51, yratio:0.425, troops : 0 , playerid : 0},
-        { id: 'Iceland', refKey: 'Iceland', text: 'Iceland', xratio: 0.435, yratio:0.2, troops : 0 , playerid : 0},
-        { id: 'Western Europe', refKey: 'Western Europe', text: 'Western Europe', xratio: 0.43, yratio:0.47, troops : 0 , playerid : 0},
-        { id: 'Scandinavia', refKey: 'Scandinavia', text: 'Scandinavia', xratio: 0.505, yratio:0.19, troops : 0 , playerid : 0},
-        { id: 'Great Britain', refKey: 'Great Britain', text: 'Great Britain', xratio: 0.42, yratio:0.315, troops : 0 , playerid : 0},
+        {id: 'Ukraine', refKey: 'Ukraine', text: 'Ukraine', xratio: 0.582, yratio: 0.275, troops: 0, playerid: 0},
+        {
+            id: 'Northern Europe',
+            refKey: 'Northern Europe',
+            text: 'Northern Europe',
+            xratio: 0.50,
+            yratio: 0.33,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'Southern Europe',
+            refKey: 'Southern Europe',
+            text: 'Southern Europe',
+            xratio: 0.51,
+            yratio: 0.425,
+            troops: 0,
+            playerid: 0
+        },
+        {id: 'Iceland', refKey: 'Iceland', text: 'Iceland', xratio: 0.435, yratio: 0.2, troops: 0, playerid: 0},
+        {
+            id: 'Western Europe',
+            refKey: 'Western Europe',
+            text: 'Western Europe',
+            xratio: 0.43,
+            yratio: 0.47,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'Scandinavia',
+            refKey: 'Scandinavia',
+            text: 'Scandinavia',
+            xratio: 0.505,
+            yratio: 0.19,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'Great Britain',
+            refKey: 'Great Britain',
+            text: 'Great Britain',
+            xratio: 0.42,
+            yratio: 0.315,
+            troops: 0,
+            playerid: 0
+        },
 
-        { id: 'Egypt', refKey: 'Egypt', text: 'Egypt', xratio: 0.54, yratio:0.565, troops : 0 , playerid : 0},
-        { id: 'East Africa', refKey: 'East Africa', text: 'East Africa', xratio: 0.58, yratio:0.656, troops : 0 , playerid : 0},
-        { id: 'Congo', refKey: 'Congo', text: 'Congo', xratio: 0.54, yratio:0.72, troops : 0 , playerid : 0},
-        { id: 'South Africa', refKey: 'South Africa', text: 'South Africa', xratio: 0.55, yratio:0.84, troops : 0 , playerid : 0},
-        { id: 'North Africa', refKey: 'North Africa', text: 'North Africa', xratio: 0.48, yratio:0.6, troops : 0 , playerid : 0},
-        { id: 'Madagascar', refKey: 'Madagascar', text: 'Madagascar', xratio: 0.627, yratio:0.84, troops : 0 , playerid : 0},
+        {id: 'Egypt', refKey: 'Egypt', text: 'Egypt', xratio: 0.54, yratio: 0.565, troops: 0, playerid: 0},
+        {
+            id: 'East Africa',
+            refKey: 'East Africa',
+            text: 'East Africa',
+            xratio: 0.58,
+            yratio: 0.656,
+            troops: 0,
+            playerid: 0
+        },
+        {id: 'Congo', refKey: 'Congo', text: 'Congo', xratio: 0.54, yratio: 0.72, troops: 0, playerid: 0},
+        {
+            id: 'South Africa',
+            refKey: 'South Africa',
+            text: 'South Africa',
+            xratio: 0.55,
+            yratio: 0.84,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'North Africa',
+            refKey: 'North Africa',
+            text: 'North Africa',
+            xratio: 0.48,
+            yratio: 0.6,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'Madagascar',
+            refKey: 'Madagascar',
+            text: 'Madagascar',
+            xratio: 0.627,
+            yratio: 0.84,
+            troops: 0,
+            playerid: 0
+        },
 
-        { id: 'Indonesia', refKey: 'Indonesia', text: 'Indonesia', xratio: 0.805, yratio:0.71, troops : 0 , playerid : 0},
-        { id: 'New Guinea', refKey: 'New Guinea', text: 'New Guinea', xratio: 0.884, yratio:0.68, troops : 0 , playerid : 0},
-        { id: 'Western Australia', refKey: 'Western Australia', text: 'Western Australia', xratio: 0.84, yratio:0.85, troops : 0 , playerid : 0},
-        { id: 'Eastern Australia', refKey: 'Eastern Australia', text: 'Eastern Australia', xratio: 0.915, yratio:0.82, troops : 0 , playerid : 0},
+        {id: 'Indonesia', refKey: 'Indonesia', text: 'Indonesia', xratio: 0.805, yratio: 0.71, troops: 0, playerid: 0},
+        {
+            id: 'New Guinea',
+            refKey: 'New Guinea',
+            text: 'New Guinea',
+            xratio: 0.884,
+            yratio: 0.68,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'Western Australia',
+            refKey: 'Western Australia',
+            text: 'Western Australia',
+            xratio: 0.84,
+            yratio: 0.85,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'Eastern Australia',
+            refKey: 'Eastern Australia',
+            text: 'Eastern Australia',
+            xratio: 0.915,
+            yratio: 0.82,
+            troops: 0,
+            playerid: 0
+        },
 
-        { id: 'Ural', refKey: 'Ural', text: 'Ural', xratio: 0.685, yratio:0.25, troops : 0 , playerid : 0},
-        { id: 'Siberia', refKey: 'Siberia', text: 'Siberia', xratio: 0.735, yratio:0.16, troops : 0 , playerid : 0},
-        { id: 'Yakutsk', refKey: 'Yakutsk', text: 'Yakutsk', xratio: 0.805, yratio:0.12, troops : 0 , playerid : 0},
-        { id: 'Irkutsk', refKey: 'Irkutsk', text: 'Irkutsk', xratio: 0.792, yratio:0.25, troops : 0 , playerid : 0},
-        { id: 'Kamchatka', refKey: 'Kamchatka', text: 'Kamchatka', xratio: 0.88, yratio:0.13, troops : 0 , playerid : 0},
-        { id: 'Japan', refKey: 'Japan', text: 'Japan', xratio: 0.895, yratio:0.35, troops : 0 , playerid : 0},
-        { id: 'Mongolia', refKey: 'Mongolia', text: 'Mongolia', xratio: 0.805, yratio:0.345, troops : 0 , playerid : 0},
-        { id: 'China', refKey: 'China', text: 'China', xratio: 0.76, yratio:0.42, troops : 0 , playerid : 0},
-        { id: 'Afghanistan', refKey: 'Afghanistan', text: 'Afghanistan', xratio: 0.665, yratio:0.36, troops : 0 , playerid : 0},
-        { id: 'Middle East', refKey: 'Middle East', text: 'Middle East', xratio: 0.61, yratio:0.535, troops : 0 , playerid : 0},
-        { id: 'India', refKey: 'India', text: 'India', xratio: 0.715, yratio:0.51, troops : 0 , playerid : 0},
-        { id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio:0.55, troops : 0 , playerid : 0},
+        {id: 'Ural', refKey: 'Ural', text: 'Ural', xratio: 0.685, yratio: 0.25, troops: 0, playerid: 0},
+        {id: 'Siberia', refKey: 'Siberia', text: 'Siberia', xratio: 0.735, yratio: 0.16, troops: 0, playerid: 0},
+        {id: 'Yakutsk', refKey: 'Yakutsk', text: 'Yakutsk', xratio: 0.805, yratio: 0.12, troops: 0, playerid: 0},
+        {id: 'Irkutsk', refKey: 'Irkutsk', text: 'Irkutsk', xratio: 0.792, yratio: 0.25, troops: 0, playerid: 0},
+        {id: 'Kamchatka', refKey: 'Kamchatka', text: 'Kamchatka', xratio: 0.88, yratio: 0.13, troops: 0, playerid: 0},
+        {id: 'Japan', refKey: 'Japan', text: 'Japan', xratio: 0.895, yratio: 0.35, troops: 0, playerid: 0},
+        {id: 'Mongolia', refKey: 'Mongolia', text: 'Mongolia', xratio: 0.805, yratio: 0.345, troops: 0, playerid: 0},
+        {id: 'China', refKey: 'China', text: 'China', xratio: 0.76, yratio: 0.42, troops: 0, playerid: 0},
+        {
+            id: 'Afghanistan',
+            refKey: 'Afghanistan',
+            text: 'Afghanistan',
+            xratio: 0.665,
+            yratio: 0.36,
+            troops: 0,
+            playerid: 0
+        },
+        {
+            id: 'Middle East',
+            refKey: 'Middle East',
+            text: 'Middle East',
+            xratio: 0.61,
+            yratio: 0.535,
+            troops: 0,
+            playerid: 0
+        },
+        {id: 'India', refKey: 'India', text: 'India', xratio: 0.715, yratio: 0.51, troops: 0, playerid: 0},
+        {id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio: 0.55, troops: 0, playerid: 0},
     ]);
 
-    const config = {Authorization : localStorage.getItem("lobbyToken")};
+    const config = {Authorization: localStorage.getItem("lobbyToken")};
 
     useEffect(() => {
         // Define the function to fetch game data
         async function getGame() {
             try {
-                const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, { headers: config });
+                const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
                 setGame(gameResponse.data);
                 setPhase(gameResponse.data.turnCycle.currentPhase);
                 setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
@@ -166,13 +311,15 @@ const TitleScreen: React.FC = () => {
 
         // Set up the interval to call getGame every 2 seconds
         const intervalId = setInterval(() => {
-            console.log(currentPlayerId+ "              ------------   " + parseInt(localStorage.getItem("user_id")));
-            if(game !== null){
-            console.log(game.turnCycle.currentPlayer.playerId);}
+            console.log(currentPlayerId + "              ------------   " + parseInt(localStorage.getItem("user_id")));
+            if (game !== null) {
+                console.log(game.turnCycle.currentPlayer.playerId);
+            }
             if (game && currentPlayerId !== null) { // Check if game is not null
                 if (parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))) {
                     getGame();
-                } else{}
+                } else {
+                }
             } else {
                 getGame();
             }
@@ -185,26 +332,27 @@ const TitleScreen: React.FC = () => {
     const order = {};
 
     useEffect(() => {
-        if(game !== null){
+        if (game !== null) {
             console.log("game: ", game);
             console.log("current phase: ", phase);
             console.log("current player id: ", currentPlayerId);
             console.log("current troop bonus: ", troopBonus);
             console.log("playerCycle:", PlayerCycle);
-            if(currentPlayerId !== null){
-            setCurrentPlayerId(currentPlayerId);}
+            if (currentPlayerId !== null) {
+                setCurrentPlayerId(currentPlayerId);
+            }
 
             let PlayerwithColors = {};
             let x = 0;
-            if(PlayerCycle !== null) {
-                for(const player of PlayerCycle){
+            if (PlayerCycle !== null) {
+                for (const player of PlayerCycle) {
                     PlayerwithColors[player.playerId] = Colors[x];
                     x++;
                 }
             }
             setPlayerColor(PlayerwithColors);
 
-            for(let i = 0; i < buttonData.length; i++){
+            for (let i = 0; i < buttonData.length; i++) {
                 const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
                 const button = buttonData[i];
                 if (territory) {
@@ -216,23 +364,45 @@ const TitleScreen: React.FC = () => {
                 }
                 setButtonData([...buttonData]);
             }
-            if(phase === "REINFORCEMENT") {
+            if (phase === "REINFORCEMENT") {
                 setCurrentText(NameCycle[0]);
-            }
-            else if(phase === "ATTACK") {
+            } else if (phase === "ATTACK") {
                 setCurrentText(NameCycle[1]);
-            }
-            else if(phase === "MOVE") {
+            } else if (phase === "MOVE") {
                 setCurrentText(NameCycle[2]);
             }
+
+            checkifyouHaveLostOrWon();
 
         }
     }, [game, phase, currentPlayerId]);
 
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
-        return button ? { xratio: button.xratio, yratio: button.yratio } : { xratio: 0, yratio: 0 }; // Return xratio and yratio if the button is found, otherwise return default values
+        return button ? {xratio: button.xratio, yratio: button.yratio} : {xratio: 0, yratio: 0}; // Return xratio and yratio if the button is found, otherwise return default values
     };
+
+    const checkifyouHaveLostOrWon = () => {
+        let won = true;
+        let loose = true;
+        if(game !== null) {
+            for (const x of game.board.territories()) {
+                if (x.owner !== parseInt(localStorage.getItem("user_id"))) {
+                    won = false;
+                } else if (x.owner === parseInt(localStorage.getItem("user_id"))) {
+                    loose = false
+                }
+            }
+
+            if (won) {
+                console.log("WON");
+            } else if (loose) {
+                console.log("LOSE");
+            }
+
+        }
+
+}
 
     /*const setNewPlayerOwner = (id:string, playerid:number) => {
         const button = buttonData.find(button => button.id === id);
@@ -266,12 +436,12 @@ const TitleScreen: React.FC = () => {
 
         for (const button of validbuttonid) {
             const curbutton = buttonRefs.current[button]
-            if(button === id) {
+            if (button === id) {
                 curbutton.style.border = "2px double white";
                 curbutton.style.padding = "5px"; // Example padding
+            } else {
+                curbutton.style.border = "2px solid white";
             }
-            else {
-                curbutton.style.border= "2px solid white";}
 
         }
     }
@@ -279,7 +449,7 @@ const TitleScreen: React.FC = () => {
     const checkifthereareenemies = (id: string) => {
         for (const thisterritory of adjDict.dict[id]) {
             const curterritory = game.board.territories.find(territory => territory.name === thisterritory);
-            if(curterritory.owner !== currentPlayerId){
+            if (curterritory.owner !== currentPlayerId) {
                 return true;
             }
         }
@@ -289,7 +459,7 @@ const TitleScreen: React.FC = () => {
     const checkifthereareneighbors = (id: string) => {
         for (const thisterritory of adjDict.dict[id]) {
             const curterritory = game.board.territories.find(territory => territory.name === thisterritory);
-            if(curterritory.owner === currentPlayerId){
+            if (curterritory.owner === currentPlayerId) {
                 return true;
             }
         }
@@ -298,13 +468,13 @@ const TitleScreen: React.FC = () => {
 
     const handleButtonClick = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if(phase === "REINFORCEMENT"){
+        if (phase === "REINFORCEMENT") {
             deploytroops(id);
         }
-        if(phase === "ATTACK"){
+        if (phase === "ATTACK") {
             attackTerritory(id);
         }
-        if(phase === "MOVE"){
+        if (phase === "MOVE") {
             reinforceTroops(id);
         }
     }
@@ -314,11 +484,11 @@ const TitleScreen: React.FC = () => {
 
     const attackTerritory = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if(startButton){
+        if (startButton) {
             console.log("startButton: ", startButton);
             console.log("is adj?", adjDict.dict[startButton].includes(id));
             console.log("is NOT currentPlayers?", territory.owner !== currentPlayerId);
-            if(territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)){
+            if (territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)) {
                 setHasMoved(false);
                 dehighlightadjbutton(startButton);
                 drawLine(startButton, id);
@@ -328,18 +498,15 @@ const TitleScreen: React.FC = () => {
                 const cont = JSON.stringify({territory_def, territory_atk});
                 openModal(cont);
                 setStartButton(null);
-            }
-            else if (startButton === id){
+            } else if (startButton === id) {
                 setStartButton(null);
                 dehighlightadjbutton(startButton);
-            }
-            else if(territory.owner === currentPlayerId){
+            } else if (territory.owner === currentPlayerId) {
                 dehighlightadjbutton(startButton);
                 setStartButton(id);
                 highlightadjbutton(id);
             }
-        }
-        else if (territory.owner === currentPlayerId && checkifthereareenemies(id)){
+        } else if (territory.owner === currentPlayerId && checkifthereareenemies(id)) {
             setStartButton(id);
             highlightadjbutton(id);
         }
@@ -378,19 +545,20 @@ const TitleScreen: React.FC = () => {
         }
     };*/
 
-    const nextState = async() => {
+    const nextState = async () => {
 
         if (phase === "MOVE") {
             setStartButton(null);
             setDrawingLine(null);
-            if(startButton){
-                dehighlightadjbutton(startButton);}
+            if (startButton) {
+                dehighlightadjbutton(startButton);
+            }
             undoLine();
             setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
-        }
-        else{
-            if(startButton){
-            dehighlightadjbutton(startButton);}
+        } else {
+            if (startButton) {
+                dehighlightadjbutton(startButton);
+            }
             undoLine();
             setStartButton(null);
             setDrawingLine(null);
@@ -420,17 +588,18 @@ const TitleScreen: React.FC = () => {
         }
     }
 
-    const redirectTroops = (id : string) => {
+    const redirectTroops = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
         if (drawingLine) {
             if (currentPlayerId === territory.owner && territory.troops > 1 && checkifthereareneighbors(id) && hasMoved === false) {
-            // Draw line between start button and clicked button
-            undoLine();
-            setStartButton(null);
-            setDrawingLine(false); // Reset drawing line mode
-            setStartButton(id);
-            checkForAllValidReinforcements(id);}
-        }else if(startButton){
+                // Draw line between start button and clicked button
+                undoLine();
+                setStartButton(null);
+                setDrawingLine(false); // Reset drawing line mode
+                setStartButton(id);
+                checkForAllValidReinforcements(id);
+            }
+        } else if (startButton) {
             if (currentPlayerId === territory.owner && CurrentHighlightedButtons.includes(id) && id !== startButton) {
                 dehighlightadjbutton(startButton);
                 const territory_from = game.board.territories.find(territory => territory.name === startButton);
@@ -451,7 +620,7 @@ const TitleScreen: React.FC = () => {
                 }
             }
         } else {
-            if (currentPlayerId === territory.owner && checkifthereareneighbors(id) && territory.troops > 1 ) {
+            if (currentPlayerId === territory.owner && checkifthereareneighbors(id) && territory.troops > 1) {
                 setStartButton(id);
                 checkForAllValidReinforcements(id);
             }
@@ -484,7 +653,7 @@ const TitleScreen: React.FC = () => {
 
     const dehighlightadjbutton = (startId: string) => {
         const adjacentTerritories = adjDict.dict[startId];
-        for(const territory of adjacentTerritories){
+        for (const territory of adjacentTerritories) {
             const button = buttonRefs.current[territory]
             button.style.border = "2px solid black";
         }
@@ -512,7 +681,7 @@ const TitleScreen: React.FC = () => {
 
 
         let ratio = scaledPercentage; // Adjust this ratio as needed
-        if(ratio > 1){
+        if (ratio > 1) {
             ratio = 0.982;
         }
         const newEndx = startx + ratio * (endx - startx);
@@ -560,9 +729,9 @@ const TitleScreen: React.FC = () => {
         const button = buttonRefs.current[id];
         if (button) {
             const rect = button.getBoundingClientRect();
-            return { x: (rect.left+rect.right)/2, y: (rect.top+rect.bottom)/2 };
+            return {x: (rect.left + rect.right) / 2, y: (rect.top + rect.bottom) / 2};
         } else {
-            return { x: 0, y: 0 }; // Default position if button is not found
+            return {x: 0, y: 0}; // Default position if button is not found
         }
     };
 
@@ -612,18 +781,18 @@ const TitleScreen: React.FC = () => {
 
     const fetchData = async () => {
         try {
-            const config = { Authorization: localStorage.getItem("lobbyToken") };
+            const config = {Authorization: localStorage.getItem("lobbyToken")};
             // get lobby info
-            const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, { headers: config });
+            const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, {headers: config});
             const lobbyData = getLobbyResponse.data;
 
             // set the userIdList to an array of longs consisting of all the user IDs in the lobby
             let userIdList = lobbyData.players;
 
             let playeridwithavatar = {};
-            const config1 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+            const config1 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id")};
 
-            if(PlayerCycle !== null) {
+            if (PlayerCycle !== null) {
                 for (const playerid of PlayerCycle) {
                     playeridwithavatar[playerid.playerId] = null;
                 }
@@ -659,102 +828,102 @@ const TitleScreen: React.FC = () => {
 
         // Preload the image
         const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
-        preloadImage(imageSrc).then((image : HTMLImageElement) => {
+        preloadImage(imageSrc).then((image: HTMLImageElement) => {
 
-            // Once the image is fully loaded, update the canvas
-            fetchData();
-            const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-            const ctx = canvas.getContext('2d');
+                // Once the image is fully loaded, update the canvas
+                fetchData();
+                const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+                const ctx = canvas.getContext('2d');
 
-            const resizeCanvas = () => {
-                canvas.width = canvas.parentElement.clientWidth;
-                canvas.height = canvas.parentElement.clientHeight;
-                let aspectRatio = 0
+                const resizeCanvas = () => {
+                    canvas.width = canvas.parentElement.clientWidth;
+                    canvas.height = canvas.parentElement.clientHeight;
+                    let aspectRatio = 0
 
-                aspectRatio = image.width / image.height;
+                    aspectRatio = image.width / image.height;
 
-                let drawWidth = canvas.width;
-                let drawHeight = canvas.height;
+                    let drawWidth = canvas.width;
+                    let drawHeight = canvas.height;
 
-                // Adjust the size of the image to maintain aspect ratio
-                if (drawWidth / drawHeight > aspectRatio) {
-                    drawWidth = drawHeight * aspectRatio;
-                } else {
-                    drawHeight = drawWidth / aspectRatio;
-                }
-
-                const x = (canvas.width - drawWidth) / 2;
-                const y = (canvas.height - drawHeight) / 2;
-
-                setCurHeight(drawHeight);
-                setCurWidth(drawWidth);
-                setX(x);
-                setY(y);
-
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(image, x, y, drawWidth, drawHeight);
-                resizeButtons(x, y, drawWidth, drawHeight);
-            };
-
-            const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
-                const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
-                const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
-
-                Object.keys(buttonRefs.current).forEach((buttonId: string) => {
-                    const button = buttonRefs.current[buttonId];
-                    const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
-
-                    button.style.left = `${x}px`;
-                    button.style.top = `${y}px`;
-                    button.style.width = `${buttonWidth}px`;
-                    button.style.height = `${buttonHeight}px`;
-                    button.style.fontSize = `${buttonHeight*0.35}px`;
-
-
-                    if(game !== null){
-                        const territory = game.board.territories.find(territory => territory.name === buttonId);
-                        button.style.backgroundColor = PlayerColor[territory.owner];
+                    // Adjust the size of the image to maintain aspect ratio
+                    if (drawWidth / drawHeight > aspectRatio) {
+                        drawWidth = drawHeight * aspectRatio;
+                    } else {
+                        drawHeight = drawWidth / aspectRatio;
                     }
 
-                });
+                    const x = (canvas.width - drawWidth) / 2;
+                    const y = (canvas.height - drawHeight) / 2;
 
-                //Dynamically Adjust heigh and Widgt of the lower Textboxes
-                //const troopAmountDiv = document.getElementById('nextState');
-                let allbuttons = document.querySelectorAll('.dynbut');
-                let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                for (const but of buttonsArray) {
-                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                    (but as HTMLButtonElement).style.width = `${buttonWidth*9}px`;
-                    (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.35*2.5}px`;
-                }
+                    setCurHeight(drawHeight);
+                    setCurWidth(drawWidth);
+                    setX(x);
+                    setY(y);
 
-                allbuttons = document.querySelectorAll('.avatar');
-                buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                for (const but of buttonsArray) {
-                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                    (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
-                }
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(image, x, y, drawWidth, drawHeight);
+                    resizeButtons(x, y, drawWidth, drawHeight);
+                };
 
-            };
+                const resizeButtons = (startx: number, starty: number, drawWidth: number, drawHeight: number) => {
+                    const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
+                    const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
 
-            const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
-                const {xratio, yratio} = getButtonRatiosById(buttonId)
-                let x = startx + drawWidth * xratio; // Default left position
-                let y = starty + drawHeight * yratio; // Default top position
+                    Object.keys(buttonRefs.current).forEach((buttonId: string) => {
+                        const button = buttonRefs.current[buttonId];
+                        const {x, y} = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
 
-                return { x, y };
-            };
+                        button.style.left = `${x}px`;
+                        button.style.top = `${y}px`;
+                        button.style.width = `${buttonWidth}px`;
+                        button.style.height = `${buttonHeight}px`;
+                        button.style.fontSize = `${buttonHeight * 0.35}px`;
 
-            // Initial setup
-            resizeCanvas();
 
-            // Handle resize event
-            window.addEventListener('resize', resizeCanvas);
+                        if (game !== null) {
+                            const territory = game.board.territories.find(territory => territory.name === buttonId);
+                            button.style.backgroundColor = PlayerColor[territory.owner];
+                        }
 
-            return () => {
-                window.removeEventListener('resize', resizeCanvas);
-            };
-        }
+                    });
+
+                    //Dynamically Adjust heigh and Widgt of the lower Textboxes
+                    //const troopAmountDiv = document.getElementById('nextState');
+                    let allbuttons = document.querySelectorAll('.dynbut');
+                    let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                    for (const but of buttonsArray) {
+                        (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                        (but as HTMLButtonElement).style.width = `${buttonWidth * 9}px`;
+                        (but as HTMLButtonElement).style.fontSize = `${buttonHeight * 0.35 * 2.5}px`;
+                    }
+
+                    allbuttons = document.querySelectorAll('.avatar');
+                    buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                    for (const but of buttonsArray) {
+                        (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                        (but as HTMLButtonElement).style.width = `${buttonWidth * 20}px`;
+                    }
+
+                };
+
+                const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
+                    const {xratio, yratio} = getButtonRatiosById(buttonId)
+                    let x = startx + drawWidth * xratio; // Default left position
+                    let y = starty + drawHeight * yratio; // Default top position
+
+                    return {x, y};
+                };
+
+                // Initial setup
+                resizeCanvas();
+
+                // Handle resize event
+                window.addEventListener('resize', resizeCanvas);
+
+                return () => {
+                    window.removeEventListener('resize', resizeCanvas);
+                };
+            }
         );
 
     }, [PlayerColor]);
@@ -762,120 +931,119 @@ const TitleScreen: React.FC = () => {
     //PlayerColor
 
 
+    /*   useLayoutEffect(() => {
+           // Function to preload the image
+           const preloadImage = (url) => {
+               return new Promise((resolve, reject) => {
+                   const image = new Image();
+                   image.onload = () => resolve(image);
+                   image.onerror = reject;
+                   image.src = url;
+               });
+           };
+           preloadImage(require('../../styles/views/Pictures/RiskMap21.png'));
 
- /*   useLayoutEffect(() => {
-        // Function to preload the image
-        const preloadImage = (url) => {
-            return new Promise((resolve, reject) => {
-                const image = new Image();
-                image.onload = () => resolve(image);
-                image.onerror = reject;
-                image.src = url;
-            });
-        };
-        preloadImage(require('../../styles/views/Pictures/RiskMap21.png'));
+           fetchData();
+           // Canvas setup
+           const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+           const ctx = canvas.getContext('2d');
+           const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
 
-        fetchData();
-        // Canvas setup
-        const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-        const ctx = canvas.getContext('2d');
-        const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
+           const resizeCanvas = () => {
+               canvas.width = canvas.parentElement.clientWidth;
+               canvas.height = canvas.parentElement.clientHeight;
 
-        const resizeCanvas = () => {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
+               const image = new Image();
+               image.src = imageSrc;
+               setPicture(image);
 
-            const image = new Image();
-            image.src = imageSrc;
-            setPicture(image);
+               const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
+                   const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
+                   const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
 
-            const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
-                const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
-                const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
+                   Object.keys(buttonRefs.current).forEach((buttonId: string) => {
+                       const button = buttonRefs.current[buttonId];
+                       const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
 
-                Object.keys(buttonRefs.current).forEach((buttonId: string) => {
-                    const button = buttonRefs.current[buttonId];
-                    const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
-
-                    button.style.left = `${x}px`;
-                    button.style.top = `${y}px`;
-                    button.style.width = `${buttonWidth}px`;
-                    button.style.height = `${buttonHeight}px`;
-                    button.style.fontSize = `${buttonHeight*0.35}px`;
-
-
-                    if(game !== null){
-                        const territory = game.board.territories.find(territory => territory.name === buttonId);
-                        button.style.backgroundColor = PlayerColor[territory.owner];
-                    }
-
-                });
-
-                //Dynamically Adjust heigh and Widgt of the lower Textboxes
-                //const troopAmountDiv = document.getElementById('nextState');
-                let allbuttons = document.querySelectorAll('.dynbut');
-                let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                for (const but of buttonsArray) {
-                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                    (but as HTMLButtonElement).style.width = `${buttonWidth*9}px`;
-                    (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.35*2.5}px`;
-                }
-
-                allbuttons = document.querySelectorAll('.avatar');
-                buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                for (const but of buttonsArray) {
-                    (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                    (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
-                }
-
-            };
-
-            const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
-                const {xratio, yratio} = getButtonRatiosById(buttonId)
-                let x = startx + drawWidth * xratio; // Default left position
-                let y = starty + drawHeight * yratio; // Default top position
-
-                return { x, y };
-            };
-            image.onload = () => {
-                const aspectRatio = image.width / image.height;
-                let drawWidth = canvas.width;
-                let drawHeight = canvas.height;
-
-                // Adjust the size of the image to maintain aspect ratio
-                if (drawWidth / drawHeight > aspectRatio) {
-                    drawWidth = drawHeight * aspectRatio;
-                } else {
-                    drawHeight = drawWidth / aspectRatio;
-                }
-
-                // Center the image on the canvas
-                const x = (canvas.width - drawWidth) / 2;
-                const y = (canvas.height - drawHeight) / 2;
-
-                setCurHeight(drawHeight);
-                setCurWidth(drawWidth);
-                setX(x);
-                setY(y);
+                       button.style.left = `${x}px`;
+                       button.style.top = `${y}px`;
+                       button.style.width = `${buttonWidth}px`;
+                       button.style.height = `${buttonHeight}px`;
+                       button.style.fontSize = `${buttonHeight*0.35}px`;
 
 
-                // Clear the canvas and draw the image
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(image, x, y, drawWidth, drawHeight);
-                resizeButtons(x, y, drawWidth, drawHeight);
-            };
-        };
+                       if(game !== null){
+                           const territory = game.board.territories.find(territory => territory.name === buttonId);
+                           button.style.backgroundColor = PlayerColor[territory.owner];
+                       }
 
-        // Initial setup
-        resizeCanvas();
+                   });
 
-        // Handle resize event
-        window.addEventListener('resize', resizeCanvas);
+                   //Dynamically Adjust heigh and Widgt of the lower Textboxes
+                   //const troopAmountDiv = document.getElementById('nextState');
+                   let allbuttons = document.querySelectorAll('.dynbut');
+                   let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                   for (const but of buttonsArray) {
+                       (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
+                       (but as HTMLButtonElement).style.width = `${buttonWidth*9}px`;
+                       (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.35*2.5}px`;
+                   }
 
-        return () => {
-            window.removeEventListener('resize', resizeCanvas);
-        };
-    }, [PlayerColor]);*/
+                   allbuttons = document.querySelectorAll('.avatar');
+                   buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                   for (const but of buttonsArray) {
+                       (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
+                       (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
+                   }
+
+               };
+
+               const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
+                   const {xratio, yratio} = getButtonRatiosById(buttonId)
+                   let x = startx + drawWidth * xratio; // Default left position
+                   let y = starty + drawHeight * yratio; // Default top position
+
+                   return { x, y };
+               };
+               image.onload = () => {
+                   const aspectRatio = image.width / image.height;
+                   let drawWidth = canvas.width;
+                   let drawHeight = canvas.height;
+
+                   // Adjust the size of the image to maintain aspect ratio
+                   if (drawWidth / drawHeight > aspectRatio) {
+                       drawWidth = drawHeight * aspectRatio;
+                   } else {
+                       drawHeight = drawWidth / aspectRatio;
+                   }
+
+                   // Center the image on the canvas
+                   const x = (canvas.width - drawWidth) / 2;
+                   const y = (canvas.height - drawHeight) / 2;
+
+                   setCurHeight(drawHeight);
+                   setCurWidth(drawWidth);
+                   setX(x);
+                   setY(y);
+
+
+                   // Clear the canvas and draw the image
+                   ctx.clearRect(0, 0, canvas.width, canvas.height);
+                   ctx.drawImage(image, x, y, drawWidth, drawHeight);
+                   resizeButtons(x, y, drawWidth, drawHeight);
+               };
+           };
+
+           // Initial setup
+           resizeCanvas();
+
+           // Handle resize event
+           window.addEventListener('resize', resizeCanvas);
+
+           return () => {
+               window.removeEventListener('resize', resizeCanvas);
+           };
+       }, [PlayerColor]);*/
 
 
     let renderButtons = (
@@ -895,16 +1063,17 @@ const TitleScreen: React.FC = () => {
             </button>
         ))
     );
-    function getAvatarSrc(x : number) {
-        if(PlayerCycle !== null && PlayerCycle.length > x){
+
+    function getAvatarSrc(x: number) {
+        if (PlayerCycle !== null && PlayerCycle.length > x) {
             return AllIDwithAvatar[PlayerCycle[x].playerId];
-        } else{
+        } else {
             return CasualAvatar;
         }
     }
 
     function getcurrentAvatarColor(x) {
-        if(PlayerCycle !== null && PlayerCycle.length > x && PlayerCycle[x].playerId === currentPlayerId) {
+        if (PlayerCycle !== null && PlayerCycle.length > x && PlayerCycle[x].playerId === currentPlayerId) {
             return `2px solid black`;
         } else {
             return "2px solid transparent"; // Return empty string if x is out of bounds or PlayerCycle[x] is falsy
@@ -912,11 +1081,12 @@ const TitleScreen: React.FC = () => {
     }
 
     function getAvatarColor(x) {
-        if(PlayerCycle !== null && PlayerCycle.length > x) {
-            if(PlayerCycle[x].playerId === currentPlayerId) {
+        if (PlayerCycle !== null && PlayerCycle.length > x) {
+            if (PlayerCycle[x].playerId === currentPlayerId) {
                 return `6px double ${PlayerColor[PlayerCycle[x].playerId]}`;
-            } else{
-            return `4px solid ${PlayerColor[PlayerCycle[x].playerId]}`;}
+            } else {
+                return `4px solid ${PlayerColor[PlayerCycle[x].playerId]}`;
+            }
         } else {
             return "2px solid transparent"; // Return empty string if x is out of bounds or PlayerCycle[x] is falsy
         }
@@ -962,7 +1132,7 @@ const TitleScreen: React.FC = () => {
         </div>
         <div className="gamescreen-bottomright-container">
             {num !== 1 ? (
-                <div className="avatar" id={'avatar0'} style={{ ...avatarStyle, border: `${getAvatarColor(0)}` }}>
+                <div className="avatar" id={'avatar0'} style={{...avatarStyle, border: `${getAvatarColor(0)}`}}>
                     <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
@@ -1010,7 +1180,7 @@ const TitleScreen: React.FC = () => {
                         modalContent={modalContent}
                         onClose={closeModal}
                         lobbyId={lobbyId}
-                    gameId={gameId}
+                        gameId={gameId}
                     />
                 </section>
                 <canvas id="myCanvas"></canvas>
