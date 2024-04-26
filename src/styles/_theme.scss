@@ -7,11 +7,11 @@
    these values control the colors of your application.
    feel free to play around with these and see what other look you can come up with! :D
 */
-$accentButton: #d87d14;
-$accent: #1373c2;
+$accentButton: rgba(0, 0, 0, 0.49);
+$accent: #5a7c9a;
 $accentDark: #073449;
-$textColor: white;
-$background: #262632;
+$textColor: #ffffff;
+$background: rgb(161, 101, 101);  
 
 /* some constants */
 
@@ -28,7 +28,7 @@ $fontMono: "Roboto Mono", monospace;
 /* a standard drop shadow */
 $dropShadow: 0 0.25em 0.25em rgba(0, 0, 0, 0.25);
 
-$borderRadius: 0.75em;
+$borderRadius: 0.5em;
 
 /* mixins
 
