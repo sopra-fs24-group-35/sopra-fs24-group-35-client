@@ -115,10 +115,10 @@ const AttackModal = ({isModalOpen, modalContent, onClose, lobbyId, gameId}) => {
   const move = async () => {
     const number = parseInt(MoveTroops);
     const config = {Authorization: localStorage.getItem("lobbyToken")};
-    const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
-    const now = gameResponse.data.board;
-    const territory1 = now.territories.find(territory => territory.name === attackTerritory.name);
-    const territory2 = now.territories.find(territory => territory.name === defenseTerritory.name);
+    // const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
+    // const now = gameResponse.data.board;
+    // const territory1 = now.territories.find(territory => territory.name === attackTerritory.name);
+    // const territory2 = now.territories.find(territory => territory.name === defenseTerritory.name);
     // territory1.troops -= number;
     // territory2.troops += number;
     const requestBody1 = JSON.stringify({
