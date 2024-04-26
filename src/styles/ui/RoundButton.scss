@@ -1,0 +1,20 @@
+@import "../theme";
+
+.round-button {
+  padding: 8px; /* Adjust padding to make the button smaller */
+  /* Allow the button height to adjust based on content */
+  /* Allow the button width to adjust based on content */
+  border-radius: 20px; /* Make the button round */
+  font-size: 12px; /* Decrease font size for a smaller button */
+  text-transform: none; /* Disable text transformation */
+  letter-spacing: normal; /* Disable letter spacing */
+  text-shadow: none; /* Remove text shadow */
+}
+
+/* Ensure the button maintains the accent color */
+.round-button:hover,
+.round-button:active,
+.round-button:focus {
+  transform: translateY(-2px);
+  background-color: rgb(255, 0, 0) /* Use the accent color for background on hover, active, and focus */
+}
