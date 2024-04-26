@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import "styles/ui/WinLooseModal.scss";
 import "styles/views/Login.scss"
 import PropTypes from "prop-types";
-import { api, handleError } from "helpers/api";
-import { User } from "types";
-import ApiStyles from "helpers/avatarApiStyles";
-import {Button} from "./Button";
 
-const LooseModal = ({ isModalOpen, onClose}) => {
+
+const LoseModal = ({ isModalOpen, onClose}) => {
   if (!isModalOpen) {
     return null;
   }
@@ -31,11 +28,11 @@ const LooseModal = ({ isModalOpen, onClose}) => {
 };
 
 
-LooseModal.propTypes = {
+LoseModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   lobbyId: PropTypes.number.isRequired,
   gameId: PropTypes.number.isRequired
 };
 
-export default LooseModal;
+export default LoseModal;
