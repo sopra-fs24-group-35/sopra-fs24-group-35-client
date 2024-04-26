@@ -12,14 +12,14 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 60%;
+    width: 100%;
     max-width: 30em;
     height: 28em;
     font-size: 16px;
     font-weight: 300;
     padding-left: 37px;
     padding-right: 37px;
-    border-radius: 0.75em;
+    border-radius: 0.5em;
     background-color: $background;
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
@@ -34,9 +34,9 @@
     padding-left: 15px;
     margin-left: -4px;
     border: none;
-    border-radius: 0.75em;
+    border-radius: 0.5em;
     margin-bottom: 20px;
-    background: transparentize(white, 0.85);
+    background: transparentize(white, 0.6);
     color: $textColor;
   }
   &.label {
