@@ -33,7 +33,6 @@ const TitleScreen: React.FC = () => {
     let [num, setNum] = useState(0);
     let avatarPos = 0
     const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
-    const id = localStorage.getItem("user_id")
 
     let avatarId;
     const CasualAvatar = "https://api.dicebear.com/8.x/shapes/svg?seed=Mittens";
@@ -179,13 +178,15 @@ const TitleScreen: React.FC = () => {
             console.log("current troop bonus: ", troopBonus);
             console.log("playerOrder:", playerColors);
 
-            if(!playerColors) {
-                for(let j = 0; j < game.players.length; j++){
-
-                    order[game.players[j].playerId] = playerColorsArray[j];
-                    setPlayerColors(order);
+            let PlayerwithColors = {};
+            let x = 0;
+            if(PlayerCycle !== null) {
+                for(const player of PlayerCycle){
+                    PlayerwithColors[player.playerId] = playerColorsArray[x];
+                    x++;
                 }
             }
+            setPlayerColors(PlayerwithColors);
 
             for(let i = 0; i < buttonData.length; i++){
                 const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
@@ -703,7 +704,7 @@ const TitleScreen: React.FC = () => {
 
                     if(game !== null){
                         const territory = game.board.territories.find(territory => territory.name === buttonId);
-                        button.style.backgroundColor = PlayerColor[territory.owner];
+                        button.style.backgroundColor = playerColors[territory.owner];
                     }
 
                 });
@@ -747,7 +748,8 @@ const TitleScreen: React.FC = () => {
         }
         );
 
-    }, [game]);
+    }, [game, playerColors]);
+
 
 
 
@@ -768,6 +770,7 @@ const TitleScreen: React.FC = () => {
             </button>
         ))
     );
+
     function getAvatarSrc(x : number) {
         if(PlayerCycle !== null && PlayerCycle.length > x){
             return AllIDwithAvatar[PlayerCycle[x].playerId];
@@ -787,9 +790,9 @@ const TitleScreen: React.FC = () => {
     function getAvatarColor(x) {
         if(PlayerCycle !== null && PlayerCycle.length > x) {
             if(PlayerCycle[x].playerId === currentPlayerId) {
-                return `6px double ${PlayerColor[PlayerCycle[x].playerId]}`;
+                return `6px double ${playerColors[PlayerCycle[x].playerId]}`;
             } else{
-            return `4px solid ${PlayerColor[PlayerCycle[x].playerId]}`;}
+            return `4px solid ${playerColors[PlayerCycle[x].playerId]}`;}
         } else {
             return "2px solid transparent"; // Return empty string if x is out of bounds or PlayerCycle[x] is falsy
         }
@@ -890,5 +893,3 @@ const TitleScreen: React.FC = () => {
 }
 
 export default TitleScreen;
-
-

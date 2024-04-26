@@ -23,7 +23,7 @@ const AttackModal = ({isModalOpen, modalContent, onClose, lobbyId, gameId}) => {
   const [attackTerritory, setAttackTerritory] = useState(null);
 
   const [selectedTroops, setSelectedTroops] = useState(3);
-  const [selectedAttacks, setSelectedAttacks] = useState(1);
+  const [selectedAttacks, setSelectedAttacks] = useState(100);
   const [MoveTroops, setMoveTroops] = useState();
   //console.log("selectedTroops", selectedTroops);
 
@@ -57,6 +57,10 @@ const AttackModal = ({isModalOpen, modalContent, onClose, lobbyId, gameId}) => {
           // onClose();
           //return;
           setSameOwner(true);
+        }
+
+        if (getAttackerTerritory.data.troops === 1){
+          onClose(true);
         }
 
         const config2 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id")};
@@ -112,25 +116,15 @@ const AttackModal = ({isModalOpen, modalContent, onClose, lobbyId, gameId}) => {
       console.log("attack response:", attackResponse);
     }*/
 
-  const move = async () => {
-    const number = parseInt(MoveTroops);
-    const config = {Authorization: localStorage.getItem("lobbyToken")};
-    // const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
-    // const now = gameResponse.data.board;
-    // const territory1 = now.territories.find(territory => territory.name === attackTerritory.name);
-    // const territory2 = now.territories.find(territory => territory.name === defenseTerritory.name);
-    // territory1.troops -= number;
-    // territory2.troops += number;
-    const requestBody1 = JSON.stringify({
-      "attackingTerritory": attackTerritory.name,
-      "defendingTerritory": defenseTerritory.name,
-      "troopsAmount": number
-    });
-    const updateGame = await api.put(`lobbies/${lobbyId}/game/${gameId}/transfer`, requestBody1, {headers: config});
-    console.log("AFTER MOVING: " + updateGame.data);
-    onClose(true);
-
-  }
+    const move = async() => {
+      const config = { Authorization: localStorage.getItem("lobbyToken") };
+      const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedAttacks});
+      console.log("requestBody: ", requestBody);
+      const moveResponse = await api.put(`lobbies/${lobbyId}/game/${gameId}/transfer`, requestBody, {headers: config});
+      setGame(moveResponse.data);
+      console.log("move response:", moveResponse);
+    }
+  
 
 
   const Player = ({user}: { user: User }) => (
@@ -147,91 +141,73 @@ const AttackModal = ({isModalOpen, modalContent, onClose, lobbyId, gameId}) => {
   };
 
   return (
-      <div className="modal" onClick={onClose}>
-        <div className="modal-content" onClick={e => e.stopPropagation()}>
-          <button className="close" onClick={onClose}>
-            &times;
-          </button>
-          <main className="modal-mainContents">
-            <div className="modal-info-container">
-              <div className="defender-info">
-                <h5 className="modal-title">{(!sameOwner) ? "DEFENDER" : "MOVING TROOPS"}</h5>
-                {defender && <Player user={defender}/>}
-              </div>
-              {(!sameOwner) ?
-                  (
-                      <>
-                        <p className="vs-text">{(!sameOwner) ? "VS" : '\u2190'}</p>
-                        <div className="attacker-info">
-                          <h5 className="modal-title">ATTACKER</h5>
-                          {attacker && <Player user={attacker}/>}
-                        </div>
-                      </>
-                  ) : (null)}
+    <div className="modal" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <button className="close" onClick={onClose}>
+          &times;
+        </button>
+        <main className="modal-mainContents">
+          <div className="modal-info-container">
+            <div className="defender-info">
+              <h5 className="modal-title">{(!sameOwner) ? "DEFENDER" : "MOVING TROOPS"}</h5>
+              {defender && <Player user={defender} />}
             </div>
-            <div className="modal-info-container">
-              <div className="defense-territory-info">
-                <h5 className="modal-title">{modalContent.territory_def}</h5>
-                <h5 className="troopInfo">{(!sameOwner) ? "Enemy Troops:" : "Your Troops:"} {defenseTerritory && defenseTerritory.troops}</h5>
-              </div>
-              <p className="vs-text">{(!sameOwner) ? "VS" : '\u2190'}</p>
-              <div className="attack-territory-info">
-                <h5 className="modal-title">{modalContent.territory_atk}</h5>
-                <h5 className="troopInfo">Your Troops: {attackTerritory && attackTerritory.troops}</h5>
-                <div className="selectables">
-                  {(!sameOwner) ? (
-                          <div>
-                            <label className="select-label">
-                              Troops:
-                              <select className="select" value={selectedTroops}
-                                onChange={e => setSelectedTroops(e.target.value)}>
-                                <option value={3}>3</option>
-                                <option value={2}>2</option>
-                                <option value={1}>1</option>
-                              </select>
-                            </label>
-                            <hr className="hr"/>
-                          </div>
-                      )
-                      : (null)}
-                    {(sameOwner) ?
-                        <label className="select-label"> Move:
-                    <input
-                        type="number"
-                        className="input"
-                        value={MoveTroops}
-                        onChange={e => {
-                          const value = parseInt(e.target.value);
-                          // Check if the value is a positive integer and within the specified range
-                          if (!isNaN(value) && value > 0 && value < attackTerritory.troops) {
-                            setMoveTroops(value);
-                          }
-                        }}
-                    />
-                        </label>:
-                        <label className="select-label"> Attack:
-                          <select className="select" value={selectedTroops}
-                            onChange={e => setSelectedTroops(e.target.value)}>
-                      <option value={1}>1</option>
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
-                  </label>}
+            {(!sameOwner) ?
+            (
+              <>
+                <p className="vs-text">{(!sameOwner) ? "VS" : '\u2190'}</p>
+                <div className="attacker-info">
+                  <h5 className="modal-title">ATTACKER</h5>
+                  {attacker && <Player user={attacker} />}
                 </div>
+              </>
+            ) : (null)}
+          </div>
+          <div className="modal-info-container">
+            <div className="defense-territory-info">
+              <h5 className="modal-title">{modalContent.territory_def}</h5>
+              <h5 className="troopInfo">{(!sameOwner) ? "Enemy Troops:" : "Your Troops:"} {defenseTerritory && defenseTerritory.troops}</h5>
+            </div>
+            <p className="vs-text">{(!sameOwner) ? "VS" : '\u2190' }</p>
+            <div className="attack-territory-info">
+              <h5 className="modal-title">{modalContent.territory_atk}</h5>
+              <h5 className="troopInfo">Your Troops: {attackTerritory && attackTerritory.troops}</h5>
+              <div className="selectables">
+              {(!sameOwner) ? (
+                <div>
+                  <label className="select-label">
+                  Troops:
+                  <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
+                    <option value={3}>3</option>
+                    <option value={2}>2</option>
+                    <option value={1}>1</option>
+                  </select>
+                  </label>
+                  <hr className="hr"/>
+                </div>
+                )
+                : (null)}
+                <label className="select-label">
+                {(!sameOwner) ? "Attacks:" : "Move Troops:"}
+                  <select className="select" value={selectedAttacks} onChange={e => setSelectedAttacks(e.target.value)}>
+                    <option value={1}>1</option>
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </label>
               </div>
             </div>
-            <div className="button-div">
-              {(!sameOwner) ? <Button width="50%" onClick={attack}>Attack</Button> :
-                  <Button width="50%" onClick={move}>Move Troops</Button>}
-            </div>
-          </main>
-        </div>
+          </div>
+          <div className="button-div">
+            {(!sameOwner) ? <Button width="50%" onClick={attack}>Attack</Button> : <Button width="50%" onClick={move}>Move Troops</Button>}
+          </div>
+        </main>
       </div>
+    </div>
   );
 };
-
 
 AttackModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
