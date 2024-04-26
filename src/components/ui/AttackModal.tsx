@@ -57,6 +57,9 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, game
           //return;
           setSameOwner(true);
         }
+        if (getAttackerTerritory.data.troops <= 1){
+          onClose(true);
+        }
 
         const config2 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id")};
 
@@ -98,12 +101,12 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, game
   }
 
   const move = async() => {
-    onMove(true);
     const config = { Authorization: localStorage.getItem("lobbyToken") };
     const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedAttacks});
     console.log("requestBody: ", requestBody);
     const moveResponse = await api.put(`lobbies/${lobbyId}/game/${gameId}/transfer`, requestBody, {headers: config});
     setGame(moveResponse.data);
+    onMove(true);
     console.log("move response:", moveResponse);
   }
 
