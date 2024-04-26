@@ -78,8 +78,10 @@ const Registration = () => {
               value={password}
               onChange={(n) => setPassword(n)}
             />
-            <img style={{ marginBottom: '10px' }} width="50%" src={gesamt} alt="avatar" />
-            <Button style={{ marginBottom: '10px' }} width="50%" onClick={AvatarCreation}>Switch</Button>
+            <img className="registration avatar" width="50%" src={gesamt} alt="avatar" />
+            <div className="registration switch-button">
+              <Button width="50%" onClick={AvatarCreation}>Switch</Button>
+            </div>
             <label style={{ fontSize: "0.75em" }}> (Your password needs to be at least 8 characters long.) </label>
             <div className="login button-container">
               <Button
