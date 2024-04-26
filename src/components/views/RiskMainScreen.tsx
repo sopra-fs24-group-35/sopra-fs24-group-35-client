@@ -1,10 +1,6 @@
-import React, { useState, useEffect, useLayoutEffect} from "react";
-//import React, { useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import "styles/views/GameScreen.scss";
 import { api, handleError } from "helpers/api";
-import {Button} from "../ui/Button";
-import {RoundButton} from "../ui/RoundButton";
-import BaseContainer from "../ui/BaseContainer";
 import { useNavigate, useParams } from "react-router-dom";
 import game from "./Game";
 import { User } from "../../types";
@@ -14,8 +10,6 @@ import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
-import { Simulate } from "react-dom/test-utils";
-import play = Simulate.play;
 
 
 const TitleScreen: React.FC = () => {
@@ -29,17 +23,12 @@ const TitleScreen: React.FC = () => {
     const navigate = useNavigate();
     const styles = new ApiStyles;
     let [num, setNum] = useState(0);
-    let avatarPos = 0
-    const [gesamt, setGesamt] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
-    const id = localStorage.getItem("user_id")
 
-    let avatarId;
     const CasualAvatar = "https://api.dicebear.com/8.x/shapes/svg?seed=Mittens";
     const [AllIDwithAvatar, setAllIDwithAvatar] = useState({});
 
     const {gameId} = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
-    const [anzeige, setAnzeige] = useState(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[num]}`);
     const [startButton, setStartButton] = useState<string | null>(null);
     const [drawingLine, setDrawingLine] = useState(false);
     const adjDict = new AdjDict();
@@ -49,27 +38,22 @@ const TitleScreen: React.FC = () => {
     const [cury, setY] = useState(0);
     const [curwidth, setCurWidth] = useState(0);
     const [curheight, setCurHeight] = useState(0);
-    const [picture, setPicture] = useState('../../styles/views/Pictures/RiskMap21.png');
 
-    const [curstate, setCurState] = useState(1);
-    //const [buttonStateText, setButtonStateText] = useState('Go to Attack');
-    const [curTroopAmount, setCurTroopAmount] = useState(15);
     const [PlayerColor, setPlayerColor] = useState({});
-    const Colors = ["red", "blue", "violet", "green", "orange"];
+    const Colors = ["red", "blue", "purple", "green", "orange", "brown"];
     const [PlayerCycle, setPlayerCycle] = useState(null);
     const [curListOfValidReinforcements, setcurListOfValidReinforcements] = useState([]);
     const [CurrentHighlightedButtons, setCurrentHighlightedButtons] = useState(null);
     const NameCycle = ["Go to Attack", "Go to Troop Movement", "End The Turn"];
-    const [Cyclecount, setCyclecount] = useState(0);
     const [CurrentText, setCurrentText] = useState("Go To Attack");
-    const [hasMoved, setHasMoved] = useState(false);
     const [LooseList, setLooseList] = useState([]);
     const [isWinModalOpen, setIsWinModalOpen] = useState(false);
     const [isLooseModalOpen, setIsLooseModalOpen] = useState(false)
     const [WinLooseWasShown, setWinLooseWasShown] = useState(false)
 
     /*---------------Attack Modal Setup----------------*/
-    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [moved, setMoved] = useState(false);
     const [modalContent, setModalContent] = useState({
         territory_def: "Add territory name here",
         territory_atk: "Add territory name here",
@@ -78,13 +62,12 @@ const TitleScreen: React.FC = () => {
     const openModal = (content) => {
         setIsModalOpen(true);
         setModalContent(JSON.parse(content));
-        const onCloseCallback = (value) => {
-            console.log("Received value from modal:", value);
-            // Handle the value received from the modal
-        };
-        return onCloseCallback; // Return the callback function
+        setStartButton(null);
     };
 
+    const moving = () => {
+        setMoved(true);
+    };
 
     const closeModal = async () => {
         const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
@@ -318,7 +301,7 @@ const TitleScreen: React.FC = () => {
 
         // Set up the interval to call getGame every 2 seconds
         const intervalId = setInterval(() => {
-            console.log(currentPlayerId + "              ------------   " + parseInt(localStorage.getItem("user_id")));
+            console.log(currentPlayerId + "  ------------  " + parseInt(localStorage.getItem("user_id")));
             if (game !== null) {
                 console.log(game.turnCycle.currentPlayer.playerId);
             }
@@ -326,6 +309,7 @@ const TitleScreen: React.FC = () => {
                 if (parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))) {
                     getGame();
                 } else {
+                    console.log("i'm here");
                 }
             } else {
                 getGame();
@@ -336,7 +320,6 @@ const TitleScreen: React.FC = () => {
         return () => clearInterval(intervalId);
     }, [currentPlayerId]);
 
-    const order = {};
 
     useEffect(() => {
         if (game !== null) {
@@ -400,25 +383,15 @@ const TitleScreen: React.FC = () => {
                     loose = false
                 }
             }
-            if (won === true) {
-                setIsWinModalOpen(true);
-                setWinLooseWasShown(true);
-            } else if (loose === true) {
-                setIsLooseModalOpen(true);
-                setWinLooseWasShown(true);
+
+            if (won) {
+                console.log("WON");
+            } else if (loose) {
+                console.log("LOSE");
             }
-
         }
+    }
 
-}
-
-    /*const setNewPlayerOwner = (id:string, playerid:number) => {
-        const button = buttonData.find(button => button.id === id);
-        button.playerid = playerid;
-        setButtonData([...buttonData]);
-        const curbutton = buttonRefs.current[id];
-        curbutton.style.backgroundColor = Colors[2];
-    }*/
 
     const checkForAllValidReinforcements = (id: string) => {
         const playerid = currentPlayerId;
@@ -497,7 +470,6 @@ const TitleScreen: React.FC = () => {
             console.log("is adj?", adjDict.dict[startButton].includes(id));
             console.log("is NOT currentPlayers?", territory.owner !== currentPlayerId);
             if (territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)) {
-                setHasMoved(false);
                 dehighlightadjbutton(startButton);
                 drawLine(startButton, id);
                 //setDrawingLine(true); // Enable drawing line mode
@@ -526,35 +498,6 @@ const TitleScreen: React.FC = () => {
         redirectTroops(id)
     }
 
-    /*const handleButtonClick1 = (id: string) => {
-        console.log(" First Terri: " + startButton + ", Second Terri: " + id + ", drawline: " + drawingLine + ".");
-        const territory = game.board.territories.find(territory => territory.name === id);
-        if (drawingLine) {
-            // Draw line between start button and clicked button
-        if (currentPlayerId === territory.owner && checkifthereareenemies(id)) {
-            undoLine();
-            setStartButton(null);
-            setEndButton(null);
-            setDrawingLine(false); // Reset drawing line mode
-            setStartButton(id);
-            highlightadjbutton(id)}
-        }else if(startButton){
-            if (currentPlayerId !== territory.owner && CurrentHighlightedButtons.includes(id)){
-                dehighlightadjbutton(startButton);
-                drawLine(startButton, id);
-                setDrawingLine(true); // Enable drawing line mode
-                const territory_def = id;
-                const territory_atk = startButton;
-                const cont = JSON.stringify({territory_def, territory_atk});
-                openModal(cont);}
-        } else {
-            if (currentPlayerId === territory.owner && checkifthereareenemies(id)) {
-                setStartButton(id);
-                highlightadjbutton(id);
-            }
-        }
-    };*/
-
     const nextState = async () => {
 
         if (phase === "MOVE") {
@@ -577,6 +520,7 @@ const TitleScreen: React.FC = () => {
         const requestBody = JSON.stringify({"board": game.board});
         const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}`, requestBody, {headers: config});
 
+        setMoved(false);
         setGame(updateGame.data);
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
@@ -600,40 +544,31 @@ const TitleScreen: React.FC = () => {
 
     const redirectTroops = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if (drawingLine) {
-            if (currentPlayerId === territory.owner && territory.troops > 1 && checkifthereareneighbors(id) && hasMoved === false) {
-                // Draw line between start button and clicked button
-                undoLine();
-                setStartButton(null);
-                setDrawingLine(false); // Reset drawing line mode
-                setStartButton(id);
-                checkForAllValidReinforcements(id);
-            }
-        } else if (startButton) {
+        if (startButton) {
             if (currentPlayerId === territory.owner && CurrentHighlightedButtons.includes(id) && id !== startButton) {
                 dehighlightadjbutton(startButton);
-                const territory_from = game.board.territories.find(territory => territory.name === startButton);
                 const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
                 const button_to = buttonData.find(button => button.id === id);
                 if (button_from && button_to && button_from.troops > 1) {
                     const territory_def = id;
                     const territory_atk = startButton;
                     const cont = JSON.stringify({territory_def, territory_atk});
-                    const onCloseCallback = openModal(cont);
-                    //onCloseCallback(value);
+                    openModal(cont);
 
-                    setHasMoved(true);
                     setButtonData([...buttonData]); // Update the button data array in the state
                     setGame(game);
                     drawLine(startButton, id);
                     setDrawingLine(true); // Enable drawing line mode
                 }
+                
             }
-        } else {
-            if (currentPlayerId === territory.owner && checkifthereareneighbors(id) && territory.troops > 1) {
+            else if (startButton === id && !moved) {
+                setStartButton(null);
+                dehighlightadjbutton(startButton);
+            }
+        } else if (currentPlayerId === territory.owner && checkifthereareneighbors(id) && territory.troops > 1 && !moved) {
                 setStartButton(id);
                 checkForAllValidReinforcements(id);
-            }
         }
     }
 
@@ -786,7 +721,6 @@ const TitleScreen: React.FC = () => {
             newNum = 0;
         }
         setNum(newNum);
-        setGesamt(`https://api.dicebear.com/8.x/thumbs/svg?seed=${styles[newNum]}`);
     }
 
     const fetchData = async () => {
@@ -938,123 +872,6 @@ const TitleScreen: React.FC = () => {
 
     }, [PlayerColor]);
 
-    //PlayerColor
-
-
-    /*   useLayoutEffect(() => {
-           // Function to preload the image
-           const preloadImage = (url) => {
-               return new Promise((resolve, reject) => {
-                   const image = new Image();
-                   image.onload = () => resolve(image);
-                   image.onerror = reject;
-                   image.src = url;
-               });
-           };
-           preloadImage(require('../../styles/views/Pictures/RiskMap21.png'));
-
-           fetchData();
-           // Canvas setup
-           const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-           const ctx = canvas.getContext('2d');
-           const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
-
-           const resizeCanvas = () => {
-               canvas.width = canvas.parentElement.clientWidth;
-               canvas.height = canvas.parentElement.clientHeight;
-
-               const image = new Image();
-               image.src = imageSrc;
-               setPicture(image);
-
-               const resizeButtons = (startx:number, starty:number, drawWidth: number, drawHeight: number) => {
-                   const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
-                   const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
-
-                   Object.keys(buttonRefs.current).forEach((buttonId: string) => {
-                       const button = buttonRefs.current[buttonId];
-                       const { x, y } = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
-
-                       button.style.left = `${x}px`;
-                       button.style.top = `${y}px`;
-                       button.style.width = `${buttonWidth}px`;
-                       button.style.height = `${buttonHeight}px`;
-                       button.style.fontSize = `${buttonHeight*0.35}px`;
-
-
-                       if(game !== null){
-                           const territory = game.board.territories.find(territory => territory.name === buttonId);
-                           button.style.backgroundColor = PlayerColor[territory.owner];
-                       }
-
-                   });
-
-                   //Dynamically Adjust heigh and Widgt of the lower Textboxes
-                   //const troopAmountDiv = document.getElementById('nextState');
-                   let allbuttons = document.querySelectorAll('.dynbut');
-                   let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                   for (const but of buttonsArray) {
-                       (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                       (but as HTMLButtonElement).style.width = `${buttonWidth*9}px`;
-                       (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.35*2.5}px`;
-                   }
-
-                   allbuttons = document.querySelectorAll('.avatar');
-                   buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                   for (const but of buttonsArray) {
-                       (but as HTMLButtonElement).style.height = `${buttonHeight*2.5}px`;
-                       (but as HTMLButtonElement).style.width = `${buttonWidth*20}px`;
-                   }
-
-               };
-
-               const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx:number, starty:number, buttonId: string) => {
-                   const {xratio, yratio} = getButtonRatiosById(buttonId)
-                   let x = startx + drawWidth * xratio; // Default left position
-                   let y = starty + drawHeight * yratio; // Default top position
-
-                   return { x, y };
-               };
-               image.onload = () => {
-                   const aspectRatio = image.width / image.height;
-                   let drawWidth = canvas.width;
-                   let drawHeight = canvas.height;
-
-                   // Adjust the size of the image to maintain aspect ratio
-                   if (drawWidth / drawHeight > aspectRatio) {
-                       drawWidth = drawHeight * aspectRatio;
-                   } else {
-                       drawHeight = drawWidth / aspectRatio;
-                   }
-
-                   // Center the image on the canvas
-                   const x = (canvas.width - drawWidth) / 2;
-                   const y = (canvas.height - drawHeight) / 2;
-
-                   setCurHeight(drawHeight);
-                   setCurWidth(drawWidth);
-                   setX(x);
-                   setY(y);
-
-
-                   // Clear the canvas and draw the image
-                   ctx.clearRect(0, 0, canvas.width, canvas.height);
-                   ctx.drawImage(image, x, y, drawWidth, drawHeight);
-                   resizeButtons(x, y, drawWidth, drawHeight);
-               };
-           };
-
-           // Initial setup
-           resizeCanvas();
-
-           // Handle resize event
-           window.addEventListener('resize', resizeCanvas);
-
-           return () => {
-               window.removeEventListener('resize', resizeCanvas);
-           };
-       }, [PlayerColor]);*/
-
 
     let renderButtons = (
         buttonData.map((button) => (
@@ -1189,6 +1006,7 @@ const TitleScreen: React.FC = () => {
                         isModalOpen={isModalOpen}
                         modalContent={modalContent}
                         onClose={closeModal}
+                        onMove={moving}
                         lobbyId={lobbyId}
                         gameId={gameId}
                     />
