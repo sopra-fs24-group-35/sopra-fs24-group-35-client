@@ -372,19 +372,19 @@ const TitleScreen: React.FC = () => {
 
     const checkifyouHaveLostOrWon = () => {
         let won = true;
-        let loose = true;
-        if(game !== null  && WinLoseWasShown === false) {
+        let lose = true;
+        if(game !== null && WinLoseWasShown === false) {
             for (const x of game.board.territories) {
                 if (x.owner !== parseInt(localStorage.getItem("user_id"))) {
                     won = false;
                 } else if (x.owner === parseInt(localStorage.getItem("user_id"))) {
-                    loose = false
+                    lose = false
                 }
             }
             if (won === true) {
                 setIsWinModalOpen(true);
                 setWinLoseWasShown(true);
-            } else if (loose === true) {
+            } else if (lose === true) {
                 setIsLoseModalOpen(true);
                 setWinLoseWasShown(true);
             }
