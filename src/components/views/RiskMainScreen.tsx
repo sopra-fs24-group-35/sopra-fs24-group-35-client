@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import game from "./Game";
 import { User } from "../../types";
 import ModalWin from "../ui/ModalWin";
-import LooseModal from "../ui/LooseModal";
+import LoseModal from "../ui/LooseModal";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
 import Game from "models/Game";
@@ -18,6 +18,7 @@ const TitleScreen: React.FC = () => {
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [troopBonus, setTroopBonus] = useState(null);
+    const [allTroopsUsed, setAllTroopsUsed] = useState(false);
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -30,7 +31,6 @@ const TitleScreen: React.FC = () => {
     const {gameId} = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
     const [startButton, setStartButton] = useState<string | null>(null);
-    const [drawingLine, setDrawingLine] = useState(false);
     const adjDict = new AdjDict();
     //reload idea
 
@@ -46,10 +46,9 @@ const TitleScreen: React.FC = () => {
     const [CurrentHighlightedButtons, setCurrentHighlightedButtons] = useState(null);
     const NameCycle = ["Go to Attack", "Go to Troop Movement", "End The Turn"];
     const [CurrentText, setCurrentText] = useState("Go To Attack");
-    const [LooseList, setLooseList] = useState([]);
     const [isWinModalOpen, setIsWinModalOpen] = useState(false);
-    const [isLooseModalOpen, setIsLooseModalOpen] = useState(false)
-    const [WinLooseWasShown, setWinLooseWasShown] = useState(false)
+    const [isLoseModalOpen, setIsLoseModalOpen] = useState(false)
+    const [WinLoseWasShown, setWinLoseWasShown] = useState(false)
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,7 +72,7 @@ const TitleScreen: React.FC = () => {
         const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
         setGame(updatedGame.data);
         setIsModalOpen(false);
-        setIsLooseModalOpen(false);
+        setIsLoseModalOpen(false);
         setIsWinModalOpen(false);
         undoLine();
     };
@@ -309,7 +308,6 @@ const TitleScreen: React.FC = () => {
                 if (parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))) {
                     getGame();
                 } else {
-                    console.log("i'm here");
                 }
             } else {
                 getGame();
@@ -375,7 +373,7 @@ const TitleScreen: React.FC = () => {
     const checkifyouHaveLostOrWon = () => {
         let won = true;
         let loose = true;
-        if(game !== null  && WinLooseWasShown === false) {
+        if(game !== null  && WinLoseWasShown === false) {
             for (const x of game.board.territories) {
                 if (x.owner !== parseInt(localStorage.getItem("user_id"))) {
                     won = false;
@@ -383,15 +381,15 @@ const TitleScreen: React.FC = () => {
                     loose = false
                 }
             }
-
-            if (won) {
-                console.log("WON");
-            } else if (loose) {
-                console.log("LOSE");
+            if (won === true) {
+                setIsWinModalOpen(true);
+                setWinLoseWasShown(true);
+            } else if (loose === true) {
+                setIsLoseModalOpen(true);
+                setWinLoseWasShown(true);
             }
         }
     }
-
 
     const checkForAllValidReinforcements = (id: string) => {
         const playerid = currentPlayerId;
@@ -423,7 +421,6 @@ const TitleScreen: React.FC = () => {
             } else {
                 curbutton.style.border = "2px solid white";
             }
-
         }
     }
 
@@ -502,19 +499,18 @@ const TitleScreen: React.FC = () => {
 
         if (phase === "MOVE") {
             setStartButton(null);
-            setDrawingLine(null);
             if (startButton) {
                 dehighlightadjbutton(startButton);
             }
             undoLine();
             setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
-        } else {
+        }
+        else {
             if (startButton) {
                 dehighlightadjbutton(startButton);
             }
             undoLine();
             setStartButton(null);
-            setDrawingLine(null);
         }
 
         const requestBody = JSON.stringify({"board": game.board});
@@ -524,6 +520,7 @@ const TitleScreen: React.FC = () => {
         setGame(updateGame.data);
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
+        
     }
 
     const increaseTroops = (territory_id: string) => {
@@ -536,7 +533,6 @@ const TitleScreen: React.FC = () => {
 
             let troops = troopBonus;
             setTroopBonus(troops - 1);
-
             setButtonData([...buttonData]); // Update the button data array in the state
             setGame(game);
         }
@@ -558,7 +554,6 @@ const TitleScreen: React.FC = () => {
                     setButtonData([...buttonData]); // Update the button data array in the state
                     setGame(game);
                     drawLine(startButton, id);
-                    setDrawingLine(true); // Enable drawing line mode
                 }
                 
             }
@@ -930,8 +925,13 @@ const TitleScreen: React.FC = () => {
                     backgroundColor: 'red',
                     transform: 'translateY(-50%)',
                 }}
-                onClick={() => {// Set the value of x here
-                    const cur = nextState();
+                onClick={() => {
+                    if (troopBonus !== 0 && phase === "REINFORCEMENT") {
+    
+                    }
+                    else {
+                        const cur = nextState();
+                    }
                 }}
                 disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
             >
@@ -1010,8 +1010,8 @@ const TitleScreen: React.FC = () => {
                         lobbyId={lobbyId}
                         gameId={gameId}
                     />
-                    <LooseModal
-                        isModalOpen={isLooseModalOpen}
+                    <LoseModal
+                        isModalOpen={isLoseModalOpen}
                         onClose={closeModal}
                     />
                     <ModalWin
