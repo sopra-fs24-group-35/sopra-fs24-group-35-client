@@ -152,6 +152,7 @@ const TitleScreen: React.FC = () => {
                 setGame(gameResponse.data);
                 setPhase(gameResponse.data.turnCycle.currentPhase);
                 setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
+                console.log("current player: " + gameResponse.data.turnCycle.currentPlayer.playerId);
                 setTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
                 setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
             } catch (error) {
@@ -165,15 +166,21 @@ const TitleScreen: React.FC = () => {
 
         // Set up the interval to call getGame every 2 seconds
         const intervalId = setInterval(() => {
-            if(currentPlayerId !== null){
-            if(parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))){
-                console.log(currentPlayerId+ "              ------------   " + parseInt(localStorage.getItem("user_id")));
-            getGame();}}
+            console.log(currentPlayerId+ "              ------------   " + parseInt(localStorage.getItem("user_id")));
+            if(game !== null){
+            console.log(game.turnCycle.currentPlayer.playerId);}
+            if (game && currentPlayerId !== null) { // Check if game is not null
+                if (parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))) {
+                    getGame();
+                } else{}
+            } else {
+                getGame();
+            }
         }, 2000);
 
         // Clean up the interval when the component unmounts or when the dependency array changes
         return () => clearInterval(intervalId);
-    }, []);
+    }, [currentPlayerId]);
 
     const order = {};
 
@@ -184,6 +191,8 @@ const TitleScreen: React.FC = () => {
             console.log("current player id: ", currentPlayerId);
             console.log("current troop bonus: ", troopBonus);
             console.log("playerCycle:", PlayerCycle);
+            if(currentPlayerId !== null){
+            setCurrentPlayerId(currentPlayerId);}
 
             let PlayerwithColors = {};
             let x = 0;
@@ -931,19 +940,25 @@ const TitleScreen: React.FC = () => {
             >
                 {CurrentText}
             </button>
-            {(troopBonus !== 0 && phase === "REINFORCEMENT") && <div
-                id="nextState"
-                className="dynbut gamescreen-buttons-container"
-                style={{
-                    left: 'calc(45% + 25px)',
-                    top: '50%', // Change top to 50% to position it in the vertical middle
-                    transform: 'translateY(-50%)', // Move the element up by half its own height to center it vertically
-                    backgroundColor: 'red',
-                }}
-                disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
-            >
-                Troop Amount: {troopBonus}
-            </div>}
+            {troopBonus !== 0 && phase === "REINFORCEMENT" && (() => {
+                if (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) {
+                    return (
+                        <div
+                            id="nextState"
+                            className="dynbut gamescreen-buttons-container"
+                            style={{
+                                left: 'calc(45% + 25px)',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                backgroundColor: 'red',
+                            }}
+                            disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
+                        >
+                            Troop Amount: {troopBonus}
+                        </div>
+                    );
+                }
+            })()}
         </div>
         <div className="gamescreen-bottomright-container">
             {num !== 1 ? (
