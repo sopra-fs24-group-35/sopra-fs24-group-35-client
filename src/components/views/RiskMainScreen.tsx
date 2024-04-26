@@ -8,6 +8,8 @@ import BaseContainer from "../ui/BaseContainer";
 import { useNavigate, useParams } from "react-router-dom";
 import game from "./Game";
 import { User } from "../../types";
+import ModalWin from "../ui/ModalWin";
+import LooseModal from "../ui/LooseModal";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
 import Game from "models/Game";
@@ -62,6 +64,9 @@ const TitleScreen: React.FC = () => {
     const [CurrentText, setCurrentText] = useState("Go To Attack");
     const [hasMoved, setHasMoved] = useState(false);
     const [LooseList, setLooseList] = useState([]);
+    const [isWinModalOpen, setIsWinModalOpen] = useState(false);
+    const [isLooseModalOpen, setIsLooseModalOpen] = useState(false)
+    const [WinLooseWasShown, setWinLooseWasShown] = useState(false)
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -85,6 +90,8 @@ const TitleScreen: React.FC = () => {
         const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
         setGame(updatedGame.data);
         setIsModalOpen(false);
+        setIsLooseModalOpen(false);
+        setIsWinModalOpen(false);
         undoLine();
     };
 
@@ -385,7 +392,7 @@ const TitleScreen: React.FC = () => {
     const checkifyouHaveLostOrWon = () => {
         let won = true;
         let loose = true;
-        if(game !== null) {
+        if(game !== null  && WinLooseWasShown === false) {
             for (const x of game.board.territories) {
                 if (x.owner !== parseInt(localStorage.getItem("user_id"))) {
                     won = false;
@@ -393,11 +400,12 @@ const TitleScreen: React.FC = () => {
                     loose = false
                 }
             }
-
-            if (won) {
-                console.log("WON");
-            } else if (loose) {
-                console.log("LOSE");
+            if (won === true) {
+                setIsWinModalOpen(true);
+                setWinLooseWasShown(true);
+            } else if (loose === true) {
+                setIsLooseModalOpen(true);
+                setWinLooseWasShown(true);
             }
 
         }
@@ -799,7 +807,7 @@ const TitleScreen: React.FC = () => {
 
                 for (const player of userIdList) {
                     const playerresponse = await api.get("/users/" + player, {headers: config1});
-                    playeridwithavatar[playerresponse.data.id] = `https://api.dicebear.com/8.x/thumbs/svg?seed=${playerresponse.data.avatarId}`;
+                    playeridwithavatar[playerresponse.data.id] = `https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[playerresponse.data.avatarId]}`;
                 }
                 let xnumber = -3;
                 while (Object.keys(playeridwithavatar).length < 4) {
@@ -1182,6 +1190,15 @@ const TitleScreen: React.FC = () => {
                         lobbyId={lobbyId}
                         gameId={gameId}
                     />
+                    <LooseModal
+                        isModalOpen={isLooseModalOpen}
+                        onClose={closeModal}
+                    />
+                    <ModalWin
+                        isModalOpen={isWinModalOpen}
+                        onClose={closeModal}
+                    />
+
                 </section>
                 <canvas id="myCanvas"></canvas>
                 {renderButtons}
