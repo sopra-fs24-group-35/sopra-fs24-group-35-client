@@ -221,7 +221,7 @@ const TitleScreen: React.FC = () => {
 
                 const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
                 let tempGame = gameResponse.data;
-                console.log("phase: ", game.turnCycle.currentPhase);
+                //console.log("phase: ", game.turnCycle.currentPhase);
                 console.log("actual phase: ", tempGame.turnCycle.currentPhase);
                 if(game && game.turnCycle.currentPhase !== tempGame.turnCycle.currentPhase){
                     setGame(tempGame);
@@ -235,14 +235,14 @@ const TitleScreen: React.FC = () => {
         else {
             clearInterval(update); // Stop the interval
         }
-    }, [isCurrentPlayer]);
+    }, [isCurrentPlayer, game]);
 
     useEffect(() => {
         const interval = update;
         return () => {
             clearInterval(interval);
         }
-    }, [isCurrentPlayer]);
+    }, [isCurrentPlayer, game]);
 
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
