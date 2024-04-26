@@ -509,15 +509,17 @@ const TitleScreen: React.FC = () => {
             } else if (startButton === id) {
                 setStartButton(null);
                 dehighlightadjbutton(startButton);
-            } else if (territory.owner === currentPlayerId) {
+            } else{
+                if(territory.owner === currentPlayerId && checkifthereareenemies(id)){
                 dehighlightadjbutton(startButton);
                 setStartButton(id);
-                highlightadjbutton(id);
+                highlightadjbutton(id);}
             }
-        } else if (territory.owner === currentPlayerId && checkifthereareenemies(id)) {
+        } else {
+            if(territory.owner === currentPlayerId && checkifthereareenemies(id)){
             setStartButton(id);
             highlightadjbutton(id);
-        }
+        }}
     }
 
     const reinforceTroops = (id: string) => {
