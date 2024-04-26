@@ -109,12 +109,12 @@ const LobbyErstellen = () => {
             style={{ marginBottom: '15px' }}>
             Create Lobby
           </Button>
-          <Button
-            width="100%"
-            onClick={() => navigate("/avatar")}
-            style={{ marginBottom: '15px' }}>
-            Change avatar
-          </Button>
+          {/*<Button*/}
+          {/*  width="100%"*/}
+          {/*  onClick={() => navigate("/avatar")}*/}
+          {/*  style={{ marginBottom: '15px' }}>*/}
+          {/*  Change avatar*/}
+          {/*</Button>*/}
           <Button
             width="100%"
             onClick={() => logout()}>
