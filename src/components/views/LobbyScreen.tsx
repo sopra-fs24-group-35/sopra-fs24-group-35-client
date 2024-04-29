@@ -148,7 +148,7 @@ const LobbyScreen = () => {
         if (startingGame){
             timer = 5;
             startGame = setInterval(() => {
-                if (timer <= 0) {
+                if (timer <= 1) {
                     clearInterval(startGame);
                     if (startingGame) {
                         getGame()
