@@ -49,6 +49,7 @@ const TitleScreen: React.FC = () => {
     const [isWinModalOpen, setIsWinModalOpen] = useState(false);
     const [isLoseModalOpen, setIsLoseModalOpen] = useState(false)
     const [WinLoseWasShown, setWinLoseWasShown] = useState(false)
+    const [StartTimer, setStartTimer] = useState(0);
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -371,20 +372,22 @@ const TitleScreen: React.FC = () => {
     };
 
     const checkifyouHaveLostOrWon = () => {
+        let timer = StartTimer;
+        setStartTimer(prevState => prevState + 1);
         let won = true;
-        let lose = true;
-        if(game !== null && WinLoseWasShown === false) {
+        let loose = true;
+        if(game !== null  && WinLoseWasShown === false && StartTimer > 3) {
             for (const x of game.board.territories) {
                 if (x.owner !== parseInt(localStorage.getItem("user_id"))) {
                     won = false;
                 } else if (x.owner === parseInt(localStorage.getItem("user_id"))) {
-                    lose = false
+                    loose = false
                 }
             }
             if (won === true) {
                 setIsWinModalOpen(true);
                 setWinLoseWasShown(true);
-            } else if (lose === true) {
+            } else if (loose === true) {
                 setIsLoseModalOpen(true);
                 setWinLoseWasShown(true);
             }
@@ -705,6 +708,25 @@ const TitleScreen: React.FC = () => {
         marginLeft: '5px', // Adjust the space between images
     };
 
+    const avatarStyleSide: React.CSSProperties = {
+        width: '20px', // Adjust the size of the circle
+        height: '20px', // Adjust the size of the circle
+        borderRadius: '50%', // Makes the image circular
+        overflow: 'hidden', // Hides the overflow
+        marginRight: '5px', // Adjust the space between image
+        marginLeft: '5px', // Adjust the space between images
+    };
+
+    const avatarStylePlayingSide: React.CSSProperties = {
+        width: '75px', // Adjust the size of the circle
+        height: '75px', // Adjust the size of the circle
+        borderRadius: '50%', // Makes the image circular
+        overflow: 'hidden', // Hides the overflow
+        marginRight: '5px', // Adjust the space between images
+        marginLeft: '5px', // Adjust the space between images
+        border: '4px solid black', // Red outline
+    };
+
     const imageStyle: React.CSSProperties = {
         width: '100%',
         height: '100%',
@@ -833,14 +855,14 @@ const TitleScreen: React.FC = () => {
                     for (const but of buttonsArray) {
                         (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
                         (but as HTMLButtonElement).style.width = `${buttonWidth * 9}px`;
-                        (but as HTMLButtonElement).style.fontSize = `${buttonHeight * 0.35 * 2.5}px`;
+                        (but as HTMLButtonElement).style.fontSize = `${buttonHeight * 0.3 * 2.5}px`;
                     }
 
                     allbuttons = document.querySelectorAll('.avatar');
                     buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
                     for (const but of buttonsArray) {
-                        (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                        (but as HTMLButtonElement).style.width = `${buttonWidth * 20}px`;
+                        (but as HTMLButtonElement).style.height = `${buttonHeight * 4}px`;
+                        (but as HTMLButtonElement).style.width = `${buttonWidth * 4}px`;
                     }
 
                 };
@@ -927,7 +949,7 @@ const TitleScreen: React.FC = () => {
                 }}
                 onClick={() => {
                     if (troopBonus !== 0 && phase === "REINFORCEMENT") {
-    
+
                     }
                     else {
                         const cur = nextState();
@@ -944,7 +966,7 @@ const TitleScreen: React.FC = () => {
                             id="nextState"
                             className="dynbut gamescreen-buttons-container"
                             style={{
-                                left: 'calc(45% + 25px)',
+                                left: 'calc(55% + 25px)',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
                                 backgroundColor: 'red',
@@ -958,44 +980,67 @@ const TitleScreen: React.FC = () => {
             })()}
         </div>
         <div className="gamescreen-bottomright-container">
+            <button
+                id="nextState"
+                className="dynbut gamescreen-buttons-container"
+                style={{
+                    top: '50%',
+                    backgroundColor: 'red',
+                    transform: 'translateY(-50%)',
+                }}
+                onClick={() => {
+                    if (troopBonus !== 0 && phase === "REINFORCEMENT") {
+
+                    } else {
+                        const cur = nextState();
+                    }
+                }}
+            >
+                Leave Game
+            </button>
+        </div>
+    </div>);
+
+    let sideContent = (
+        <div className="avatar-container">
             {num !== 1 ? (
-                <div className="avatar" id={'avatar0'} style={{...avatarStyle, border: `${getAvatarColor(0)}`}}>
+                <div className="avatar" id={'avatar0'} style={{...avatarStyleSide, border: `${getAvatarColor(0)}`}}>
                     <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div className="avatar" style={{avatarStylePlaying}}>
+                <div className="avatar" style={{avatarStylePlayingSide}}>
                     <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
                 </div>
             )}
             {num !== 1 ? (
-                <div className="avatar" id={'avatar1'} style={{...avatarStyle, border: `${getAvatarColor(1)}`}}>
+                <div className="avatar" id={'avatar1'} style={{...avatarStyleSide, border: `${getAvatarColor(1)}`}}>
                     <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div className="avatar" style={avatarStylePlaying}>
+                <div className="avatar" style={avatarStylePlayingSide}>
                     <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
                 </div>
             )}
             {num !== 2 ? (
-                <div className="avatar" id={'avatar2'} style={{...avatarStyle, border: `${getAvatarColor(2)}`}}>
+                <div className="avatar" id={'avatar2'} style={{...avatarStyleSide, border: `${getAvatarColor(2)}`}}>
                     <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div className="avatar" style={avatarStylePlaying}>
+                <div className="avatar" style={avatarStylePlayingSide}>
                     <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
                 </div>
             )}
             {num !== 3 ? (
-                <div className="avatar" id={'avatar3'} style={{...avatarStyle, border: `${getAvatarColor(3)}`}}>
+                <div className="avatar" id={'avatar3'} style={{...avatarStyleSide, border: `${getAvatarColor(3)}`}}>
                     <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div className="avatar" style={avatarStylePlaying}>
+                <div className="avatar" style={avatarStylePlayingSide}>
                     <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
                 </div>
             )}
         </div>
-    </div>);
+    );
 
     return (
         <div className="gamescreen-container">
@@ -1024,7 +1069,9 @@ const TitleScreen: React.FC = () => {
                 {renderButtons}
             </div>
             {lowerContent}
-
+            <div className="container-80-20">
+                {sideContent}
+            </div>
         </div>
     );
 }

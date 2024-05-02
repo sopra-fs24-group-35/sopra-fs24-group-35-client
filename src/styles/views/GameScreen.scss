@@ -52,6 +52,8 @@
   width: 100vw; /* Use viewport width to fill the entire screen */
   position: relative;
   margin: 0 auto;
+  //display: flex;
+  //flex-direction: column; /* Stack containers vertically */
   /*  background-image: url('Pictures/RiskMap2.png');
     background-size: contain; !* Scale the background image to fit entirely within the container *!
     background-position: center; !* Center the background image within the container *!
@@ -63,14 +65,25 @@
 .gamescreen-innerupper-container{
   position: relative;
   height: 80%; /* Use viewport height to fill the entire screen */
-  width: 100vw; /* Use viewport width to fill the entire screen */
-  background-color: #d2d2d2;
+  width: 80%; /* Use viewport width to fill the entire screen */
+  //background-color: #d2d2d2;
   //background-image: url('Pictures/RiskMap2.png');
   background-size: contain; /* Scale the background image to fit entirely within the container */
   background-position: center; /* Center the background image within the container */
   background-repeat: no-repeat; /* Prevent the background image from repeating */
-  background-color: rgb(193, 180, 162);
+  background-color: #9d8963;
+  display: flex;
 }
+.gamescreen-rightside-container{
+    position: relative;
+    width: 20vw; /* Adjust width as needed */
+    height: 100vw; /* Full height of the container */
+    background-color: #000000; /* Example background color */
+    display: flex;
+    /* Add any additional styling as needed */
+
+}
+
 .gamescreen-innerlower-container{
   position: relative;
   height: 20%; /* Use viewport height to fill the entire screen */
@@ -91,10 +104,71 @@
   border-radius: $borderRadius;
   height: 100%; /* Use viewport height to fill the entire screen */
   width: 35%; /* Use viewport width to fill the entire screen */
-  background-color: #545454;
+  background-color: #9d8963;
   justify-content: center;
   align-items: center;
   display: flex;
 }
+
+.container-80-80 {
+  width: 80%;
+  height: 80%;
+  position: absolute;
+  top: 10%; /* Adjust to center vertically */
+  left: 10%; /* Adjust to center horizontally */
+  background-size: contain; /* Scale the background image to fit entirely within the container */
+  background-position: center; /* Center the background image within the container */
+  background-repeat: no-repeat; /* Prevent the background image from repeating */
+  background-color: #9d8963;
+}
+
+/* Styles for the container taking 80% of height and 20% of width of the big container */
+.container-80-20 {
+  width: 20%;
+  height: 80%;
+  background-color: #9d8963; /* Change to desired background color */
+  position: absolute;
+  top: 0; /* Adjust to center vertically */
+  right: 0;
+}
+
+/* Styles for the container taking 100% of width and 20% of height of the big container */
+.container-100-20 {
+  width: 100%;
+  height: 20%;
+  background-color: #9d8963; /* Change to desired background color */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.avatar-container {
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Arrange items vertically */
+  align-items: center; /* Align items horizontally in the center */
+  justify-content: center; /* Align items vertically in the center */
+  //position: relative;
+  border-radius: $borderRadius;
+  background-color: rgba(112, 97, 70, 0.32);
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  text-align: center; /* Center the buttons horizontally */
+  padding: 20px 0; /* Increase top and bottom padding */
+
+}
+
+///* Styles for the avatars */
+//.avatar {
+//  width: 75px; /* Adjust the size of the circle */
+//  height: 75px; /* Adjust the size of the circle */
+//  border-radius: 50%; /* Makes the image circular */
+//  overflow: hidden; /* Hides the overflow */
+//  margin: 5px; /* Adjust the space between images */
+//  border: 4px solid black; /* Red outline */
+//}
+
 
 
