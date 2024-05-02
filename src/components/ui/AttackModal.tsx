@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "styles/ui/Modal.scss";
+import "styles/ui/AttackModal.scss";
 import PropTypes from "prop-types";
 import { api, handleError } from "helpers/api";
 import { User } from "types";

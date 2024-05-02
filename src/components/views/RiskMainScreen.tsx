@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "styles/views/GameScreen.scss";
 import { api, handleError } from "helpers/api";
 import { useNavigate, useParams } from "react-router-dom";
+import { Spinner } from "components/ui/Spinner";
 import game from "./Game";
 import { User } from "../../types";
 import ModalWin from "../ui/ModalWin";
@@ -867,25 +868,6 @@ const TitleScreen: React.FC = () => {
 
     }, [PlayerColor]);
 
-
-    let renderButtons = (
-        buttonData.map((button) => (
-            <button
-                key={button.id}
-                id={button.id}
-                ref={(buttonRef) => {
-                    if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
-                }}
-                className="button"
-                style={{}}
-                onClick={() => handleButtonClick(button.id)}
-                disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
-            >
-                {button.troops}
-            </button>
-        ))
-    );
-
     function getAvatarSrc(x: number) {
         if (PlayerCycle !== null && PlayerCycle.length > x) {
             return AllIDwithAvatar[PlayerCycle[x].playerId];
@@ -997,6 +979,26 @@ const TitleScreen: React.FC = () => {
         </div>
     </div>);
 
+    let content = <Spinner/>;
+
+    if(game){
+        content = buttonData.map((button) => (
+            <button
+                key={button.id}
+                id={button.id}
+                ref={(buttonRef) => {
+                    if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
+                }}
+                className="button"
+                style={{}}
+                onClick={() => handleButtonClick(button.id)}
+                disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
+            >
+                {button.troops}
+            </button>
+        ));
+    }
+
     return (
         <div className="gamescreen-container">
             <div className="gamescreen-innerupper-container">
@@ -1018,10 +1020,9 @@ const TitleScreen: React.FC = () => {
                         isModalOpen={isWinModalOpen}
                         onClose={closeModal}
                     />
-
                 </section>
                 <canvas id="myCanvas"></canvas>
-                {renderButtons}
+                {content}
             </div>
             {lowerContent}
 
