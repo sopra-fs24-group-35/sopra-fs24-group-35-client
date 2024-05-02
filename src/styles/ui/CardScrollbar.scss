@@ -1,0 +1,29 @@
+.card-scrollbar {
+    width: 50%;
+    height: 350px;
+    scale: 1;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    white-space: nowrap;
+    padding: 140px 0;
+    position: relative;
+    transition: transform 0.3s ease;
+
+    &::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+
+    &:hover {
+        transform: scale(1) translateY(-5px); /* Scale up the card on hover */
+        z-index: 1; /* Ensure the hovered card is on top of other cards */
+      }
+}
+  
+.card-scroll {
+    display: inline-flex;
+}
+
+.space {
+    margin-right: 100px;
+}

@@ -1,0 +1,49 @@
+.risk-card {
+  width: 130px; /* Adjust width as needed */
+  height: 200px; /* Adjust height as needed */
+  background-color: white;
+  border: 1px solid #a18041;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 5px;
+  margin-left: 5px;
+  transition: transform 0.3s ease;
+  background-image: url('../../styles/views/Pictures/CardBackground.png');
+  background-size: cover;
+  background-position: center;
+
+  &:hover {
+    transform: scale(1.6) translateY(-40px); /* Scale up the card on hover */
+    margin-right: 35px;
+    margin-left: 35px;
+    z-index: 1; /* Ensure the hovered card is on top of other cards */
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.border {
+  width: 116px; /* Adjust width as needed */
+  height: 186px; /* Adjust height as needed */
+  background-color: rgba(0, 26, 255, 0);
+  border: 1px solid #5e4819;
+  border-radius: 6px;
+  margin-right: 5px;
+  margin-left: 5px;
+  
+}
+
+.text {
+  margin-bottom: 40px; /* Adjust as needed */
+  margin-top: 30px; /* Adjust as needed */
+  text-align: center; /* Center the text horizontally */
+  width: 100%; /* Set the width to ensure text wrapping */
+  overflow-wrap: break-word;
+  font-family: "Arial Narrow", sans-serif;
+  background-color: rgb(167, 205, 255);
+}
