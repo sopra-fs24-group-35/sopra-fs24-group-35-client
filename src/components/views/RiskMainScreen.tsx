@@ -8,6 +8,7 @@ import ModalWin from "../ui/ModalWin";
 import LoseModal from "../ui/LoseModal";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
+import LeaveModal from "../ui/LeaveModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
 
@@ -48,8 +49,11 @@ const TitleScreen: React.FC = () => {
     const [CurrentText, setCurrentText] = useState("Go To Attack");
     const [isWinModalOpen, setIsWinModalOpen] = useState(false);
     const [isLoseModalOpen, setIsLoseModalOpen] = useState(false)
+    const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
     const [WinLoseWasShown, setWinLoseWasShown] = useState(false)
     const [StartTimer, setStartTimer] = useState(0);
+    const [LooseList, setLooseList] = useState([]);
+    const [CyclewithTroopsandTerritories, setCyclewithTroopsandTerritories] = useState({});
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,6 +78,7 @@ const TitleScreen: React.FC = () => {
         setGame(updatedGame.data);
         setIsModalOpen(false);
         setIsLoseModalOpen(false);
+        setIsLeaveModalOpen(false);
         setIsWinModalOpen(false);
         undoLine();
     };
@@ -362,6 +367,7 @@ const TitleScreen: React.FC = () => {
             }
 
             checkifyouHaveLostOrWon();
+            setdeathsymbol()
 
         }
     }, [game, phase, currentPlayerId]);
@@ -374,24 +380,72 @@ const TitleScreen: React.FC = () => {
     const checkifyouHaveLostOrWon = () => {
         let timer = StartTimer;
         setStartTimer(prevState => prevState + 1);
+
         let won = true;
         let loose = true;
-        if(game !== null  && WinLoseWasShown === false && StartTimer > 3) {
+        if(game !== null && StartTimer > 6) {
+            let dic = setupdictionayforStats();
             for (const x of game.board.territories) {
+                dic = addtroopsandterritories(dic, x);
                 if (x.owner !== parseInt(localStorage.getItem("user_id"))) {
                     won = false;
                 } else if (x.owner === parseInt(localStorage.getItem("user_id"))) {
                     loose = false
                 }
             }
-            if (won === true) {
+            setCyclewithTroopsandTerritories(dic);
+            if (won === true && WinLoseWasShown === false) {
                 setIsWinModalOpen(true);
                 setWinLoseWasShown(true);
-            } else if (loose === true) {
+            } else if (loose === true && WinLoseWasShown === false) {
                 setIsLoseModalOpen(true);
                 setWinLoseWasShown(true);
             }
         }
+    }
+
+    const setdeathsymbol = () => {
+        let timer = StartTimer;
+        setStartTimer(prevState => prevState + 1);
+        if(game !== null  && StartTimer > 6) {
+            if (PlayerCycle !== null) {
+                let count = 0;
+                for (const x of game.players) {
+                    let bool = false;
+                    for (const y of PlayerCycle) {
+                        if(x.playerId === y.playerId){
+                            bool = true;
+                        }
+                    }
+                    if (bool === false && !LooseList.includes(x.playerId)) {
+                        const list = LooseList;
+                        list[count] = x.playerId;
+                        setLooseList(list);
+                        const avatar0Button = document.getElementById(`avatar${count}`);
+                        avatar0Button.style.backgroundColor = "black";
+                        count++;
+                    }
+
+
+                }
+            }
+        }
+    }
+
+    const setupdictionayforStats = () => {
+        let dic = {};
+        for (const y of PlayerCycle) {
+            dic[y] = [PlayerCycle.playerId, 0, 0];
+        }
+        return dic;
+    }
+
+    const addtroopsandterritories = (dic, territory) => {
+        for (const y of PlayerCycle) {
+            dic[y][1] = +1;
+            dic[y][2] = +territory.troops;
+        }
+        return dic;
     }
 
     const checkForAllValidReinforcements = (id: string) => {
@@ -678,6 +732,12 @@ const TitleScreen: React.FC = () => {
         }
     };
 
+    const LeavePlayer = async () => {
+        const config1 = {Authorization: localStorage.getItem("lobbyToken")};
+        const user_Id = localStorage.getItem("user_id");
+        const gameResponse = await api.put(`/lobbies/${lobbyId}/game/${gameId}/user/${user_Id}`, {headers: config1});
+    }
+
     //const redButton = document.getElementById('redButton');
     const containerStyle: React.CSSProperties = {
         position: 'fixed',
@@ -912,7 +972,7 @@ const TitleScreen: React.FC = () => {
         if (PlayerCycle !== null && PlayerCycle.length > x) {
             return AllIDwithAvatar[PlayerCycle[x].playerId];
         } else {
-            return CasualAvatar;
+            return null;
         }
     }
 
@@ -989,11 +1049,8 @@ const TitleScreen: React.FC = () => {
                     transform: 'translateY(-50%)',
                 }}
                 onClick={() => {
-                    if (troopBonus !== 0 && phase === "REINFORCEMENT") {
-
-                    } else {
-                        const cur = nextState();
-                    }
+                    setIsLeaveModalOpen(true);
+                    //LeavePlayer();
                 }}
             >
                 Leave Game
@@ -1003,41 +1060,33 @@ const TitleScreen: React.FC = () => {
 
     let sideContent = (
         <div className="avatar-container">
-            {num !== 1 ? (
+            {getAvatarSrc(0) !== null ? (
                 <div className="avatar" id={'avatar0'} style={{...avatarStyleSide, border: `${getAvatarColor(0)}`}}>
                     <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div className="avatar" style={{avatarStylePlayingSide}}>
-                    <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
-                </div>
+                <div></div>
             )}
-            {num !== 1 ? (
+            {getAvatarSrc(1) !== null? (
                 <div className="avatar" id={'avatar1'} style={{...avatarStyleSide, border: `${getAvatarColor(1)}`}}>
                     <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div className="avatar" style={avatarStylePlayingSide}>
-                    <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
-                </div>
+                <div></div>
             )}
-            {num !== 2 ? (
+            {getAvatarSrc(2) !== null? (
                 <div className="avatar" id={'avatar2'} style={{...avatarStyleSide, border: `${getAvatarColor(2)}`}}>
                     <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div className="avatar" style={avatarStylePlayingSide}>
-                    <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
-                </div>
+                <div></div>
             )}
-            {num !== 3 ? (
+            {getAvatarSrc(3) !== null? (
                 <div className="avatar" id={'avatar3'} style={{...avatarStyleSide, border: `${getAvatarColor(3)}`}}>
                     <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
                 </div>
             ) : (
-                <div className="avatar" style={avatarStylePlayingSide}>
-                    <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
-                </div>
+                <div></div>
             )}
         </div>
     );
@@ -1061,6 +1110,10 @@ const TitleScreen: React.FC = () => {
                     />
                     <ModalWin
                         isModalOpen={isWinModalOpen}
+                        onClose={closeModal}
+                    />
+                    <LeaveModal
+                        isModalOpen={isLeaveModalOpen}
                         onClose={closeModal}
                     />
 
