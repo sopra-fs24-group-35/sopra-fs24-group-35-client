@@ -1,207 +1,161 @@
 import React, { useEffect, useState } from "react";
 import "styles/ui/RiskCardModal.scss";
+import { Spinner } from "components/ui/Spinner";
 import PropTypes from "prop-types";
 import { api, handleError } from "helpers/api";
-import { User } from "types";
+import RiskCard from "../ui/RiskCard";
+import { Player, Card } from "types";
 import ApiStyles from "helpers/avatarApiStyles";
 import {Button} from "../ui/Button";
 import Game from "models/Game";
 
-const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, gameId }) => {
-  if (!isModalOpen) {
-    return null;
-  }
+const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
+    if (!isModalOpen) {
+        return null;
+    }
 
-  const apiStyles = new ApiStyles;
+    const apiStyles = new ApiStyles;
 
-  const [attacker, setAttacker] = useState<User>(null);
-  const [defender, setDefender] = useState<User>(null);
-  const [game, setGame] = useState<Game>(null);
-  const [sameOwner, setSameOwner] = useState(false);
+    const [currentPlayer, setCurrentPlayer] = useState<Player>(null);
+    const [cards, setCards] = useState<Card[]>([{troops: "0", territoryName: "Brazil", id: 0}, {troops: "0", territoryName: "Argentina", id: 1}, {troops: "0", territoryName: "South Africa", id: 2}, {troops: "2", territoryName: "South Africa", id: 3}, {troops: "2", territoryName: "China", id: 4}, {troops: "1", territoryName: "Southern Europe", id: 5}]);
+    const [game, setGame] = useState<Game>(null);
+    const [selectedCards, setSelectedCards] = useState<Card[]>([]);
+    const [tradable, setTradable] = useState(false);
 
-  const [defenseTerritory, setDefenseTerritory] = useState(null);
-  const [attackTerritory, setAttackTerritory] = useState(null);
-
-  const [selectedTroops, setSelectedTroops] = useState(3);
-  const [selectedAttacks, setSelectedAttacks] = useState(100);
-  //console.log("selectedTroops", selectedTroops);
-
-  useEffect(() => {
-    
-    async function fetchData() {
-
-      try {
-        const config1 = {Authorization: localStorage.getItem("lobbyToken")};
-
-        //console.log("lobbyId: ", lobbyId);
-
-        const getDefenderTerritory = await api.get(`/lobbies/${lobbyId}/game/${gameId}/territory/${modalContent.territory_def}`, {headers: config1});
-
-        setDefenseTerritory(getDefenderTerritory.data);
-
-        const getAttackerTerritory = await api.get(`/lobbies/${lobbyId}/game/${gameId}/territory/${modalContent.territory_atk}`, {headers: config1});
+    useEffect(() => {
         
-        setAttackTerritory(getAttackerTerritory.data);
+        async function fetchData() {
 
-        //console.log("defender territory: ", getDefenderTerritory);
+        try {
+            const config1 = {Authorization: localStorage.getItem("lobbyToken")};
 
-        const defenderId =  getDefenderTerritory.data.owner;
+            //console.log("lobbyId: ", lobbyId);
 
-        const attackerId = getAttackerTerritory.data.owner;
-
-        console.log("same owner?", defenderId === attackerId);
-
-        if (defenderId === attackerId){
-          // maybe make it so you can transfer as many troops as you want?
-          // onClose();
-          //return;
-          setSameOwner(true);
+            
+        } catch (error) {
+            console.error(
+            `Something went wrong while fetching the users: \n${handleError(
+                error
+            )}`
+            );
+            console.error("Details:", error);
+            alert(
+            "Something went wrong while fetching the users! See the console for details."
+            );
         }
-        if (getAttackerTerritory.data.troops <= 1){
-          onClose(true);
+        }    
+
+        fetchData();
+    }, [game]);
+
+    const trade = async() => {
+
+    };
+
+    useEffect(() => {
+        console.log("selected cards:", selectedCards);
+        console.log("cards:", cards);
+
+        if(selectedCards.length >= 3){
+            console.log("hello?")
+            if(selectedCards[0].troops === selectedCards[1].troops && selectedCards[0].troops === selectedCards[2].troops){
+                setTradable(true);
+            }
+            else if(selectedCards[0].troops !== selectedCards[1].troops && selectedCards[0].troops!== selectedCards[2].troops && selectedCards[1].troops !== selectedCards[2].troops){
+                setTradable(true);
+            }
         }
-
-        const config2 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id")};
-
-        const def = await api.get(`/users/${defenderId}`, {headers: config2});
+        else {
+            setTradable(false);
+        }
         
-        const atk = await api.get(`/users/${attackerId}`, {headers: config2});
+    }, [selectedCards, cards]);
 
-        //console.log("defendant: ", def);
+    const handleCardClick = (troopNum: string, terName: string, idNum: number) => {
+        
+        const newCard: Card = {
+            troops: troopNum,
+            territoryName: terName,
+            id: idNum
+        };
 
-        setDefender(def.data);
+        // Check if the card is already selected
+        const isSelected = selectedCards.some(card => card.troops === newCard.troops && card.territoryName === newCard.territoryName);
 
-        setAttacker(atk.data);
+        // Check if the card is already selected
+        if (isSelected) {
+            // If already selected, remove it from the selected cards
+            setSelectedCards(selectedCards.filter(card => card.troops !== newCard.troops || card.territoryName !== newCard.territoryName));
+            setCards([...cards, newCard]);
+        } else {
+            if (selectedCards.length === 3) {
+                // If maximum length is reached, prevent adding a new card
+                console.log("Maximum number of cards selected");
+                return;
+            }
+            // If not selected, add it to the selected cards
+            setSelectedCards([...selectedCards, newCard]);
+            setCards(cards.filter(card => card.troops !== newCard.troops || card.territoryName !== newCard.territoryName));
+        }
+    };
 
-        //console.log("Def username: ", defender.username);
+    let content = <Spinner/>
 
-      } catch (error) {
-        console.error(
-        `Something went wrong while fetching the users: \n${handleError(
-            error
-        )}`
-        );
-        console.error("Details:", error);
-        alert(
-        "Something went wrong while fetching the users! See the console for details."
-        );
-      }
-    }    
-    
-    fetchData();
-  }, [game]);
+    if(cards){
+        content = (
+            <ul className="card-list">
+                {cards.map((card: Card) => (
+                    <li key={card.id}>
+                        <div className="cardHolder" onClick={() => handleCardClick(card.troops, card.territoryName, card.id)}>
+                            <RiskCard troop={card.troops} territoryName={card.territoryName} />
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        )
+    }
 
-  const attack = async() => {
-    const config = { Authorization: localStorage.getItem("lobbyToken") };
-    const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedTroops,"repeats" : selectedAttacks});
-    console.log("requestBody: ", requestBody);
-    const attackResponse = await api.post(`lobbies/${lobbyId}/game/${gameId}/attacks`, requestBody, {headers: config});
-    setGame(attackResponse.data);
-    console.log("attack response:", attackResponse);
-  }
-
-  const move = async() => {
-    const config = { Authorization: localStorage.getItem("lobbyToken") };
-    const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedAttacks});
-    console.log("requestBody: ", requestBody);
-    const moveResponse = await api.put(`lobbies/${lobbyId}/game/${gameId}/transfer`, requestBody, {headers: config});
-    setGame(moveResponse.data);
-    onMove(true);
-    console.log("move response:", moveResponse);
-  }
-
-
-  const Player = ({ user }: { user: User }) => (
-      <div className="player cont">
-        <img className="player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
-        <div className="player username">{user.username}</div>
-      </div>
-  );
-
-    
-  Player.propTypes = {
-  user: PropTypes.object,
-  };
-
-  return (
-    <div className="modal" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <button className="close" onClick={onClose}>
-          &times;
-        </button>
-        <main className="modal-mainContents">
-          <div className="modal-info-container">
-            <div className="defender-info">
-              <h5 className="modal-title">{(!sameOwner) ? "DEFENDER" : "MOVING TROOPS"}</h5>
-              {defender && <Player user={defender} />}
-            </div>
-            {(!sameOwner) ?
-            (
-              <>
-                <p className="vs-text">{(!sameOwner) ? "VS" : '\u2190'}</p>
-                <div className="attacker-info">
-                  <h5 className="modal-title">ATTACKER</h5>
-                  {attacker && <Player user={attacker} />}
+    return (
+        <div className="modal-cards" onClick={onClose}>
+        <div className="modal-contentCards" onClick={e => e.stopPropagation()}>
+            <button className="close" onClick={onClose}>
+            &times;
+            </button>
+            <main className="modal-mainContents">
+                <div className="modal-selectedRiskCards">
+                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[0].troops, selectedCards[0].territoryName, selectedCards[0].id)}>
+                        {selectedCards.length >= 1 && 
+                            <RiskCard troop={selectedCards[0].troops} territoryName={selectedCards[0].territoryName}/>
+                        }
+                    </div>
+                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[1].troops, selectedCards[1].territoryName, selectedCards[1].id)}>
+                        {selectedCards.length >= 2 && 
+                            <RiskCard troop={selectedCards[1].troops} territoryName={selectedCards[1].territoryName}/>
+                        }
+                    </div>
+                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[2].troops, selectedCards[2].territoryName, selectedCards[2].id)}>
+                        {selectedCards.length === 3 && 
+                            <RiskCard troop={selectedCards[2].troops} territoryName={selectedCards[2].territoryName}/>
+                        }
+                    </div>
                 </div>
-              </>
-            ) : (null)}
-          </div>
-          <div className="modal-info-container">
-            <div className="defense-territory-info">
-              <h5 className="modal-title">{modalContent.territory_def}</h5>
-              <h5 className="troopInfo">{(!sameOwner) ? "Enemy Troops:" : "Your Troops:"} {defenseTerritory && defenseTerritory.troops}</h5>
-            </div>
-            <p className="vs-text">{(!sameOwner) ? "VS" : '\u2190' }</p>
-            <div className="attack-territory-info">
-              <h5 className="modal-title">{modalContent.territory_atk}</h5>
-              <h5 className="troopInfo">Your Troops: {attackTerritory && attackTerritory.troops}</h5>
-              <div className="selectables">
-              {(!sameOwner) ? (
-                <div>
-                  <label className="select-label">
-                  Troops:
-                  <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
-                    <option value={3}>3</option>
-                    <option value={2}>2</option>
-                    <option value={1}>1</option>
-                  </select>
-                  </label>
-                  <hr className="hr"/>
+                <div className="modal-riskcards">
+                    {content}
                 </div>
-                )
-                : (null)}
-                <label className="select-label">
-                {(!sameOwner) ? "Attacks:" : "Move Troops:"}
-                  <select className="select" value={selectedAttacks} onChange={e => setSelectedAttacks(e.target.value)}>
-                    <option value={1}>1</option>
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
-                </label>
-              </div>
-            </div>
-          </div>
-          <div className="button-div">
-            {(!sameOwner) ? <Button width="50%" onClick={attack}>Attack</Button> : <Button width="50%" onClick={move}>Move Troops</Button>}
-          </div>
-        </main>
-      </div>
-    </div>
-  );
+                <div className="button-div">
+                    {(true) && <Button width="50%" disabled={!tradable} onClick={trade}>Trade</Button>}
+                </div>
+            </main>
+        </div>
+        </div>
+    );
 };
 
-AttackModal.propTypes = {
-  isModalOpen: PropTypes.bool.isRequired,
-  modalContent: PropTypes.shape({
-    territory_def: PropTypes.string.isRequired,
-    territory_atk: PropTypes.string.isRequired,
-  }).isRequired,
-  onClose: PropTypes.func.isRequired,
-  onMove: PropTypes.func.isRequired,
-  lobbyId: PropTypes.number.isRequired,
-  gameId: PropTypes.number.isRequired
+RiskCardModal.propTypes = {
+isModalOpen: PropTypes.bool.isRequired,
+onClose: PropTypes.func.isRequired,
+lobbyId: PropTypes.number.isRequired,
+gameId: PropTypes.number.isRequired
 };
 
-export default AttackModal;
+export default RiskCardModal;

@@ -49,7 +49,6 @@ const Login = () => {
       <div className="basescreen title" style={{ marginBottom: '50px', width: '100px', opacity: '0', animation: 'fadeIn 2s forwards' }}>
         <img src={riskLogo} style={{ maxWidth: '50%', maxHeight: '50%', width: 'auto', height: 'auto', position: 'absolute', top: '0', left: '50%', transform: `translate(${-50}%, ${-20}%)` }} alt="My Image" />
       </div>
-      <CardScrollbar/>
       <BaseContainer>
         <div className="login container">
           <div className="login form">

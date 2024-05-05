@@ -23,7 +23,7 @@ const CardScrollbar = () => {
         >
             <div className="card-scroll">
                 <div className="space"/>
-                <RiskCard troop="0" territoryName = 'Southern Europe'/>
+                {/*<RiskCard troop="0" territoryName = 'Southern Europe'/>
                 <RiskCard troop="1" territoryName = 'Yakutsk'/>
                 <RiskCard troop="2" territoryName = 'Northwest Territory'/>
                 <RiskCard troop="2" territoryName = 'Western US'/>
@@ -34,7 +34,7 @@ const CardScrollbar = () => {
                 <RiskCard troop="2" territoryName = 'China'/>
                 <RiskCard troop="1" territoryName = 'Alaska'/>
                 <RiskCard troop="0" territoryName = 'Western Europe'/>
-                
+                */}
             </div>
         </div>
     );

@@ -16,9 +16,9 @@
   background-position: center;
 
   &:hover {
-    transform: scale(1.6) translateY(-40px); /* Scale up the card on hover */
-    margin-right: 35px;
-    margin-left: 35px;
+    transform: scale(1.2) translateY(-20px); /* Scale up the card on hover */
+    margin-right: 5px;
+    margin-left: 5px;
     z-index: 1; /* Ensure the hovered card is on top of other cards */
   }
 

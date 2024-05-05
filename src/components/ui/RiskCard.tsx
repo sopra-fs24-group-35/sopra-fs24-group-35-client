@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 
 
-const RiskCard = ({ troop, territoryName }) => {
+const RiskCard = ({ troop, territoryName}) => {
     let imageFileName;
     let color;
 
