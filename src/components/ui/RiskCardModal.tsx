@@ -99,8 +99,6 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
         }
     };
 
-    //beans
-
     let content = <Spinner/>
 
     if(cards){
