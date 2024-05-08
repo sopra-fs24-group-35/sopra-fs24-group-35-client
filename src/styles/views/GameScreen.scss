@@ -69,13 +69,13 @@
   background-size: contain; /* Scale the background image to fit entirely within the container */
   background-position: center; /* Center the background image within the container */
   background-repeat: no-repeat; /* Prevent the background image from repeating */
-  background-color: rgb(193, 180, 162);
+  background-color: rgb(156, 133, 86)
 }
 .gamescreen-innerlower-container{
   position: relative;
   height: 20%; /* Use viewport height to fill the entire screen */
   width: 100vw; /* Use viewport width to fill the entire screen */
-  background-color: rgb(193, 180, 162);
+  background-color: rgb(163,140,94,);
   display: flex;
 }
 

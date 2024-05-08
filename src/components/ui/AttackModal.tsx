@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "styles/ui/Modal.scss";
+import "styles/ui/AttackModal.scss";
 import PropTypes from "prop-types";
 import { api, handleError } from "helpers/api";
 import { User } from "types";
@@ -112,10 +112,10 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, game
 
 
   const Player = ({ user }: { user: User }) => (
-      <div className="player cont">
-        <img className="player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
-        <div className="player username">{user.username}</div>
-      </div>
+    <div className="player cont">
+      <img className="player avatar" src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${apiStyles.styles[user.avatarId]}`} alt="Avatar" />
+      <div className="player username">{user.username}</div>
+    </div>
   );
 
     

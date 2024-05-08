@@ -34,7 +34,7 @@ const LobbyScreen = () => {
     const [gameId, setGameId] = useState(null);
 
     useEffect(() => {
-        localStorage.setItem("lobbyId", lobbyId)
+        localStorage.setItem("lobbyId", lobbyId);
         let timeoutId;
 
         if(lobby !== null && lobby.gameId !== null){
@@ -201,10 +201,10 @@ const LobbyScreen = () => {
                 </ul>
                 {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ? 
                 (
-                <Button width="100%" style={{ marginBottom: '10px' }}  onClick={gameStart}>
+                <Button width="100%" style={{ marginBottom: '10px' }} disabled={users.length === 1}  onClick={gameStart}>
                     Start Game
                 </Button>
-                ) : ((lobbyOwnerId === parseInt(localStorage.getItem("user_id"))) &&
+                ) : ((lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && startingGame) &&
                 <Button width="100%" style={{ marginBottom: '10px' }}  onClick={cancelGameStart}>
                     Cancel Game
                 </Button>

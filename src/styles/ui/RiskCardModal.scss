@@ -1,0 +1,117 @@
+@import "../theme";
+
+.bodyCards {
+    font-size: 25px;
+    color: black;
+    background: rgb(152, 105, 105);
+}
+.modal-cards {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.modal-contentCards {
+    border: 1px solid rgb(152, 105, 105);
+    min-width: 920px;
+    min-height: 400px;
+    background-color: rgba(152, 105, 105, 0.929);
+    border-radius: $borderRadius;
+    position: absolute;
+}
+.close {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #1e1e1e;
+    font-size: 35px;
+    font-weight: bold;
+    border: none;
+    background: none;
+    text-align: match-parent;
+    padding: 1px;
+    padding-right: 3px;
+    width: 30px; 
+    height: 30px; 
+    line-height: 0px; 
+}
+.close:hover,
+.close:focus {
+    color: red;
+}
+.modal-title {
+    display: flex;
+    justify-content: center;
+    color: $textColor;
+    font-weight: 800;
+    font-family: $fontDefault;
+    line-height: 28px;
+    font-size: larger;
+    margin: auto;
+}
+.modal-selectedRiskCards{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border: 2px solid black;
+    border-radius: $borderRadius;
+    border: none;
+    padding: 10px;
+    margin: 30px;
+}
+.card-list {
+    list-style: none;
+    padding-left: 0px;
+    display: flex;
+}
+.modal-first {
+    width: 130px; /* Adjust width as needed */
+    height: 200px; /* Adjust height as needed */
+    margin: 5px;
+    border: 2px solid black;
+    border-radius: $borderRadius;
+    transform-origin: bottom center; /* Set the transformation origin */
+}
+/* Adjust the angle for each card */
+.modal-first:nth-child(1) {
+    transform: translateY(20px) rotate(-20deg); /* Adjust the angle for the first card */
+}
+
+.modal-first:nth-child(3) {
+    transform: translateY(20px) rotate(20deg); /* Adjust the angle for the second card */
+}
+
+.modal-first:nth-child(2) {
+    transform: rotate(0deg); /* Adjust the angle for the third card */
+}
+.modal-explain {
+    display: flex;
+    justify-content: center;
+    color: $textColor;
+    font-weight: 500;
+    font-family: $fontDefault;
+    line-height: 10px;
+    font-size: medium;
+    margin-top: 40px;
+}
+.modal-riskcards {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    border: 2px solid black;
+    border-radius: $borderRadius;
+    padding: 5px;
+    margin: 30px;
+}
+.button-div {
+    display: flex;
+    justify-content: center;
+    margin: 10px;
+}

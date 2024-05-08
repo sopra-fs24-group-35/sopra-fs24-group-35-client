@@ -6,6 +6,7 @@ import { Button } from "components/ui/Button";
 import "styles/views/Login.scss";
 import "styles/views/LobbyErstellen.scss";
 import BaseContainer from "components/ui/BaseContainer";
+import RiskCardModal from "../ui/RiskCardModal";
 import PropTypes from "prop-types";
 let riskLogo = require("./Risk.png");
 
@@ -72,24 +73,43 @@ const LobbyErstellen = () => {
       );
     }
   }
-    const logout = async () => {
-        try {
-            const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
 
-            const response = await api.post("/users/logout", null, {headers: config});
-            localStorage.removeItem("username");
-            localStorage.removeItem("user_id");
-            localStorage.removeItem("token");
-            navigate("/login");
-        } catch (error) {
-            alert(
-                `Something went wrong during the logout: \n${handleError(error)}`
-            );
-        }
-    };
+  const logout = async () => {
+    try {
+      const config = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id") };
+
+      const response = await api.post("/users/logout", null, {headers: config});
+      localStorage.removeItem("username");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("token");
+      navigate("/login");
+    } catch (error) {
+      alert(
+        `Something went wrong during the logout: \n${handleError(error)}`
+      );
+    }
+  };
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="basescreen title-screen" style={{ position: 'relative' }}>
+      <section>
+        <RiskCardModal
+          isModalOpen={isModalOpen}
+          onClose={closeModal}
+          lobbyId={4}
+          gameId={5}
+        />
+      </section>
       <div className="basescreen overlay"></div>
       <div className="basescreen title" style={{ marginBottom: '50px', opacity: '0', animation: 'fadeIn 2s forwards' }}>
         <img src={riskLogo} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', position: 'absolute', top: '0', left: '50%', transform: `translate(${-50}%, ${-10}%)` }} alt="My Image" />
@@ -119,6 +139,11 @@ const LobbyErstellen = () => {
             width="100%"
             onClick={() => logout()}>
             Log out
+          </Button>
+          <Button
+            width="100%"
+            onClick={() => openModal()}>
+            RiskCard Modal
           </Button>
         </div>
       </div>
