@@ -42,13 +42,25 @@ const joinScreen = () => {
               value={code}
               onChange={(un: string) => setCode(un)}
             />
-            <Button
-              width="100%"
-              key = {code}
-              onClick={() => goToLobby(code)}
-              >
-              Confirm
-            </Button>
+            <div className="basescreen actual-buttons">
+              <div className="basescreen buttons">
+                <Button
+                  width="100%"
+                  key = {code}
+                  onClick={() => goToLobby(code)}
+                  >
+                  Confirm
+                </Button>
+              </div>
+              <div className="basescreen buttons">
+                <Button
+                  width="100%"
+                  onClick={() => navigate("/lobby")}
+                  >
+                  Go Back
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </BaseContainer>

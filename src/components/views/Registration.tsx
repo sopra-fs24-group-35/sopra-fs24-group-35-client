@@ -83,13 +83,21 @@ const Registration = () => {
               <Button width="50%" onClick={AvatarCreation}>Switch</Button>
             </div>
             <label style={{ fontSize: "0.75em" }}> (Your password needs to be at least 8 characters long.) </label>
-            <div className="login button-container">
+            <div className="registration button-container">
               <Button
                 disabled={!username || (!password || password.length < 8)}
                 width="100%"
                 onClick={() => doRegistration()}
               >
                 Register now!
+              </Button>
+            </div>
+            <div className="registration back-button">
+              <Button
+                width="100%"
+                onClick={() => navigate("/login")}
+              >
+                Go Back
               </Button>
             </div>
           </div>

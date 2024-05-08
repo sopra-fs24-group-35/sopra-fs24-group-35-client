@@ -49,14 +49,19 @@
     justify-content: center;
     margin-top: 1em;
   }
-  &.avatar{
+  &.back-button {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+  }
+  &.avatar {
     display: flex;
     align-self: center;
     margin-bottom: 10px;
     border-radius: 50%;
     object-fit: cover;
   }
-  &.switch-button{
+  &.switch-button {
     display: flex;
     justify-content: center;
   }

@@ -73,7 +73,16 @@
     //background-color: #504536;
     color: #b03838;
   }
-
+  &.actual-buttons {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: 5px;
+    min-width: 150px;
+  }
+  &.buttons {
+    margin: 10px;
+  }
   .avatar form{
     margin-top: 2em;
     min-height: 300px;
@@ -98,9 +107,6 @@
     background-color: $background;
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
-
-  }
-  .bottomright form{
 
   }
 }
