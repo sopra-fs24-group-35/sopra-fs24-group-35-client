@@ -398,7 +398,7 @@ const TitleScreen: React.FC = () => {
     const checkifyouHaveLostOrWon = () => {
         let won = true;
         let loose = true;
-        if(game !== null && StartTimer > 3) {
+        if(game !== null && StartTimer > 1) {
             let dic = setupdictionayforStats();
             for (const x of game.board.territories) {
                 dic = addtroopsandterritories(dic, x);
