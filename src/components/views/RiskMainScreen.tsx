@@ -345,6 +345,13 @@ const TitleScreen: React.FC = () => {
                 setCurrentPlayerId(currentPlayerId);
             }
 
+            if(CyclewithTroopsandTerritories !== null){
+                // console.log("0 : " + CyclewithTroopsandTerritories[0]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[1]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[2]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[3]);
+            }
+
             let PlayerwithColors = {};
             let x = 0;
             if (ALLCycle !== null) {
@@ -379,7 +386,6 @@ const TitleScreen: React.FC = () => {
             console.log("Current Timer: " + StartTimer);
             checkifyouHaveLostOrWon();
             setdeathsymbol()
-            checkifGamegetsDeleted();
 
         }
     }, [game, phase, currentPlayerId]);
@@ -402,6 +408,11 @@ const TitleScreen: React.FC = () => {
                     loose = false
                 }
             }
+            console.log("HALLOO");
+            console.log("0 : " + CyclewithTroopsandTerritories[0]);
+            console.log("0 : " + CyclewithTroopsandTerritories[1]);
+            console.log("0 : " + CyclewithTroopsandTerritories[2]);
+            console.log("0 : " + CyclewithTroopsandTerritories[3]);
             setCyclewithTroopsandTerritories(dic);
             if (won === true && WinLoseWasShown === false) {
                 setIsWinModalOpen(true);
@@ -427,12 +438,15 @@ const TitleScreen: React.FC = () => {
                             bool = true;
                         }
                     }
+                    console.log("BOOL: "+ bool + "  playerid: " + x.playerId + "  count: " + count);
+                    console.log(LooseList);
                     if (bool === false && !LooseList.includes(x.playerId)) {
                         const list = LooseList;
                         list[count] = x.playerId;
                         setLooseList(list);
                         const avatar0Button = document.getElementById(`avatar${count}`);
                         avatar0Button.style.backgroundColor = "black";
+                        avatar0Button.style.borderRadius = "10px";
                     }
 
 
@@ -445,34 +459,24 @@ const TitleScreen: React.FC = () => {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
     }
 
-    const checkifGamegetsDeleted = () => {
-        if(game !== null  && StartTimer > 3) {
-            if(game.turnCycle.playerCycle.length === 0){
-                console.log('Before Pause');
-                pause(10000)
-                    .then(() => {
-                        console.log('After 10 seconds');
-                        localStorage.removeItem("lobbyToken");
-                        localStorage.removeItem("lobbyId");
-                        navigate("/lobby");
-                    });
-            }
-        }
-
-    }
-
     const setupdictionayforStats = () => {
         let dic = {};
-        for (const y of PlayerCycle) {
-            dic[y] = [PlayerCycle.playerId, 0, 0];
+        let x = 0;
+        for (const y of ALLCycle) {
+            dic[x] = [y.playerId, 0, 0];
+            x++;
         }
         return dic;
     }
 
     const addtroopsandterritories = (dic, territory) => {
-        for (const y of PlayerCycle) {
-            dic[y][1] = +1;
-            dic[y][2] = +territory.troops;
+        let x = -1;
+        for (const y of ALLCycle) {
+            x++;
+            if (territory.owner === y.playerId) {
+                dic[x][1] += 1;
+                dic[x][2] += territory.troops;
+            }
         }
         return dic;
     }
@@ -795,6 +799,8 @@ const TitleScreen: React.FC = () => {
         overflow: 'hidden', // Hides the overflow
         marginRight: '5px', // Adjust the space between image
         marginLeft: '5px', // Adjust the space between images
+        textAlign: 'center',
+
     };
 
     const avatarStylePlayingSide: React.CSSProperties = {
@@ -963,6 +969,13 @@ const TitleScreen: React.FC = () => {
                         (but as HTMLButtonElement).style.width = `${buttonWidth * 4}px`;
                     }
 
+                    allbuttons = document.querySelectorAll('.avatarfont');
+                    buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                    for (const but of buttonsArray) {
+                        (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.82}px`;
+
+                    }
+
                 };
 
                 const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
@@ -1059,7 +1072,7 @@ const TitleScreen: React.FC = () => {
                         {CurrentText}
                     </button>
 
-                    {troopBonus !== 0 && phase === "REINFORCEMENT" && (
+                    {troopBonus !== 0 && phase === "REINFORCEMENT" && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
                         <div
                             id="nextState"
                             className="dynbut gamescreen-buttons-container"
@@ -1101,34 +1114,81 @@ const TitleScreen: React.FC = () => {
 
     let sideContent = (
         <div className="avatar-container">
-            {getAvatarSrc(0) !== null ? (
-                <div className="avatar" id={'avatar0'} style={{...avatarStyleSide, border: `${getAvatarColor(0)}`}}>
-                    <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div></div>
-            )}
-            {getAvatarSrc(1) !== null? (
-                <div className="avatar" id={'avatar1'} style={{...avatarStyleSide, border: `${getAvatarColor(1)}`}}>
-                    <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div></div>
-            )}
-            {getAvatarSrc(2) !== null? (
-                <div className="avatar" id={'avatar2'} style={{...avatarStyleSide, border: `${getAvatarColor(2)}`}}>
-                    <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div></div>
-            )}
-            {getAvatarSrc(3) !== null? (
-                <div className="avatar" id={'avatar3'} style={{...avatarStyleSide, border: `${getAvatarColor(3)}`}}>
-                    <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div></div>
-            )}
+            <div>
+                {getAvatarSrc(0) !== null ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ position: 'relative' }}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[0] !== undefined? (
+                            <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][1]}</span>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][2]}</span>
+                            </div>
+                            ):(<div></div>)}
+                            <div className="avatar" id={'avatar0'} style={{ ...avatarStyleSide, border: `${getAvatarColor(0)}` }}>
+                                <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
+                            </div>
+                        </div>
+                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[0].username}</div>
+                    </div>
+                ) : (
+                    <div></div>
+                )}
+                {getAvatarSrc(1) !== null ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ position: 'relative' }}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[1] !== undefined? (
+                                <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][1]}</span>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][2]}</span>
+                                </div>
+                            ):(<div></div>)}
+                            <div className="avatar" id={'avatar1'} style={{ ...avatarStyleSide, border: `${getAvatarColor(1)}` }}>
+                                <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
+                            </div>
+                        </div>
+                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[1].username}</div>
+                    </div>
+                ) : (
+                    <div></div>
+                )}
+                {getAvatarSrc(2) !== null ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ position: 'relative' }}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[2] !== undefined? (
+                                <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][1]}</span>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][2]}</span>
+                                </div>
+                            ):(<div></div>)}
+                            <div className="avatar" id={'avatar2'} style={{ ...avatarStyleSide, border: `${getAvatarColor(2)}` }}>
+                                <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
+                            </div>
+                        </div>
+                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[2].username}</div>
+                    </div>
+                ) : (
+                    <div></div>
+                )}
+                {getAvatarSrc(3) !== null ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ position: 'relative' }}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[3] !== undefined? (
+                                <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][1]}</span>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][2]}</span>
+                                </div>
+                            ):(<div></div>)}
+                            <div className="avatar" id={'avatar3'} style={{ ...avatarStyleSide, border: `${getAvatarColor(3)}` }}>
+                                <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
+                            </div>
+                        </div>
+                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[3].username}</div>
+                    </div>
+                ) : (
+                    <div></div>
+                )}
+            </div>
+
         </div>
     );
 
