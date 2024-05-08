@@ -8,6 +8,7 @@ import ModalWin from "../ui/ModalWin";
 import LoseModal from "../ui/LoseModal";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
+import LeaveModal from "../ui/LeaveModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
 
@@ -42,13 +43,18 @@ const TitleScreen: React.FC = () => {
     const [PlayerColor, setPlayerColor] = useState({});
     const Colors = ["red", "blue", "purple", "green", "orange", "brown"];
     const [PlayerCycle, setPlayerCycle] = useState(null);
+    const [ALLCycle, setALLCycle] = useState(null);
     const [curListOfValidReinforcements, setcurListOfValidReinforcements] = useState([]);
     const [CurrentHighlightedButtons, setCurrentHighlightedButtons] = useState(null);
     const NameCycle = ["Go to Attack", "Go to Troop Movement", "End The Turn"];
     const [CurrentText, setCurrentText] = useState("Go To Attack");
     const [isWinModalOpen, setIsWinModalOpen] = useState(false);
     const [isLoseModalOpen, setIsLoseModalOpen] = useState(false)
+    const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
     const [WinLoseWasShown, setWinLoseWasShown] = useState(false)
+    const [StartTimer, setStartTimer] = useState(0);
+    const [LooseList, setLooseList] = useState([]);
+    const [CyclewithTroopsandTerritories, setCyclewithTroopsandTerritories] = useState({});
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,12 +79,12 @@ const TitleScreen: React.FC = () => {
         setGame(updatedGame.data);
         setIsModalOpen(false);
         setIsLoseModalOpen(false);
+        setIsLeaveModalOpen(false);
         setIsWinModalOpen(false);
         undoLine();
     };
 
     useEffect(() => {
-        //console.log("isModalOpen", isModalOpen);
     }, [isModalOpen]);
     /*-------------------------------------------------*/
 
@@ -289,9 +295,21 @@ const TitleScreen: React.FC = () => {
                 console.log("current player: " + gameResponse.data.turnCycle.currentPlayer.playerId);
                 setTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
                 setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
+                setALLCycle(gameResponse.data.players);
             } catch (error) {
                 console.error("Error fetching game data:", error);
+                if(error.message === "Request failed with status code 404"){
+                    console.log('Before Pause');
+                    pause(10000)
+                        .then(() => {
+                            console.log('After 10 seconds');
+                            localStorage.removeItem("lobbyToken");
+                            localStorage.removeItem("lobbyId");
+                            navigate("/lobby");
+                        });
+                }
                 // Handle error if needed
+                //if(game)
             }
         }
 
@@ -300,9 +318,7 @@ const TitleScreen: React.FC = () => {
 
         // Set up the interval to call getGame every 2 seconds
         const intervalId = setInterval(() => {
-            console.log(currentPlayerId + "  ------------  " + parseInt(localStorage.getItem("user_id")));
             if (game !== null) {
-                console.log(game.turnCycle.currentPlayer.playerId);
             }
             if (game && currentPlayerId !== null) { // Check if game is not null
                 if (parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))) {
@@ -324,16 +340,22 @@ const TitleScreen: React.FC = () => {
             console.log("game: ", game);
             console.log("current phase: ", phase);
             console.log("current player id: ", currentPlayerId);
-            console.log("current troop bonus: ", troopBonus);
             console.log("playerCycle:", PlayerCycle);
             if (currentPlayerId !== null) {
                 setCurrentPlayerId(currentPlayerId);
             }
 
+            if(CyclewithTroopsandTerritories !== null){
+                // console.log("0 : " + CyclewithTroopsandTerritories[0]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[1]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[2]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[3]);
+            }
+
             let PlayerwithColors = {};
             let x = 0;
-            if (PlayerCycle !== null) {
-                for (const player of PlayerCycle) {
+            if (ALLCycle !== null) {
+                for (const player of ALLCycle) {
                     PlayerwithColors[player.playerId] = Colors[x];
                     x++;
                 }
@@ -348,7 +370,7 @@ const TitleScreen: React.FC = () => {
                     button.playerid = territory.playerId;
 
                 } else {
-                    console.log("Territory not found for button:", button.id);
+
                 }
                 setButtonData([...buttonData]);
             }
@@ -360,7 +382,10 @@ const TitleScreen: React.FC = () => {
                 setCurrentText(NameCycle[2]);
             }
 
+            setStartTimer(prevState => prevState + 1);
+            console.log("Current Timer: " + StartTimer);
             checkifyouHaveLostOrWon();
+            setdeathsymbol()
 
         }
     }, [game, phase, currentPlayerId]);
@@ -372,23 +397,88 @@ const TitleScreen: React.FC = () => {
 
     const checkifyouHaveLostOrWon = () => {
         let won = true;
-        let lose = true;
-        if(game !== null && WinLoseWasShown === false) {
+        let loose = true;
+        if(game !== null && StartTimer > 1) {
+            let dic = setupdictionayforStats();
             for (const x of game.board.territories) {
+                dic = addtroopsandterritories(dic, x);
                 if (x.owner !== parseInt(localStorage.getItem("user_id"))) {
                     won = false;
                 } else if (x.owner === parseInt(localStorage.getItem("user_id"))) {
-                    lose = false
+                    loose = false
                 }
             }
-            if (won === true) {
+            console.log("HALLOO");
+            console.log("0 : " + CyclewithTroopsandTerritories[0]);
+            console.log("0 : " + CyclewithTroopsandTerritories[1]);
+            console.log("0 : " + CyclewithTroopsandTerritories[2]);
+            console.log("0 : " + CyclewithTroopsandTerritories[3]);
+            setCyclewithTroopsandTerritories(dic);
+            if (won === true && WinLoseWasShown === false) {
                 setIsWinModalOpen(true);
                 setWinLoseWasShown(true);
-            } else if (lose === true) {
+                nextState();
+
+            } else if (loose === true && WinLoseWasShown === false) {
                 setIsLoseModalOpen(true);
                 setWinLoseWasShown(true);
             }
         }
+    }
+
+    const setdeathsymbol = () => {
+        if(game !== null  && StartTimer > 3) {
+            if (PlayerCycle !== null) {
+                let count = -1;
+                for (const x of game.players) {
+                    count++;
+                    let bool = false;
+                    for (const y of PlayerCycle) {
+                        if(x.playerId === y.playerId){
+                            bool = true;
+                        }
+                    }
+                    console.log("BOOL: "+ bool + "  playerid: " + x.playerId + "  count: " + count);
+                    console.log(LooseList);
+                    if (bool === false && !LooseList.includes(x.playerId)) {
+                        const list = LooseList;
+                        list[count] = x.playerId;
+                        setLooseList(list);
+                        const avatar0Button = document.getElementById(`avatar${count}`);
+                        avatar0Button.style.backgroundColor = "black";
+                        avatar0Button.style.borderRadius = "10px";
+                    }
+
+
+                }
+            }
+        }
+    }
+
+    function pause(milliseconds) {
+        return new Promise(resolve => setTimeout(resolve, milliseconds));
+    }
+
+    const setupdictionayforStats = () => {
+        let dic = {};
+        let x = 0;
+        for (const y of ALLCycle) {
+            dic[x] = [y.playerId, 0, 0];
+            x++;
+        }
+        return dic;
+    }
+
+    const addtroopsandterritories = (dic, territory) => {
+        let x = -1;
+        for (const y of ALLCycle) {
+            x++;
+            if (territory.owner === y.playerId) {
+                dic[x][1] += 1;
+                dic[x][2] += territory.troops;
+            }
+        }
+        return dic;
     }
 
     const checkForAllValidReinforcements = (id: string) => {
@@ -463,9 +553,6 @@ const TitleScreen: React.FC = () => {
     const attackTerritory = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
         if (startButton) {
-            console.log("startButton: ", startButton);
-            console.log("is adj?", adjDict.dict[startButton].includes(id));
-            console.log("is NOT currentPlayers?", territory.owner !== currentPlayerId);
             if (territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)) {
                 dehighlightadjbutton(startButton);
                 drawLine(startButton, id);
@@ -705,6 +792,27 @@ const TitleScreen: React.FC = () => {
         marginLeft: '5px', // Adjust the space between images
     };
 
+    const avatarStyleSide: React.CSSProperties = {
+        width: '20px', // Adjust the size of the circle
+        height: '20px', // Adjust the size of the circle
+        borderRadius: '50%', // Makes the image circular
+        overflow: 'hidden', // Hides the overflow
+        marginRight: '5px', // Adjust the space between image
+        marginLeft: '5px', // Adjust the space between images
+        textAlign: 'center',
+
+    };
+
+    const avatarStylePlayingSide: React.CSSProperties = {
+        width: '75px', // Adjust the size of the circle
+        height: '75px', // Adjust the size of the circle
+        borderRadius: '50%', // Makes the image circular
+        overflow: 'hidden', // Hides the overflow
+        marginRight: '5px', // Adjust the space between images
+        marginLeft: '5px', // Adjust the space between images
+        border: '4px solid black', // Red outline
+    };
+
     const imageStyle: React.CSSProperties = {
         width: '100%',
         height: '100%',
@@ -731,19 +839,14 @@ const TitleScreen: React.FC = () => {
             let playeridwithavatar = {};
             const config1 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id")};
 
-            if (PlayerCycle !== null) {
-                for (const playerid of PlayerCycle) {
+            if (ALLCycle !== null) {
+                for (const playerid of ALLCycle) {
                     playeridwithavatar[playerid.playerId] = null;
                 }
 
                 for (const player of userIdList) {
                     const playerresponse = await api.get("/users/" + player, {headers: config1});
                     playeridwithavatar[playerresponse.data.id] = `https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[playerresponse.data.avatarId]}`;
-                }
-                let xnumber = -3;
-                while (Object.keys(playeridwithavatar).length < 4) {
-                    playeridwithavatar[xnumber] = CasualAvatar;
-                    xnumber++;
                 }
                 setAllIDwithAvatar(playeridwithavatar);
             }
@@ -753,6 +856,29 @@ const TitleScreen: React.FC = () => {
         }
     };
     const nextSate = document.getElementById('nextState');
+
+    const LeavePlayer = async () => {
+        let bool = false;
+        for(const x of game.turnCycle.playerCycle){
+            if (x.playerId === parseInt(localStorage.getItem("user_id"), 10)){
+                bool = true;
+                console.log("HEYHOOO BOOL TRUE");
+            }
+        }
+        const config1 = {Authorization: localStorage.getItem("lobbyToken")};
+        const userId = localStorage.getItem("user_id");
+
+        if(bool){
+            const gameResponse = await api.put(`lobbies/${lobbyId}/game/${gameId}/user/${userId}`, {},  {headers: config1});
+            localStorage.removeItem("lobbyToken");
+            localStorage.removeItem("lobbyId");
+            navigate("/lobby");
+        } else {
+            localStorage.removeItem("lobbyToken");
+            localStorage.removeItem("lobbyId");
+            navigate("/lobby");
+        }
+    }
 
     useEffect(() => {
         // Function to preload the image
@@ -833,14 +959,21 @@ const TitleScreen: React.FC = () => {
                     for (const but of buttonsArray) {
                         (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
                         (but as HTMLButtonElement).style.width = `${buttonWidth * 9}px`;
-                        (but as HTMLButtonElement).style.fontSize = `${buttonHeight * 0.35 * 2.5}px`;
+                        (but as HTMLButtonElement).style.fontSize = `${buttonHeight * 0.3 * 2.5}px`;
                     }
 
                     allbuttons = document.querySelectorAll('.avatar');
                     buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
                     for (const but of buttonsArray) {
-                        (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                        (but as HTMLButtonElement).style.width = `${buttonWidth * 20}px`;
+                        (but as HTMLButtonElement).style.height = `${buttonHeight * 4}px`;
+                        (but as HTMLButtonElement).style.width = `${buttonWidth * 4}px`;
+                    }
+
+                    allbuttons = document.querySelectorAll('.avatarfont');
+                    buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                    for (const but of buttonsArray) {
+                        (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.82}px`;
+
                     }
 
                 };
@@ -887,10 +1020,10 @@ const TitleScreen: React.FC = () => {
     );
 
     function getAvatarSrc(x: number) {
-        if (PlayerCycle !== null && PlayerCycle.length > x) {
-            return AllIDwithAvatar[PlayerCycle[x].playerId];
+        if (ALLCycle !== null && ALLCycle.length > x) {
+            return AllIDwithAvatar[ALLCycle[x].playerId];
         } else {
-            return CasualAvatar;
+            return null;
         }
     }
 
@@ -903,11 +1036,11 @@ const TitleScreen: React.FC = () => {
     }
 
     function getAvatarColor(x) {
-        if (PlayerCycle !== null && PlayerCycle.length > x) {
-            if (PlayerCycle[x].playerId === currentPlayerId) {
-                return `6px double ${PlayerColor[PlayerCycle[x].playerId]}`;
+        if (PlayerCycle !== null && ALLCycle.length > x) {
+            if (ALLCycle[x].playerId === currentPlayerId) {
+                return `6px double ${PlayerColor[ALLCycle[x].playerId]}`;
             } else {
-                return `4px solid ${PlayerColor[PlayerCycle[x].playerId]}`;
+                return `4px solid ${PlayerColor[ALLCycle[x].playerId]}`;
             }
         } else {
             return "2px solid transparent"; // Return empty string if x is out of bounds or PlayerCycle[x] is falsy
@@ -916,86 +1049,148 @@ const TitleScreen: React.FC = () => {
 
     let lowerContent = (<div className="gamescreen-innerlower-container">
         <div className="gamescreen-bottomleft-container">
-            <button
-                id="nextState"
-                className="dynbut gamescreen-buttons-container"
-                style={{
-                    left: '7%',
-                    top: '50%',
-                    backgroundColor: 'red',
-                    transform: 'translateY(-50%)',
-                }}
-                onClick={() => {
-                    if (troopBonus !== 0 && phase === "REINFORCEMENT") {
-    
-                    }
-                    else {
-                        const cur = nextState();
-                    }
-                }}
-                disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
-            >
-                {CurrentText}
-            </button>
-            {troopBonus !== 0 && phase === "REINFORCEMENT" && (() => {
-                if (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) {
-                    return (
+            { WinLoseWasShown === false && (
+                <div>
+                    <button
+                        id="nextState"
+                        className="dynbut gamescreen-buttons-container"
+                        style={{
+                            left: '7%',
+                            top: '50%',
+                            backgroundColor: 'red',
+                            transform: 'translateY(-50%)',
+                        }}
+                        onClick={() => {
+                            if (troopBonus !== 0 && phase === "REINFORCEMENT") {
+                                // Handle button click logic here
+                            } else {
+                                const cur = nextState();
+                            }
+                        }}
+                        disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
+                    >
+                        {CurrentText}
+                    </button>
+
+                    {troopBonus !== 0 && phase === "REINFORCEMENT" && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
                         <div
                             id="nextState"
                             className="dynbut gamescreen-buttons-container"
                             style={{
-                                left: 'calc(45% + 25px)',
+                                left: 'calc(55% + 25px)',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
                                 backgroundColor: 'red',
+                            }}
+                            onClick={() => {
+                                setTroopBonus(prevState => prevState + 10);
                             }}
                             disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                         >
                             Troop Amount: {troopBonus}
                         </div>
-                    );
-                }
-            })()}
+                    )}
+                </div>
+            )}
         </div>
         <div className="gamescreen-bottomright-container">
-            {num !== 1 ? (
-                <div className="avatar" id={'avatar0'} style={{...avatarStyle, border: `${getAvatarColor(0)}`}}>
-                    <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div className="avatar" style={{avatarStylePlaying}}>
-                    <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
-                </div>
-            )}
-            {num !== 1 ? (
-                <div className="avatar" id={'avatar1'} style={{...avatarStyle, border: `${getAvatarColor(1)}`}}>
-                    <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div className="avatar" style={avatarStylePlaying}>
-                    <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
-                </div>
-            )}
-            {num !== 2 ? (
-                <div className="avatar" id={'avatar2'} style={{...avatarStyle, border: `${getAvatarColor(2)}`}}>
-                    <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div className="avatar" style={avatarStylePlaying}>
-                    <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
-                </div>
-            )}
-            {num !== 3 ? (
-                <div className="avatar" id={'avatar3'} style={{...avatarStyle, border: `${getAvatarColor(3)}`}}>
-                    <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
-                </div>
-            ) : (
-                <div className="avatar" style={avatarStylePlaying}>
-                    <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
-                </div>
-            )}
+            <button
+                id="nextState"
+                className="dynbut gamescreen-buttons-container"
+                style={{
+                    top: '50%',
+                    backgroundColor: 'red',
+                    transform: 'translateY(-50%)',
+                }}
+                onClick={() => {
+                    //setIsLeaveModalOpen(true);
+                    LeavePlayer();
+                }}
+            >
+                Leave Game
+            </button>
         </div>
     </div>);
+
+    let sideContent = (
+        <div className="avatar-container">
+            <div>
+                {getAvatarSrc(0) !== null ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ position: 'relative' }}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[0] !== undefined? (
+                            <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][1]}</span>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][2]}</span>
+                            </div>
+                            ):(<div></div>)}
+                            <div className="avatar" id={'avatar0'} style={{ ...avatarStyleSide, border: `${getAvatarColor(0)}` }}>
+                                <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
+                            </div>
+                        </div>
+                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[0].username}</div>
+                    </div>
+                ) : (
+                    <div></div>
+                )}
+                {getAvatarSrc(1) !== null ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ position: 'relative' }}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[1] !== undefined? (
+                                <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][1]}</span>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][2]}</span>
+                                </div>
+                            ):(<div></div>)}
+                            <div className="avatar" id={'avatar1'} style={{ ...avatarStyleSide, border: `${getAvatarColor(1)}` }}>
+                                <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
+                            </div>
+                        </div>
+                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[1].username}</div>
+                    </div>
+                ) : (
+                    <div></div>
+                )}
+                {getAvatarSrc(2) !== null ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ position: 'relative' }}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[2] !== undefined? (
+                                <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][1]}</span>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][2]}</span>
+                                </div>
+                            ):(<div></div>)}
+                            <div className="avatar" id={'avatar2'} style={{ ...avatarStyleSide, border: `${getAvatarColor(2)}` }}>
+                                <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
+                            </div>
+                        </div>
+                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[2].username}</div>
+                    </div>
+                ) : (
+                    <div></div>
+                )}
+                {getAvatarSrc(3) !== null ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ position: 'relative' }}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[3] !== undefined? (
+                                <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][1]}</span>
+                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][2]}</span>
+                                </div>
+                            ):(<div></div>)}
+                            <div className="avatar" id={'avatar3'} style={{ ...avatarStyleSide, border: `${getAvatarColor(3)}` }}>
+                                <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
+                            </div>
+                        </div>
+                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[3].username}</div>
+                    </div>
+                ) : (
+                    <div></div>
+                )}
+            </div>
+
+        </div>
+    );
 
     return (
         <div className="gamescreen-container">
@@ -1018,13 +1213,19 @@ const TitleScreen: React.FC = () => {
                         isModalOpen={isWinModalOpen}
                         onClose={closeModal}
                     />
+                    <LeaveModal
+                        isModalOpen={isLeaveModalOpen}
+                        onClose={closeModal}
+                    />
 
                 </section>
                 <canvas id="myCanvas"></canvas>
                 {renderButtons}
             </div>
             {lowerContent}
-
+            <div className="container-80-20">
+                {sideContent}
+            </div>
         </div>
     );
 }
