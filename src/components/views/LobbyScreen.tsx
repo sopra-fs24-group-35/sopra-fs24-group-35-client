@@ -34,7 +34,7 @@ const LobbyScreen = () => {
     const [gameId, setGameId] = useState(null);
 
     useEffect(() => {
-        localStorage.setItem("lobbyId", lobbyId)
+        localStorage.setItem("lobbyId", lobbyId);
         let timeoutId;
 
         if(lobby !== null && lobby.gameId !== null){

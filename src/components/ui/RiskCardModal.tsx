@@ -139,6 +139,9 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
                         }
                     </div>
                 </div>
+                <div className="modal-explain">
+                    Trade three same troops or one of each kind! (Jokers count as any troop)
+                </div>
                 <div className="modal-riskcards">
                     {content}
                 </div>

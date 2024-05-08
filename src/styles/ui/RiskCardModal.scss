@@ -91,7 +91,16 @@
 .modal-first:nth-child(2) {
     transform: rotate(0deg); /* Adjust the angle for the third card */
 }
-
+.modal-explain {
+    display: flex;
+    justify-content: center;
+    color: $textColor;
+    font-weight: 500;
+    font-family: $fontDefault;
+    line-height: 10px;
+    font-size: larger;
+    margin-top: 40px;
+}
 .modal-riskcards {
     display: flex;
     justify-content: center;
