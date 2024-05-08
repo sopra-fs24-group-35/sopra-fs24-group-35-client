@@ -71,8 +71,6 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
         
     }, [selectedCards, cards]);
 
-    //beans
-
     const handleCardClick = (troopNum: string, terName: string, idNum: number) => {
         
         const newCard: Card = {
