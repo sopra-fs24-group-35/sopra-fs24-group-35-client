@@ -17,7 +17,7 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
     const apiStyles = new ApiStyles;
 
     const [currentPlayer, setCurrentPlayer] = useState<Player>(null);
-    const [cards, setCards] = useState<Card[]>([{troops: "0", territoryName: "Brazil", id: 0}, {troops: "0", territoryName: "Argentina", id: 1}, {troops: "0", territoryName: "South Africa", id: 2}, {troops: "2", territoryName: "South Africa", id: 3}, {troops: "2", territoryName: "China", id: 4}, {troops: "1", territoryName: "Southern Europe", id: 5}]);
+    const [cards, setCards] = useState<Card[]>(null);
     const [game, setGame] = useState<Game>(null);
     const [selectedCards, setSelectedCards] = useState<Card[]>([]);
     const [tradable, setTradable] = useState(false);
@@ -27,20 +27,27 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
         async function fetchData() {
 
         try {
-            const config1 = {Authorization: localStorage.getItem("lobbyToken")};
+            const config = {Authorization: localStorage.getItem("lobbyToken")};
 
-            //console.log("lobbyId: ", lobbyId);
+            const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
 
+            const curPlayer = gameResponse.data.turnCycle.currentPlayer;
+
+            setCurrentPlayer(curPlayer);
+
+            const playerCards = curPlayer.riskCards;
+
+            setCards(playerCards);
             
         } catch (error) {
             console.error(
-            `Something went wrong while fetching the users: \n${handleError(
+            `Something went wrong while fetching the game data: \n${handleError(
                 error
             )}`
             );
             console.error("Details:", error);
             alert(
-            "Something went wrong while fetching the users! See the console for details."
+            "Something went wrong while fetching the game data! See the console for details."
             );
         }
         }    
@@ -49,7 +56,10 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
     }, [game]);
 
     const trade = async() => {
-
+        const config = { Authorization: localStorage.getItem("lobbyToken") };
+        const requestBody = JSON.stringify({"card1Name": selectedCards[0].territoryName, "card2Name": selectedCards[1].territoryName, "card3Name": selectedCards[2].territoryName});
+        const tradeResponse = await api.post(`/lobbies/${lobbyId}/game/${gameId}/cards`, requestBody, {headers: config});
+        setGame(tradeResponse.data);
     };
 
     useEffect(() => {

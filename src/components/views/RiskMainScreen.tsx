@@ -9,6 +9,7 @@ import ModalWin from "../ui/ModalWin";
 import LoseModal from "../ui/LoseModal";
 import AdjDict from '../../models/AdjDict.js';
 import AttackModal from "../ui/AttackModal";
+import RiskCardModal from "../ui/RiskCardModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
 
@@ -19,7 +20,6 @@ const TitleScreen: React.FC = () => {
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [troopBonus, setTroopBonus] = useState(null);
-    const [allTroopsUsed, setAllTroopsUsed] = useState(false);
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -81,6 +81,18 @@ const TitleScreen: React.FC = () => {
     useEffect(() => {
         //console.log("isModalOpen", isModalOpen);
     }, [isModalOpen]);
+    /*-------------------------------------------------*/
+
+    /*--------------RiskCard Modal Setup---------------*/
+    const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+
+    const openCardModal = () => {
+        setIsCardModalOpen(true);
+    };
+
+    const closeCardModal = () => {
+        setIsCardModalOpen(false);
+    };
     /*-------------------------------------------------*/
 
     const [buttonData, setButtonData] = useState([
@@ -301,9 +313,9 @@ const TitleScreen: React.FC = () => {
 
         // Set up the interval to call getGame every 2 seconds
         const intervalId = setInterval(() => {
-            console.log(currentPlayerId + "  ------------  " + parseInt(localStorage.getItem("user_id")));
+            //console.log(currentPlayerId + "  ------------  " + parseInt(localStorage.getItem("user_id")));
             if (game !== null) {
-                console.log(game.turnCycle.currentPlayer.playerId);
+                //console.log(game.turnCycle.currentPlayer.playerId);
             }
             if (game && currentPlayerId !== null) { // Check if game is not null
                 if (parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))) {
@@ -480,13 +492,13 @@ const TitleScreen: React.FC = () => {
                 setStartButton(null);
                 dehighlightadjbutton(startButton);
             } else{
-                if(territory.owner === currentPlayerId && checkifthereareenemies(id)){
+                if(territory.owner === currentPlayerId && checkifthereareenemies(id) && territory.troops > 1){
                 dehighlightadjbutton(startButton);
                 setStartButton(id);
                 highlightadjbutton(id);}
             }
         } else {
-            if(territory.owner === currentPlayerId && checkifthereareenemies(id)){
+            if(territory.owner === currentPlayerId && checkifthereareenemies(id) && territory.troops > 1){
             setStartButton(id);
             highlightadjbutton(id);
         }}
@@ -1009,6 +1021,12 @@ const TitleScreen: React.FC = () => {
                         modalContent={modalContent}
                         onClose={closeModal}
                         onMove={moving}
+                        lobbyId={lobbyId}
+                        gameId={gameId}
+                    />
+                    <RiskCardModal
+                        isModalOpen={isCardModalOpen}
+                        onClose={closeCardModal}
                         lobbyId={lobbyId}
                         gameId={gameId}
                     />

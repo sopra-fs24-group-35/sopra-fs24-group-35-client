@@ -38,9 +38,7 @@ FormField.propTypes = {
 
 const LobbyErstellen = () => {
   const navigate = useNavigate();
-  let [username, setUsername] = useState<string>(null);
-  const [password, setPassword] = useState<string>(null);
-
+  
   let user_id = localStorage.getItem("user_id")
   let temp_sol:number = +user_id
   let players = [temp_sol];
