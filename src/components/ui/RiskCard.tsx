@@ -11,7 +11,7 @@ const RiskCard = ({ troop, territoryName}) => {
 
     // Define the image file name based on the word
     if (troop === 0) {
-        imageFileName = 'Infantery.png';
+        imageFileName = 'Joker.png';
     } else if (troop === 1) {
         imageFileName = 'Infantery.png';
     } else if (troop === 2) {
