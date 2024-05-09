@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Spinner } from "components/ui/Spinner";
 import game from "./Game";
 import { User } from "../../types";
+import {Button} from "../ui/Button";
 import ModalWin from "../ui/ModalWin";
 import LoseModal from "../ui/LoseModal";
 import AdjDict from '../../models/AdjDict.js';
@@ -931,6 +932,11 @@ const TitleScreen: React.FC = () => {
             >
                 {CurrentText}
             </button>
+            <Button
+                width="100%"
+                onClick={() => openCardModal()}>
+                RiskCard Modal
+            </Button>
             {troopBonus !== 0 && phase === "REINFORCEMENT" && (() => {
                 if (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) {
                     return (

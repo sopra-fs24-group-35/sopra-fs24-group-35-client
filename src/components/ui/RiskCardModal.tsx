@@ -59,7 +59,7 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
         const config = { Authorization: localStorage.getItem("lobbyToken") };
         const requestBody = JSON.stringify({"card1Name": selectedCards[0].territoryName, "card2Name": selectedCards[1].territoryName, "card3Name": selectedCards[2].territoryName});
         const tradeResponse = await api.post(`/lobbies/${lobbyId}/game/${gameId}/cards`, requestBody, {headers: config});
-        setGame(tradeResponse.data);
+        setGame("tradeResponse: ", tradeResponse.data);
     };
 
     useEffect(() => {
@@ -68,10 +68,10 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
 
         if(selectedCards.length >= 3){
             console.log("hello?")
-            if(selectedCards[0].troops === selectedCards[1].troops && selectedCards[0].troops === selectedCards[2].troops){
+            if((selectedCards[0].troops === selectedCards[1].troops && selectedCards[0].troops === selectedCards[2].troops) || (selectedCards[0].troops === selectedCards[1].troops && selectedCards[2].troops === 0) || (selectedCards[1].troops === selectedCards[2].troops && selectedCards[0].troops === 0) || (selectedCards[0].troops === selectedCards[2].troops && selectedCards[1].troops === 0)){
                 setTradable(true);
             }
-            else if(selectedCards[0].troops !== selectedCards[1].troops && selectedCards[0].troops!== selectedCards[2].troops && selectedCards[1].troops !== selectedCards[2].troops){
+            else if((selectedCards[0].troops !== selectedCards[1].troops && selectedCards[0].troops!== selectedCards[2].troops && selectedCards[1].troops !== selectedCards[2].troops) || (selectedCards[0].troops !== selectedCards[1].troops && selectedCards[2].troops === 0) || (selectedCards[1].troops !== selectedCards[2].troops && selectedCards[0].troops === 0) || (selectedCards[0].troops !== selectedCards[2].troops && selectedCards[1].troops === 0)){
                 setTradable(true);
             }
         }
@@ -81,12 +81,11 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
         
     }, [selectedCards, cards]);
 
-    const handleCardClick = (troopNum: string, terName: string, idNum: number) => {
+    const handleCardClick = (troopNum: number, terName: string) => {
         
         const newCard: Card = {
             troops: troopNum,
-            territoryName: terName,
-            id: idNum
+            territoryName: terName
         };
 
         // Check if the card is already selected
@@ -115,8 +114,8 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
         content = (
             <ul className="card-list">
                 {cards.map((card: Card) => (
-                    <li key={card.id}>
-                        <div className="cardHolder" onClick={() => handleCardClick(card.troops, card.territoryName, card.id)}>
+                    <li key={card.territoryName}>
+                        <div className="cardHolder" onClick={() => handleCardClick(card.troops, card.territoryName)}>
                             <RiskCard troop={card.troops} territoryName={card.territoryName} />
                         </div>
                     </li>
@@ -133,17 +132,17 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
             </button>
             <main className="modal-mainContents">
                 <div className="modal-selectedRiskCards">
-                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[0].troops, selectedCards[0].territoryName, selectedCards[0].id)}>
+                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[0].troops, selectedCards[0].territoryName)}>
                         {selectedCards.length >= 1 && 
                             <RiskCard troop={selectedCards[0].troops} territoryName={selectedCards[0].territoryName}/>
                         }
                     </div>
-                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[1].troops, selectedCards[1].territoryName, selectedCards[1].id)}>
+                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[1].troops, selectedCards[1].territoryName)}>
                         {selectedCards.length >= 2 && 
                             <RiskCard troop={selectedCards[1].troops} territoryName={selectedCards[1].territoryName}/>
                         }
                     </div>
-                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[2].troops, selectedCards[2].territoryName, selectedCards[2].id)}>
+                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[2].troops, selectedCards[2].territoryName)}>
                         {selectedCards.length === 3 && 
                             <RiskCard troop={selectedCards[2].troops} territoryName={selectedCards[2].territoryName}/>
                         }
