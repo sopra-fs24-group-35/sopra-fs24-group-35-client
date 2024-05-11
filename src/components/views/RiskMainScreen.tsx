@@ -342,7 +342,7 @@ const TitleScreen: React.FC = () => {
         while(game === null){
             showLoadingScreen()
         }
-
+        // hello
         if (game !== null) {
             console.log("game: ", game);
             console.log("current phase: ", phase);
