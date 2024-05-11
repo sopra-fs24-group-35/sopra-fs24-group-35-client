@@ -339,64 +339,68 @@ const TitleScreen: React.FC = () => {
 
     useEffect(() => {
 
-        while(game === null){
-            showLoadingScreen()
-        }
-        // hello
-        if (game !== null) {
-            console.log("game: ", game);
-            console.log("current phase: ", phase);
-            console.log("current player id: ", currentPlayerId);
-            console.log("playerCycle:", PlayerCycle);
-            if (currentPlayerId !== null) {
-                setCurrentPlayerId(currentPlayerId);
-            }
+        if(game === null){
+            console.log("huhuhuhuhhuuhuu");
+            console.log("CHECKER: " + game);
+            showLoadingScreen();
 
-            if(CyclewithTroopsandTerritories !== null){
-                // console.log("0 : " + CyclewithTroopsandTerritories[0]);
-                // console.log("0 : " + CyclewithTroopsandTerritories[1]);
-                // console.log("0 : " + CyclewithTroopsandTerritories[2]);
-                // console.log("0 : " + CyclewithTroopsandTerritories[3]);
-            }
-
-            let PlayerwithColors = {};
-            let x = 0;
-            if (ALLCycle !== null) {
-                for (const player of ALLCycle) {
-                    PlayerwithColors[player.playerId] = Colors[x];
-                    x++;
+        } else {
+            hideLoadingScreen();
+            // hello
+            if (game !== null) {
+                console.log("game: ", game);
+                console.log("current phase: ", phase);
+                console.log("current player id: ", currentPlayerId);
+                console.log("playerCycle:", PlayerCycle);
+                if (currentPlayerId !== null) {
+                    setCurrentPlayerId(currentPlayerId);
                 }
-            }
-            setPlayerColor(PlayerwithColors);
 
-            for (let i = 0; i < buttonData.length; i++) {
-                const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
-                const button = buttonData[i];
-                if (territory) {
-                    button.troops = territory.troops;
-                    button.playerid = territory.playerId;
-
-                } else {
-
+                if (CyclewithTroopsandTerritories !== null) {
+                    // console.log("0 : " + CyclewithTroopsandTerritories[0]);
+                    // console.log("0 : " + CyclewithTroopsandTerritories[1]);
+                    // console.log("0 : " + CyclewithTroopsandTerritories[2]);
+                    // console.log("0 : " + CyclewithTroopsandTerritories[3]);
                 }
-                setButtonData([...buttonData]);
-            }
-            if (phase === "REINFORCEMENT") {
-                setCurrentText(NameCycle[0]);
-            } else if (phase === "ATTACK") {
-                setCurrentText(NameCycle[1]);
-            } else if (phase === "MOVE") {
-                setCurrentText(NameCycle[2]);
-            }
 
-            setStartTimer(prevState => prevState + 1);
-            console.log("Current Timer: " + StartTimer);
-            checkifyouHaveLostOrWon();
-            setdeathsymbol()
+                let PlayerwithColors = {};
+                let x = 0;
+                if (ALLCycle !== null) {
+                    for (const player of ALLCycle) {
+                        PlayerwithColors[player.playerId] = Colors[x];
+                        x++;
+                    }
+                }
+                setPlayerColor(PlayerwithColors);
+
+                for (let i = 0; i < buttonData.length; i++) {
+                    const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
+                    const button = buttonData[i];
+                    if (territory) {
+                        button.troops = territory.troops;
+                        button.playerid = territory.playerId;
+
+                    } else {
+
+                    }
+                    setButtonData([...buttonData]);
+                }
+                if (phase === "REINFORCEMENT") {
+                    setCurrentText(NameCycle[0]);
+                } else if (phase === "ATTACK") {
+                    setCurrentText(NameCycle[1]);
+                } else if (phase === "MOVE") {
+                    setCurrentText(NameCycle[2]);
+                }
+
+                setStartTimer(prevState => prevState + 1);
+                console.log("Current Timer: " + StartTimer);
+                checkifyouHaveLostOrWon();
+                setdeathsymbol()
+            }
 
         }
     }, [game, phase, currentPlayerId]);
-
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
         return button ? {xratio: button.xratio, yratio: button.yratio} : {xratio: 0, yratio: 0}; // Return xratio and yratio if the button is found, otherwise return default values
@@ -496,6 +500,14 @@ const TitleScreen: React.FC = () => {
 
         // Append the loading screen to the body
         document.body.appendChild(loadingScreen);
+    }
+
+    function hideLoadingScreen() {
+        // Find and remove the loading screen
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.parentNode.removeChild(loadingScreen);
+        }
     }
     const addtroopsandterritories = (dic, territory) => {
         let x = -1;
