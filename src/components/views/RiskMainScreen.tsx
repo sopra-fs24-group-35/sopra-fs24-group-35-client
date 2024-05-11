@@ -362,8 +362,8 @@ const TitleScreen: React.FC = () => {
 
                 let PlayerwithColors = {};
                 let x = 0;
-                if (ALLCycle !== null) {
-                    for (const player of ALLCycle) {
+                if (game !== null) {
+                    for (const player of game.players) {
                         PlayerwithColors[player.playerId] = Colors[x];
                         x++;
                     }
@@ -503,7 +503,7 @@ const TitleScreen: React.FC = () => {
     const setupdictionayforStats = () => {
         let dic = {};
         let x = 0;
-        for (const y of ALLCycle) {
+        for (const y of game.players) {
             dic[x] = [y.playerId, 0, 0];
             x++;
         }
@@ -512,7 +512,7 @@ const TitleScreen: React.FC = () => {
 
     const addtroopsandterritories = (dic, territory) => {
         let x = -1;
-        for (const y of ALLCycle) {
+        for (const y of game.players) {
             x++;
             if (territory.owner === y.playerId) {
                 dic[x][1] += 1;
@@ -880,8 +880,8 @@ const TitleScreen: React.FC = () => {
             let playeridwithavatar = {};
             const config1 = {Authorization: localStorage.getItem("token"), User_ID: localStorage.getItem("user_id")};
 
-            if (ALLCycle !== null) {
-                for (const playerid of ALLCycle) {
+            if (game !== null) {
+                for (const playerid of game.players) {
                     playeridwithavatar[playerid.playerId] = null;
                 }
 
@@ -903,7 +903,7 @@ const TitleScreen: React.FC = () => {
         for(const x of game.turnCycle.playerCycle){
             if (x.playerId === parseInt(localStorage.getItem("user_id"), 10)){
                 bool = true;
-                console.log("HEYHOOO BOOL TRUE");
+                console.log("HEYHOOO BOOL TRUE for Leave");
             }
         }
         const config1 = {Authorization: localStorage.getItem("lobbyToken")};
@@ -1061,8 +1061,8 @@ const TitleScreen: React.FC = () => {
     );
 
     function getAvatarSrc(x: number) {
-        if (ALLCycle !== null && ALLCycle.length > x) {
-            return AllIDwithAvatar[ALLCycle[x].playerId];
+        if (game !== null && game.players !== null && game.players.length > x && AllIDwithAvatar !== {}) {
+            return AllIDwithAvatar[game.players[x].playerId];
         } else {
             return null;
         }
@@ -1077,16 +1077,30 @@ const TitleScreen: React.FC = () => {
     }
 
     function getAvatarColor(x) {
-        if (PlayerCycle !== null && ALLCycle.length > x) {
-            if (ALLCycle[x].playerId === currentPlayerId) {
-                return `6px double ${PlayerColor[ALLCycle[x].playerId]}`;
+        if (game !== null && game.players !== null && PlayerCycle !== null && game.players.length > x && PlayerColor !== {}) {
+            if (game.players[x].playerId === currentPlayerId) {
+                return `6px double ${PlayerColor[game.players[x].playerId]}`;
             } else {
-                return `4px solid ${PlayerColor[ALLCycle[x].playerId]}`;
+                return `4px solid ${PlayerColor[game.players[x].playerId]}`;
             }
         } else {
             return "2px solid transparent"; // Return empty string if x is out of bounds or PlayerCycle[x] is falsy
         }
     }
+
+    const handleHover = (avatar: string) => {
+        const avatarElement = document.getElementById(avatar);
+        if (avatarElement) {
+            avatarElement.style.transform = 'scale(1.2)'; // Increase the size by 20%
+        }
+    };
+
+    const handleHoverOut = (avatar: string) => {
+        const avatarElement = document.getElementById(avatar);
+        if (avatarElement) {
+            avatarElement.style.transform = 'scale(1)'; // Reset the size to normal
+        }
+    };
 
     let lowerContent = (<div className="gamescreen-innerlower-container">
         <div className="gamescreen-bottomleft-container">
@@ -1158,72 +1172,164 @@ const TitleScreen: React.FC = () => {
             <div>
                 {getAvatarSrc(0) !== null ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{ position: 'relative' }}>
-                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[0] !== undefined? (
-                            <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
-                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][1]}</span>
-                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][2]}</span>
-                            </div>
-                            ):(<div></div>)}
-                            <div className="avatar" id={'avatar0'} style={{ ...avatarStyleSide, border: `${getAvatarColor(0)}` }}>
-                                <img src={getAvatarSrc(0)} alt="avatar" style={imageStyle}/>
+                        <div style={{position: 'relative'}}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[0] !== undefined ? (
+                                <div style={{position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][1]}</span>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][2]}</span>
+                                </div>
+                            ) : (<div></div>)}
+                            <div className="avatar" id={'avatar0'}
+                                 style={{...avatarStyleSide, border: `${getAvatarColor(0)}`}}>
+                                <img
+                                    src={getAvatarSrc(0)}
+                                    alt="avatar"
+                                    style={imageStyle}
+                                    onMouseEnter={() => {
+                                        if (game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHover("avatar0");
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHoverOut("avatar0");
+                                        }
+                                    }}
+                                    onClick={() => {
+                                        console.log("I Clicked this avatar0");
+                                    }} // Moved the onClick event handler inside the img tag
+                                />
+                                {game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id")) && (
+                                    <button onClick={() => console.log("I Clicked this avatar555")}>Click me</button>
+                                )}
                             </div>
                         </div>
-                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[0].username}</div>
+                        <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[0].username}</div>
                     </div>
                 ) : (
                     <div></div>
                 )}
                 {getAvatarSrc(1) !== null ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{ position: 'relative' }}>
-                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[1] !== undefined? (
-                                <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
-                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][1]}</span>
-                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][2]}</span>
+                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                        <div style={{position: 'relative'}}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[1] !== undefined ? (
+                                <div style={{position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][1]}</span>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][2]}</span>
                                 </div>
-                            ):(<div></div>)}
-                            <div className="avatar" id={'avatar1'} style={{ ...avatarStyleSide, border: `${getAvatarColor(1)}` }}>
-                                <img src={getAvatarSrc(1)} alt="avatar" style={imageStyle}/>
+                            ) : (<div></div>)}
+                            <div className="avatar" id={'avatar1'}
+                                 style={{...avatarStyleSide, border: `${getAvatarColor(1)}`}}>
+                                <img
+                                    src={getAvatarSrc(1)}
+                                    alt="avatar"
+                                    style={imageStyle}
+                                    onMouseEnter={() => {
+                                        if (game !== null && game.players[1].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHover("avatar1");
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (game !== null && game.players[1].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHoverOut("avatar1");
+                                        }
+                                    }}
+                                    onClick={() => {
+                                        console.log("I Clicked this avatar3");
+                                    }} // Moved the onClick event handler inside the img tag
+                                />
+                                {game !== null && game.players[1].playerId === parseInt(localStorage.getItem("user_id")) && (
+                                    <button onClick={() => console.log("I Clicked this avatar1")}>Click me</button>
+                                )}
                             </div>
                         </div>
-                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[1].username}</div>
+                        <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[1].username}</div>
                     </div>
                 ) : (
                     <div></div>
                 )}
                 {getAvatarSrc(2) !== null ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{ position: 'relative' }}>
-                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[2] !== undefined? (
-                                <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
-                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][1]}</span>
-                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][2]}</span>
+                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                        <div style={{position: 'relative'}}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[2] !== undefined ? (
+                                <div style={{position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][1]}</span>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][2]}</span>
                                 </div>
-                            ):(<div></div>)}
-                            <div className="avatar" id={'avatar2'} style={{ ...avatarStyleSide, border: `${getAvatarColor(2)}` }}>
-                                <img src={getAvatarSrc(2)} alt="avatar" style={imageStyle}/>
+                            ) : (<div></div>)}
+                            <div className="avatar" id={'avatar2'}
+                                 style={{...avatarStyleSide, border: `${getAvatarColor(2)}`}}>
+                                <img
+                                    src={getAvatarSrc(2)}
+                                    alt="avatar"
+                                    style={imageStyle}
+                                    onMouseEnter={() => {
+                                        if (game !== null && game.players[2].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHover("avatar2");
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (game !== null && game.players[2].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHoverOut("avatar2");
+                                        }
+                                    }}
+                                    onClick={() => {
+                                        console.log("I Clicked this avatar2");
+                                    }} // Moved the onClick event handler inside the img tag
+                                />
+                                {game !== null && game.players[2].playerId === parseInt(localStorage.getItem("user_id")) && (
+                                    <button onClick={() => console.log("I Clicked this avatar2")}>Click me</button>
+                                )}
                             </div>
                         </div>
-                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[2].username}</div>
+                        <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[2].username}</div>
                     </div>
                 ) : (
                     <div></div>
                 )}
                 {getAvatarSrc(3) !== null ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{ position: 'relative' }}>
-                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[3] !== undefined? (
-                                <div style={{ position: 'absolute', top: '20%', right: '100%'}}>
-                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][1]}</span>
-                                    <span className="avatarfont" style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][2]}</span>
+                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                        <div style={{position: 'relative'}}>
+                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[3] !== undefined ? (
+                                <div style={{position: 'absolute', top: '20%', right: '100%'}}>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][1]}</span>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][2]}</span>
                                 </div>
-                            ):(<div></div>)}
-                            <div className="avatar" id={'avatar3'} style={{ ...avatarStyleSide, border: `${getAvatarColor(3)}` }}>
-                                <img src={getAvatarSrc(3)} alt="avatar" style={imageStyle}/>
+                            ) : (<div></div>)}
+                            <div className="avatar" id={'avatar3'}
+                                 style={{...avatarStyleSide, border: `${getAvatarColor(3)}`}}>
+                                <img
+                                    src={getAvatarSrc(3)}
+                                    alt="avatar"
+                                    style={imageStyle}
+                                    onMouseEnter={() => {
+                                        if (game !== null && game.players[3].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHover("avatar3");
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (game !== null && game.players[3].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHoverOut("avatar3");
+                                        }
+                                    }}
+                                    onClick={() => {
+                                        console.log("I Clicked this avatar3");
+                                    }} // Moved the onClick event handler inside the img tag
+                                />
+                                {game !== null && game.players[3].playerId === parseInt(localStorage.getItem("user_id")) && (
+                                    <button onClick={() => console.log("I Clicked this avatar555")}>Click me</button>
+                                )}
                             </div>
                         </div>
-                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[3].username}</div>
+                        <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[3].username}</div>
                     </div>
                 ) : (
                     <div></div>
