@@ -11,6 +11,8 @@ import AttackModal from "../ui/AttackModal";
 import LeaveModal from "../ui/LeaveModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
+import { types } from "sass";
+import Null = types.Null;
 
 
 const TitleScreen: React.FC = () => {
@@ -336,6 +338,11 @@ const TitleScreen: React.FC = () => {
 
 
     useEffect(() => {
+
+        while(game === null){
+            showLoadingScreen()
+        }
+
         if (game !== null) {
             console.log("game: ", game);
             console.log("current phase: ", phase);
@@ -468,7 +475,28 @@ const TitleScreen: React.FC = () => {
         }
         return dic;
     }
+    function showLoadingScreen() {
+        // Create a loading screen element
+        const loadingScreen = document.createElement('div');
+        loadingScreen.id = 'loading-screen';
+        loadingScreen.innerHTML = 'Loading...'; // You can customize the loading text here
 
+        // Add styles to the loading screen
+        loadingScreen.style.position = 'fixed';
+        loadingScreen.style.top = '0';
+        loadingScreen.style.left = '0';
+        loadingScreen.style.width = '100%';
+        loadingScreen.style.height = '100%';
+        loadingScreen.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        loadingScreen.style.color = '#fff';
+        loadingScreen.style.display = 'flex';
+        loadingScreen.style.justifyContent = 'center';
+        loadingScreen.style.alignItems = 'center';
+        loadingScreen.style.zIndex = '9999';
+
+        // Append the loading screen to the body
+        document.body.appendChild(loadingScreen);
+    }
     const addtroopsandterritories = (dic, territory) => {
         let x = -1;
         for (const y of ALLCycle) {
@@ -828,6 +856,7 @@ const TitleScreen: React.FC = () => {
 
     const fetchData = async () => {
         try {
+            
             const config = {Authorization: localStorage.getItem("lobbyToken")};
             // get lobby info
             const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, {headers: config});
@@ -849,6 +878,7 @@ const TitleScreen: React.FC = () => {
                     playeridwithavatar[playerresponse.data.id] = `https://api.dicebear.com/8.x/thumbs/svg?seed=${styles.styles[playerresponse.data.avatarId]}`;
                 }
                 setAllIDwithAvatar(playeridwithavatar);
+
             }
 
         } catch (error) {
@@ -890,6 +920,7 @@ const TitleScreen: React.FC = () => {
                 image.src = url;
             });
         };
+
 
         // Preload the image
         const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
