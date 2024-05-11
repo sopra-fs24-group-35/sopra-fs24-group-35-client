@@ -100,14 +100,6 @@ const LobbyErstellen = () => {
 
   return (
     <div className="basescreen title-screen" style={{ position: 'relative' }}>
-      <section>
-        <RiskCardModal
-          isModalOpen={isModalOpen}
-          onClose={closeModal}
-          lobbyId={4}
-          gameId={5}
-        />
-      </section>
       <div className="basescreen overlay"></div>
       <div className="basescreen title" style={{ marginBottom: '50px', opacity: '0', animation: 'fadeIn 2s forwards' }}>
         <img src={riskLogo} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', position: 'absolute', top: '0', left: '50%', transform: `translate(${-50}%, ${-10}%)` }} alt="My Image" />
@@ -137,11 +129,6 @@ const LobbyErstellen = () => {
             width="100%"
             onClick={() => logout()}>
             Log out
-          </Button>
-          <Button
-            width="100%"
-            onClick={() => openModal()}>
-            RiskCard Modal
           </Button>
         </div>
       </div>

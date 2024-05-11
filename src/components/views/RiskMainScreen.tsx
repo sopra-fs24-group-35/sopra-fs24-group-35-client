@@ -86,14 +86,34 @@ const TitleScreen: React.FC = () => {
 
     /*--------------RiskCard Modal Setup---------------*/
     const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+    const [traded, setTraded] = useState(false);
 
     const openCardModal = () => {
         setIsCardModalOpen(true);
     };
 
-    const closeCardModal = () => {
+    const closeCardModal = async () => {
+        const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
+        //setGame(updatedGame.data);
+
+        if (traded) {
+            let troops = troopBonus;
+            setTroopBonus(troops + updatedGame.data.turnCycle.currentPlayer.cardBonus);
+        }
+        
+        setTraded(false);
         setIsCardModalOpen(false);
     };
+
+    const trading = () => {
+        setTraded(true);
+    };
+
+    useEffect(() => {
+        //console.log("traded", traded);
+
+        //these functions are only here to update the useState
+    }, [isCardModalOpen, traded]);
     /*-------------------------------------------------*/
 
     const [buttonData, setButtonData] = useState([
@@ -303,6 +323,10 @@ const TitleScreen: React.FC = () => {
                 console.log("current player: " + gameResponse.data.turnCycle.currentPlayer.playerId);
                 setTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
                 setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
+
+                if (gameResponse.data.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === gameResponse.data.turnCycle.currentPlayer.playerId){
+                    openCardModal();
+                }
             } catch (error) {
                 console.error("Error fetching game data:", error);
                 // Handle error if needed
@@ -374,6 +398,9 @@ const TitleScreen: React.FC = () => {
                 setCurrentText(NameCycle[2]);
             }
 
+            if (phase === "MOVE" && moved) {
+                nextState();
+            }
             checkifyouHaveLostOrWon();
 
         }
@@ -549,6 +576,9 @@ const TitleScreen: React.FC = () => {
             setTroopBonus(troops - 1);
             setButtonData([...buttonData]); // Update the button data array in the state
             setGame(game);
+            if(troops - 1 === 0) {
+                nextState();
+            }
         }
     }
 
@@ -919,6 +949,7 @@ const TitleScreen: React.FC = () => {
                     top: '50%',
                     backgroundColor: 'red',
                     transform: 'translateY(-50%)',
+                    cursor: 'pointer'
                 }}
                 onClick={() => {
                     if (troopBonus !== 0 && phase === "REINFORCEMENT") {
@@ -1033,6 +1064,7 @@ const TitleScreen: React.FC = () => {
                     <RiskCardModal
                         isModalOpen={isCardModalOpen}
                         onClose={closeCardModal}
+                        onTrade={trading}
                         lobbyId={lobbyId}
                         gameId={gameId}
                     />
