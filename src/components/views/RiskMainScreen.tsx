@@ -334,61 +334,74 @@ const TitleScreen: React.FC = () => {
         return () => clearInterval(intervalId);
     }, [currentPlayerId]);
 
-
     useEffect(() => {
-        if (game !== null) {
-            console.log("game: ", game);
-            console.log("current phase: ", phase);
-            console.log("current player id: ", currentPlayerId);
-            console.log("playerCycle:", PlayerCycle);
-            if (currentPlayerId !== null) {
-                setCurrentPlayerId(currentPlayerId);
-            }
 
-            if(CyclewithTroopsandTerritories !== null){
-                // console.log("0 : " + CyclewithTroopsandTerritories[0]);
-                // console.log("0 : " + CyclewithTroopsandTerritories[1]);
-                // console.log("0 : " + CyclewithTroopsandTerritories[2]);
-                // console.log("0 : " + CyclewithTroopsandTerritories[3]);
-            }
+        if(game === null){
+            console.log("huhuhuhuhhuuhuu");
+            console.log("CHECKER: " + game);
+            showLoadingScreen();
 
-            let PlayerwithColors = {};
-            let x = 0;
-            if (ALLCycle !== null) {
-                for (const player of ALLCycle) {
-                    PlayerwithColors[player.playerId] = Colors[x];
-                    x++;
+        } else {
+            hideLoadingScreen();
+            // hello
+            if (game !== null) {
+                console.log("game: ", game);
+                console.log("current phase: ", phase);
+                console.log("current player id: ", currentPlayerId);
+                console.log("playerCycle:", PlayerCycle);
+                if (currentPlayerId !== null) {
+                    setCurrentPlayerId(currentPlayerId);
                 }
-            }
-            setPlayerColor(PlayerwithColors);
 
-            for (let i = 0; i < buttonData.length; i++) {
-                const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
-                const button = buttonData[i];
-                if (territory) {
-                    button.troops = territory.troops;
-                    button.playerid = territory.playerId;
-
-                } else {
-
+                if (CyclewithTroopsandTerritories !== null) {
+                    // console.log("0 : " + CyclewithTroopsandTerritories[0]);
+                    // console.log("0 : " + CyclewithTroopsandTerritories[1]);
+                    // console.log("0 : " + CyclewithTroopsandTerritories[2]);
+                    // console.log("0 : " + CyclewithTroopsandTerritories[3]);
                 }
-                setButtonData([...buttonData]);
-            }
-            if (phase === "REINFORCEMENT") {
-                setCurrentText(NameCycle[0]);
-            } else if (phase === "ATTACK") {
-                setCurrentText(NameCycle[1]);
-            } else if (phase === "MOVE") {
-                setCurrentText(NameCycle[2]);
-            }
 
-            setStartTimer(prevState => prevState + 1);
-            console.log("Current Timer: " + StartTimer);
-            checkifyouHaveLostOrWon();
-            setdeathsymbol()
+                let PlayerwithColors = {};
+                let x = 0;
+                if (ALLCycle !== null) {
+                    for (const player of ALLCycle) {
+                        PlayerwithColors[player.playerId] = Colors[x];
+                        x++;
+                    }
+                }
+                setPlayerColor(PlayerwithColors);
+
+                for (let i = 0; i < buttonData.length; i++) {
+                    const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
+                    const button = buttonData[i];
+                    if (territory) {
+                        button.troops = territory.troops;
+                        button.playerid = territory.playerId;
+
+                    } else {
+
+                    }
+                    setButtonData([...buttonData]);
+                }
+                if (phase === "REINFORCEMENT") {
+                    setCurrentText(NameCycle[0]);
+                } else if (phase === "ATTACK") {
+                    setCurrentText(NameCycle[1]);
+                } else if (phase === "MOVE") {
+                    setCurrentText(NameCycle[2]);
+                }
+
+                setStartTimer(prevState => prevState + 1);
+                console.log("Current Timer: " + StartTimer);
+                checkifyouHaveLostOrWon();
+                setdeathsymbol()
+            }
 
         }
     }, [game, phase, currentPlayerId]);
+
+    function pause(milliseconds) {
+        return new Promise(resolve => setTimeout(resolve, milliseconds));
+    }
 
     const getButtonRatiosById = (id) => {
         const button = buttonData.find(button => button.id === id);
@@ -398,7 +411,7 @@ const TitleScreen: React.FC = () => {
     const checkifyouHaveLostOrWon = () => {
         let won = true;
         let loose = true;
-        if(game !== null && StartTimer > 3) {
+        if(game !== null) {
             let dic = setupdictionayforStats();
             for (const x of game.board.territories) {
                 dic = addtroopsandterritories(dic, x);
@@ -427,18 +440,19 @@ const TitleScreen: React.FC = () => {
     }
 
     const setdeathsymbol = () => {
-        if(game !== null  && StartTimer > 3) {
+        if(game !== null) {
             if (PlayerCycle !== null) {
                 let count = -1;
                 for (const x of game.players) {
                     count++;
                     let bool = false;
-                    for (const y of PlayerCycle) {
+                    for (const y of game.turnCycle.playerCycle) {
                         if(x.playerId === y.playerId){
                             bool = true;
                         }
                     }
                     console.log("BOOL: "+ bool + "  playerid: " + x.playerId + "  count: " + count);
+                    console.log(game);
                     console.log(LooseList);
                     if (bool === false && !LooseList.includes(x.playerId)) {
                         const list = LooseList;
@@ -455,8 +469,35 @@ const TitleScreen: React.FC = () => {
         }
     }
 
-    function pause(milliseconds) {
-        return new Promise(resolve => setTimeout(resolve, milliseconds));
+    function showLoadingScreen() {
+        // Create a loading screen element
+        const loadingScreen = document.createElement('div');
+        loadingScreen.id = 'loading-screen';
+        loadingScreen.innerHTML = 'Loading...'; // You can customize the loading text here
+
+        // Add styles to the loading screen
+        loadingScreen.style.position = 'fixed';
+        loadingScreen.style.top = '0';
+        loadingScreen.style.left = '0';
+        loadingScreen.style.width = '100%';
+        loadingScreen.style.height = '100%';
+        loadingScreen.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        loadingScreen.style.color = '#fff';
+        loadingScreen.style.display = 'flex';
+        loadingScreen.style.justifyContent = 'center';
+        loadingScreen.style.alignItems = 'center';
+        loadingScreen.style.zIndex = '9999';
+
+        // Append the loading screen to the body
+        document.body.appendChild(loadingScreen);
+    }
+
+    function hideLoadingScreen() {
+        // Find and remove the loading screen
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.parentNode.removeChild(loadingScreen);
+        }
     }
 
     const setupdictionayforStats = () => {
@@ -998,7 +1039,7 @@ const TitleScreen: React.FC = () => {
             }
         );
 
-    }, [PlayerColor]);
+    }, [PlayerColor, game]);
 
 
     let renderButtons = (
