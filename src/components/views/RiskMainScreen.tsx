@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "styles/views/GameScreen.scss";
+// @ts-ignore
+import defeatIcon from "./defeatIcon1.png";
+// @ts-ignore
+import currentPlayerArrow from "./currentPlayerIconV2.png";
+
 import { api, handleError } from "helpers/api";
 import { useNavigate, useParams } from "react-router-dom";
-import game from "./Game";
-import { User } from "../../types";
-import {Button} from "../ui/Button";
 import ModalWin from "../ui/ModalWin";
 import LoseModal from "../ui/LoseModal";
 import AdjDict from '../../models/AdjDict.js';
@@ -13,6 +15,7 @@ import LeaveModal from "../ui/LeaveModal";
 import RiskCardModal from "../ui/RiskCardModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
+
 
 
 const TitleScreen: React.FC = () => {
@@ -55,6 +58,12 @@ const TitleScreen: React.FC = () => {
     const [StartTimer, setStartTimer] = useState(0);
     const [LoseList, setLoseList] = useState([]);
     const [CyclewithTroopsandTerritories, setCyclewithTroopsandTerritories] = useState({});
+
+    //ALL imagens
+    const defeat = new Image();
+    defeat.src = defeatIcon;
+    const arrow = new Image();
+    arrow.src = currentPlayerArrow;
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -505,8 +514,16 @@ const TitleScreen: React.FC = () => {
                         list[count] = x.playerId;
                         setLoseList(list);
                         const avatar0Button = document.getElementById(`avatar${count}`);
-                        avatar0Button.style.backgroundColor = "black";
-                        avatar0Button.style.borderRadius = "10px";
+                        //avatar0Button.style.backgroundColor = "black";
+                        //avatar0Button.style.borderRadius = "10px";
+
+                        // const defeatImage = new Image();
+                        // defeatImage.src = 'defeatIcon1.png';
+                        // defeatImage.alt = 'overlay1';
+                        defeat.classList.add('avatar-overlay');
+
+                        // Append the image element to the avatar button
+                        avatar0Button.appendChild(defeat);
                     }
 
 
@@ -1225,47 +1242,50 @@ const TitleScreen: React.FC = () => {
             <div>
                 {getAvatarSrc(0) !== null ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{position: 'relative'}}>
+                        <div style={{ position: 'relative' }}>
                             {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[0] !== undefined ? (
-                                <div style={{position: 'absolute', top: '20%', right: '100%'}}>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][1]}</span>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][2]}</span>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{"+" + game.players[0].troopBonus}</span>
+                                <div style={{ position: 'absolute', top: '20%', right: '100%' }}>
+                                    <span className="avatarfont" style={{ display: 'block' }}>{CyclewithTroopsandTerritories[0][1]}</span>
+                                    <span className="avatarfont" style={{ display: 'block' }}>{CyclewithTroopsandTerritories[0][2]}</span>
+                                    <span className="avatarfont" style={{ display: 'block' }}>{"+" + game.players[0].troopBonus}</span>
                                 </div>
                             ) : (<div></div>)}
-                            <div className="avatar" id={'avatar0'}
-                                 style={{...avatarStyleSide, border: `${getAvatarColor(0)}`}}>
-                                <img
-                                    src={getAvatarSrc(0)}
-                                    alt="avatar"
-                                    style={imageStyle}
-                                    onMouseEnter={() => {
-                                        if (game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHover("avatar0");
-                                        }
-                                    }}
-                                    onMouseLeave={() => {
-                                        if (game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHoverOut("avatar0");
-                                        }
-                                    }}
-                                    onClick={() => {
-                                        console.log("I Clicked this avatar0");
-                                    }} // Moved the onClick event handler inside the img tag
-                                />
-                                {game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id")) && (
-                                    <button onClick={() => openCardModal}>Click me</button>
+                            <div style={{ position: 'relative' }}> {/* Wrap both avatar and arrow in a container */}
+                                <div className="avatar" id={'avatar0'}
+                                     style={{ ...avatarStyleSide, border: `${getAvatarColor(0)}` }}>
+                                    <img
+                                        src={getAvatarSrc(0)}
+                                        alt="avatar"
+                                        style={imageStyle}
+                                        onMouseEnter={() => {
+                                            if (game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                                handleHover("avatar0");
+                                            }
+                                        }}
+                                        onMouseLeave={() => {
+                                            if (game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id"))) {
+                                                handleHoverOut("avatar0");
+                                            }
+                                        }}
+                                        onClick={() => {
+                                            console.log("I Clicked this avatar0");
+                                        }} // Moved the onClick event handler inside the img tag
+                                    />
+                                    {game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id")) && (
+                                        <button onClick={() => openCardModal}>Click me</button>
+                                    )}
+                                </div>
+                                {game !== null && game.turnCycle.currentPlayer.playerId === game.players[0].playerId && (
+                                    <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{ position: 'absolute', right: '-90px', top: '50%', transform: 'translateY(-50%) rotate(180deg)'}} />
                                 )}
                             </div>
                         </div>
-                        <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[0].username}</div>
+                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[0].username}</div>
                     </div>
                 ) : (
                     <div></div>
                 )}
+
                 {getAvatarSrc(1) !== null ? (
                     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                         <div style={{position: 'relative'}}>
@@ -1303,6 +1323,9 @@ const TitleScreen: React.FC = () => {
                                     <button onClick={() => openCardModal}>Click me</button>
                                 )}
                             </div>
+                            {game !== null && game.turnCycle.currentPlayer.playerId === game.players[1].playerId && (
+                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{ position: 'absolute', right: '-90px', top: '50%', transform: 'translateY(-50%) rotate(180deg)'}} />
+                            )}
                         </div>
                         <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[1].username}</div>
                     </div>
@@ -1346,6 +1369,9 @@ const TitleScreen: React.FC = () => {
                                     <button onClick={() => openCardModal}>Click me</button>
                                 )}
                             </div>
+                            {game !== null && game.turnCycle.currentPlayer.playerId === game.players[2].playerId && (
+                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{ position: 'absolute', right: '-90px', top: '50%', transform: 'translateY(-50%) rotate(180deg)'}} />
+                            )}
                         </div>
                         <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[2].username}</div>
                     </div>
@@ -1389,6 +1415,9 @@ const TitleScreen: React.FC = () => {
                                     <button onClick={() => openCardModal}>Click me</button>
                                 )}
                             </div>
+                            {game !== null && game.turnCycle.currentPlayer.playerId === game.players[3].playerId && (
+                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{ position: 'absolute', right: '-90px', top: '50%', transform: 'translateY(-50%) rotate(180deg)'}} />
+                            )}
                         </div>
                         <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[3].username}</div>
                     </div>

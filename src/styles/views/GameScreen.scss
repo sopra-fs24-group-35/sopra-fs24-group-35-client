@@ -141,7 +141,8 @@
 }
 
 .avatar-container {
-  display: flex; /* Use flexbox */
+  //display: flex; /* Use flexbox */
+  display: inline-block;
   flex-direction: column; /* Arrange items vertically */
   align-items: center; /* Align items horizontally in the center */
   justify-content: center; /* Align items vertically in the center */
@@ -155,7 +156,27 @@
   transform: translateY(-50%);
   text-align: center; /* Center the buttons horizontally */
   padding: 20px 0; /* Increase top and bottom padding */
+  z-index: 0;
 
+
+}
+
+.avatar-overlay{
+  position: absolute;
+  top: 5%;
+  left: 3%;
+  /* Adjust the z-index to ensure the overlay is displayed above the base image */
+  z-index: 1;
+  /* Add any additional styling as needed */
+}
+avatar-arrow{
+  position: absolute;
+  transform: rotate(180deg);
+  top: 0%;
+  left: 0%;
+  /* Adjust the z-index to ensure the overlay is displayed above the base image */
+  z-index: 1;
+  /* Add any additional styling as needed */
 }
 
 ///* Styles for the avatars */
