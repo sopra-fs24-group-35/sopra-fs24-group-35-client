@@ -10,18 +10,23 @@ const RiskCard = ({ troop, territoryName}) => {
     let color;
 
     // Define the image file name based on the word
-    if (troop === '0') {
+    if (troop === 0) {
+        imageFileName = 'Joker.png';
+    } else if (troop === 1) {
         imageFileName = 'Infantery.png';
-    } else if (troop === '1') {
+    } else if (troop === 2) {
         imageFileName = 'Cavallery.png';
-    } else if (troop === '2') {
+    } else if (troop === 3) {
         imageFileName = 'Artillery.png';
     } else {
         // Default image if word doesn't match any condition
         imageFileName = 'Infantery.png';
     }
 
-    if (['Alaska', 'Northwest Territory', 'Greenland', 'Quebec', 'Ontario', 'Alberta', 'Western US', 'Eastern US', 'Central America'].includes(territoryName)) {
+    if (territoryName === "Joker1" || territoryName === "Joker2") {
+        color = "linear-gradient(in hsl longer hue 45deg, red 0 0)";
+    }
+    else if (['Alaska', 'Northwest Territory', 'Greenland', 'Quebec', 'Ontario', 'Alberta', 'Western US', 'Eastern US', 'Central America'].includes(territoryName)) {
         color = "rgba(171, 209, 0, 1)";
     }
     else if (['Venezuela','Brazil', 'Peru', 'Argentina'].includes(territoryName)) {
@@ -45,7 +50,7 @@ const RiskCard = ({ troop, territoryName}) => {
             <div className="border">
                 
                 <img src={require(`../../styles/views/Pictures/${imageFileName}`)} style={{ width: '120px', position: 'relative', top: '-20px'}} alt="My Image" />
-                <p className="text" style={{'background-color': color}}> {territoryName} </p>
+                <p className="text" style={(territoryName === "Joker1" || territoryName === "Joker2") ? {background: color} : {'background-color': color}}> {(territoryName === "Joker1" || territoryName === "Joker2") ? "Joker" : territoryName} </p>
             </div>
         </div>
     );

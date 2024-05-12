@@ -12,7 +12,6 @@ export type Player = {
 };
 
 export type Card = {
-  troops: string;
+  troops: number;
   territoryName: string;
-  id: number;
 };

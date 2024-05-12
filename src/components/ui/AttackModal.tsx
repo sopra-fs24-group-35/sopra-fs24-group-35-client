@@ -200,8 +200,8 @@ AttackModal.propTypes = {
   }).isRequired,
   onClose: PropTypes.func.isRequired,
   onMove: PropTypes.func.isRequired,
-  lobbyId: PropTypes.number.isRequired,
-  gameId: PropTypes.number.isRequired
+  lobbyId: PropTypes.string.isRequired,
+  gameId: PropTypes.string.isRequired
 };
 
 export default AttackModal;

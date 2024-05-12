@@ -9,15 +9,14 @@ import ApiStyles from "helpers/avatarApiStyles";
 import {Button} from "../ui/Button";
 import Game from "models/Game";
 
-const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
+const RiskCardModal = ({ isModalOpen, onClose, onTrade, lobbyId, gameId}) => {
     if (!isModalOpen) {
         return null;
     }
 
-    const apiStyles = new ApiStyles;
-
-    const [currentPlayer, setCurrentPlayer] = useState<Player>(null);
-    const [cards, setCards] = useState<Card[]>([{troops: "0", territoryName: "Brazil", id: 0}, {troops: "0", territoryName: "Argentina", id: 1}, {troops: "0", territoryName: "South Africa", id: 2}, {troops: "2", territoryName: "South Africa", id: 3}, {troops: "2", territoryName: "China", id: 4}, {troops: "1", territoryName: "Southern Europe", id: 5}]);
+    const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
+    const [currentPhase, setCurrentPhase] = useState(null);
+    const [cards, setCards] = useState<Card[]>(null);
     const [game, setGame] = useState<Game>(null);
     const [selectedCards, setSelectedCards] = useState<Card[]>([]);
     const [tradable, setTradable] = useState(false);
@@ -27,20 +26,39 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
         async function fetchData() {
 
         try {
-            const config1 = {Authorization: localStorage.getItem("lobbyToken")};
+            const config = {Authorization: localStorage.getItem("lobbyToken")};
 
-            //console.log("lobbyId: ", lobbyId);
+            const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
 
-            
+            const players = gameResponse.data.players;
+
+            const curPlayer = gameResponse.data.turnCycle.currentPlayer;
+
+            if (parseInt(localStorage.getItem("user_id")) === curPlayer.playerId) {
+                setIsCurrentPlayer(true);
+            }
+            else {
+                setIsCurrentPlayer(false);
+            }
+
+            setCurrentPhase(gameResponse.data.turnCycle.currentPhase);
+
+            for (let player of players){
+                console.log("player", player);
+                if(player.playerId === parseInt(localStorage.getItem("user_id"))){
+                    setCards(player.riskCards);
+                    break;
+                }
+            }
         } catch (error) {
             console.error(
-            `Something went wrong while fetching the users: \n${handleError(
+            `Something went wrong while fetching the game data: \n${handleError(
                 error
             )}`
             );
             console.error("Details:", error);
             alert(
-            "Something went wrong while fetching the users! See the console for details."
+            "Something went wrong while fetching the game data! See the console for details."
             );
         }
         }    
@@ -49,7 +67,13 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
     }, [game]);
 
     const trade = async() => {
-
+        const config = { Authorization: localStorage.getItem("lobbyToken") };
+        const requestBody = JSON.stringify({"card1Name": selectedCards[0].territoryName, "card2Name": selectedCards[1].territoryName, "card3Name": selectedCards[2].territoryName});
+        const tradeResponse = await api.post(`/lobbies/${lobbyId}/game/${gameId}/cards`, requestBody, {headers: config});
+        console.log("tradeResponse: ", tradeResponse.data);
+        onTrade(true);
+        setSelectedCards([]);
+        setGame(tradeResponse.data);
     };
 
     useEffect(() => {
@@ -58,10 +82,10 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
 
         if(selectedCards.length >= 3){
             console.log("hello?")
-            if(selectedCards[0].troops === selectedCards[1].troops && selectedCards[0].troops === selectedCards[2].troops){
+            if((selectedCards[0].troops === selectedCards[1].troops && selectedCards[0].troops === selectedCards[2].troops) || (selectedCards[0].troops === selectedCards[1].troops && selectedCards[2].troops === 0) || (selectedCards[1].troops === selectedCards[2].troops && selectedCards[0].troops === 0) || (selectedCards[0].troops === selectedCards[2].troops && selectedCards[1].troops === 0)){
                 setTradable(true);
             }
-            else if(selectedCards[0].troops !== selectedCards[1].troops && selectedCards[0].troops!== selectedCards[2].troops && selectedCards[1].troops !== selectedCards[2].troops){
+            else if((selectedCards[0].troops !== selectedCards[1].troops && selectedCards[0].troops!== selectedCards[2].troops && selectedCards[1].troops !== selectedCards[2].troops) || (selectedCards[0].troops !== selectedCards[1].troops && selectedCards[2].troops === 0) || (selectedCards[1].troops !== selectedCards[2].troops && selectedCards[0].troops === 0) || (selectedCards[0].troops !== selectedCards[2].troops && selectedCards[1].troops === 0)){
                 setTradable(true);
             }
         }
@@ -71,12 +95,15 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
         
     }, [selectedCards, cards]);
 
-    const handleCardClick = (troopNum: string, terName: string, idNum: number) => {
+    useEffect(() => {
+        console.log("isCurPlayer", isCurrentPlayer);
+    }, [isCurrentPlayer, currentPhase]);
+
+    const handleCardClick = (troopNum: number, terName: string) => {
         
         const newCard: Card = {
             troops: troopNum,
-            territoryName: terName,
-            id: idNum
+            territoryName: terName
         };
 
         // Check if the card is already selected
@@ -105,8 +132,8 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
         content = (
             <ul className="card-list">
                 {cards.map((card: Card) => (
-                    <li key={card.id}>
-                        <div className="cardHolder" onClick={() => handleCardClick(card.troops, card.territoryName, card.id)}>
+                    <li key={card.territoryName}>
+                        <div className="cardHolder" onClick={() => handleCardClick(card.troops, card.territoryName)}>
                             <RiskCard troop={card.troops} territoryName={card.territoryName} />
                         </div>
                     </li>
@@ -116,37 +143,39 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
     }
 
     return (
-        <div className="modal-cards" onClick={onClose}>
+        <div className="modal-cards" onClick={(cards && cards.length >= 5 && isCurrentPlayer) ? null : (onClose)}>
         <div className="modal-contentCards" onClick={e => e.stopPropagation()}>
-            <button className="close" onClick={onClose}>
+            <button className="close" onClick={(cards && cards.length >= 5 && isCurrentPlayer) ? null : (onClose)}>
             &times;
             </button>
             <main className="modal-mainContents">
-                <div className="modal-selectedRiskCards">
-                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[0].troops, selectedCards[0].territoryName, selectedCards[0].id)}>
+                {(currentPhase === "REINFORCEMENT" && isCurrentPlayer) &&
+                <div className="modal-selectedRiskCards">  
+                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[0].troops, selectedCards[0].territoryName)}>
                         {selectedCards.length >= 1 && 
                             <RiskCard troop={selectedCards[0].troops} territoryName={selectedCards[0].territoryName}/>
                         }
                     </div>
-                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[1].troops, selectedCards[1].territoryName, selectedCards[1].id)}>
+                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[1].troops, selectedCards[1].territoryName)}>
                         {selectedCards.length >= 2 && 
                             <RiskCard troop={selectedCards[1].troops} territoryName={selectedCards[1].territoryName}/>
                         }
                     </div>
-                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[2].troops, selectedCards[2].territoryName, selectedCards[2].id)}>
+                    <div className="modal-first" onClick={() => handleCardClick(selectedCards[2].troops, selectedCards[2].territoryName)}>
                         {selectedCards.length === 3 && 
                             <RiskCard troop={selectedCards[2].troops} territoryName={selectedCards[2].territoryName}/>
                         }
                     </div>
                 </div>
+                }
                 <div className="modal-explain">
-                    Trade three cards with the same troops or one of each kind! (Jokers count as any troop)
+                    {(currentPhase === "REINFORCEMENT" && isCurrentPlayer) && "Trade three cards with the same troops or one of each kind! (Jokers count as any troop)"}
                 </div>
                 <div className="modal-riskcards">
                     {content}
                 </div>
                 <div className="button-div">
-                    {(true) && <Button width="50%" disabled={!tradable} onClick={trade}>Trade</Button>}
+                    {(currentPhase === "REINFORCEMENT" && isCurrentPlayer) && <Button width="50%" disabled={!tradable} onClick={trade}>Trade</Button>}
                 </div>
             </main>
         </div>
@@ -157,8 +186,9 @@ const RiskCardModal = ({ isModalOpen, onClose, lobbyId, gameId}) => {
 RiskCardModal.propTypes = {
 isModalOpen: PropTypes.bool.isRequired,
 onClose: PropTypes.func.isRequired,
-lobbyId: PropTypes.number.isRequired,
-gameId: PropTypes.number.isRequired
+onTrade: PropTypes.func.isRequired,
+lobbyId: PropTypes.string.isRequired,
+gameId: PropTypes.string.isRequired
 };
 
 export default RiskCardModal;

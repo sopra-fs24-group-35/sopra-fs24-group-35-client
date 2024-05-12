@@ -20,7 +20,7 @@
 .modal-content {
     border: 1px solid rgb(152, 105, 105);
     min-width: 700px;
-    min-height: 400px;
+    min-height: 575px;
     background-color: rgba(152, 105, 105, 0.929);
     border-radius: $borderRadius;
     position: absolute;
@@ -61,6 +61,8 @@
     border: 2px solid black;
     border-radius: $borderRadius;
     margin: 30px;
+    width: 420px;
+    height: 200px;
     flex-direction: row; /* Arrange children vertically */
 }
 .vs-text{
