@@ -20,7 +20,7 @@ const TitleScreen: React.FC = () => {
     const [game, setGame] = useState<Game>(null);
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
-    const [troopBonus, setTroopBonus] = useState(null);
+    const [currentTroopBonus, setCurrentTroopBonus] = useState(null);
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ const TitleScreen: React.FC = () => {
     const CasualAvatar = "https://api.dicebear.com/8.x/shapes/svg?seed=Mittens";
     const [AllIDwithAvatar, setAllIDwithAvatar] = useState({});
 
-    const {gameId} = useParams()
+    const { gameId } = useParams()
     const lobbyId = localStorage.getItem("lobbyId")
     const [startButton, setStartButton] = useState<string | null>(null);
     const adjDict = new AdjDict();
@@ -42,9 +42,8 @@ const TitleScreen: React.FC = () => {
     const [curheight, setCurHeight] = useState(0);
 
     const [PlayerColor, setPlayerColor] = useState({});
-    const Colors = ["red", "blue", "purple", "green", "orange", "brown"];
+    const colors = ["red", "blue", "purple", "green", "orange", "brown"];
     const [PlayerCycle, setPlayerCycle] = useState(null);
-    const [ALLCycle, setALLCycle] = useState(null);
     const [curListOfValidReinforcements, setcurListOfValidReinforcements] = useState([]);
     const [CurrentHighlightedButtons, setCurrentHighlightedButtons] = useState(null);
     const NameCycle = ["Go to Attack", "Go to Troop Movement", "End The Turn"];
@@ -54,7 +53,7 @@ const TitleScreen: React.FC = () => {
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
     const [WinLoseWasShown, setWinLoseWasShown] = useState(false)
     const [StartTimer, setStartTimer] = useState(0);
-    const [LooseList, setLooseList] = useState([]);
+    const [LoseList, setLoseList] = useState([]);
     const [CyclewithTroopsandTerritories, setCyclewithTroopsandTerritories] = useState({});
 
     /*---------------Attack Modal Setup----------------*/
@@ -102,8 +101,8 @@ const TitleScreen: React.FC = () => {
         //setGame(updatedGame.data);
 
         if (traded) {
-            let troops = troopBonus;
-            setTroopBonus(troops + updatedGame.data.turnCycle.currentPlayer.cardBonus);
+            let troops = currentTroopBonus;
+            setCurrentTroopBonus(troops + updatedGame.data.turnCycle.currentPlayer.cardBonus);
         }
         
         setTraded(false);
@@ -326,9 +325,15 @@ const TitleScreen: React.FC = () => {
                 setPhase(gameResponse.data.turnCycle.currentPhase);
                 setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
                 console.log("current player: " + gameResponse.data.turnCycle.currentPlayer.playerId);
-                setTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
+                setCurrentTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
                 setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
-                setALLCycle(gameResponse.data.players);
+
+                /*for (let player of gameResponse.data.players){
+                    let troopBonusList = [];
+                    let troops = player.troopBonus;
+                    troopBonusList.push(troops);
+                    setTroopBonuses(troopBonusList);
+                }*/
 
                 if (gameResponse.data.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === gameResponse.data.turnCycle.currentPlayer.playerId){
                     openCardModal();
@@ -374,8 +379,8 @@ const TitleScreen: React.FC = () => {
     useEffect(() => {
 
         if(game === null){
-            console.log("huhuhuhuhhuuhuu");
-            console.log("CHECKER: " + game);
+            /*console.log("huhuhuhuhhuuhuu");
+            console.log("CHECKER: " + game);*/
             showLoadingScreen();
 
         } else {
@@ -401,7 +406,7 @@ const TitleScreen: React.FC = () => {
                 let x = 0;
                 if (game !== null) {
                     for (const player of game.players) {
-                        PlayerwithColors[player.playerId] = Colors[x];
+                        PlayerwithColors[player.playerId] = colors[x];
                         x++;
                     }
                 }
@@ -478,7 +483,7 @@ const TitleScreen: React.FC = () => {
                 setWinLoseWasShown(true);
             }
         }
-    }
+    };
 
     const setdeathsymbol = () => {
         if(game !== null) {
@@ -494,11 +499,11 @@ const TitleScreen: React.FC = () => {
                     }
                     console.log("BOOL: "+ bool + "  playerid: " + x.playerId + "  count: " + count);
                     console.log(game);
-                    console.log(LooseList);
-                    if (bool === false && !LooseList.includes(x.playerId)) {
-                        const list = LooseList;
+                    console.log(LoseList);
+                    if (bool === false && !LoseList.includes(x.playerId)) {
+                        const list = LoseList;
                         list[count] = x.playerId;
-                        setLooseList(list);
+                        setLoseList(list);
                         const avatar0Button = document.getElementById(`avatar${count}`);
                         avatar0Button.style.backgroundColor = "black";
                         avatar0Button.style.borderRadius = "10px";
@@ -508,7 +513,7 @@ const TitleScreen: React.FC = () => {
                 }
             }
         }
-    }
+    };
 
     function showLoadingScreen() {
         // Create a loading screen element
@@ -531,7 +536,7 @@ const TitleScreen: React.FC = () => {
 
         // Append the loading screen to the body
         document.body.appendChild(loadingScreen);
-    }
+    };
 
     function hideLoadingScreen() {
         // Find and remove the loading screen
@@ -539,7 +544,7 @@ const TitleScreen: React.FC = () => {
         if (loadingScreen) {
             loadingScreen.parentNode.removeChild(loadingScreen);
         }
-    }
+    };
 
     const setupdictionayforStats = () => {
         let dic = {};
@@ -549,7 +554,7 @@ const TitleScreen: React.FC = () => {
             x++;
         }
         return dic;
-    }
+    };
 
     const addtroopsandterritories = (dic, territory) => {
         let x = -1;
@@ -561,7 +566,7 @@ const TitleScreen: React.FC = () => {
             }
         }
         return dic;
-    }
+    };
 
     const checkForAllValidReinforcements = (id: string) => {
         const playerid = currentPlayerId;
@@ -594,7 +599,7 @@ const TitleScreen: React.FC = () => {
                 curbutton.style.border = "2px solid white";
             }
         }
-    }
+    };
 
     const checkifthereareenemies = (id: string) => {
         for (const thisterritory of adjDict.dict[id]) {
@@ -604,7 +609,7 @@ const TitleScreen: React.FC = () => {
             }
         }
         return false;
-    }
+    };
 
     const checkifthereareneighbors = (id: string) => {
         for (const thisterritory of adjDict.dict[id]) {
@@ -614,7 +619,7 @@ const TitleScreen: React.FC = () => {
             }
         }
         return false;
-    }
+    };
 
     const handleButtonClick = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
@@ -627,10 +632,10 @@ const TitleScreen: React.FC = () => {
         if (phase === "MOVE") {
             reinforceTroops(id);
         }
-    }
+    };
     const deploytroops = (id: string) => {
         increaseTroops(id);
-    }
+    };
 
     const attackTerritory = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
@@ -658,11 +663,11 @@ const TitleScreen: React.FC = () => {
             setStartButton(id);
             highlightadjbutton(id);
         }}
-    }
+    };
 
     const reinforceTroops = (id: string) => {
         redirectTroops(id)
-    }
+    };
 
     const nextState = async () => {
 
@@ -672,7 +677,7 @@ const TitleScreen: React.FC = () => {
                 dehighlightadjbutton(startButton);
             }
             undoLine();
-            setTroopBonus(game.turnCycle.currentPlayer.troopBonus);
+            setCurrentTroopBonus(game.turnCycle.currentPlayer.troopBonus);
         }
         else {
             if (startButton) {
@@ -690,25 +695,25 @@ const TitleScreen: React.FC = () => {
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
         
-    }
+    };
 
     const increaseTroops = (territory_id: string) => {
         const territory = game.board.territories.find(territory => territory.name === territory_id);
         const button = buttonData.find(button => button.id === territory_id); // Find the button data for the startId
 
-        if (button && troopBonus !== 0 && territory.owner === currentPlayerId) {
+        if (button && currentTroopBonus !== 0 && territory.owner === currentPlayerId) {
             territory.troops += 1; // Increment the troops count
             button.troops = territory.troops; // set troop count to server troop count
 
-            let troops = troopBonus;
-            setTroopBonus(troops - 1);
+            let troops = currentTroopBonus;
+            setCurrentTroopBonus(troops - 1);
             setButtonData([...buttonData]); // Update the button data array in the state
             setGame(game);
             if(troops - 1 === 0) {
                 nextState();
             }
         }
-    }
+    };
 
     const redirectTroops = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
@@ -737,7 +742,7 @@ const TitleScreen: React.FC = () => {
                 setStartButton(id);
                 checkForAllValidReinforcements(id);
         }
-    }
+    };
 
     const highlightadjbutton = (startId: string) => {
         //increaseTroops(startId);
@@ -760,7 +765,7 @@ const TitleScreen: React.FC = () => {
             button.style.padding = "5px"; // Example padding
 
         }
-    }
+    };
 
 
     const dehighlightadjbutton = (startId: string) => {
@@ -777,7 +782,7 @@ const TitleScreen: React.FC = () => {
         button.style.border = "2px solid black";
         button.style.padding = "0px"; // Example padding
 
-    }
+    };
 
     const drawLine = (startId: string, endId: string) => {
         let {x: startx, y: starty} = getButtonCoordinatesById(startId);
@@ -885,7 +890,7 @@ const TitleScreen: React.FC = () => {
         marginRight: '5px', // Adjust the space between image
         marginLeft: '5px', // Adjust the space between images
         textAlign: 'center',
-
+        //cursor: 'pointer'
     };
 
     const avatarStylePlayingSide: React.CSSProperties = {
@@ -1105,7 +1110,7 @@ const TitleScreen: React.FC = () => {
     );
 
     function getAvatarSrc(x: number) {
-        if (game !== null && game.players !== null && game.players.length > x && AllIDwithAvatar !== {}) {
+        if (game !== null && game.players !== null && game.players.length > x && AllIDwithAvatar.length !== 0) {
             return AllIDwithAvatar[game.players[x].playerId];
         } else {
             return null;
@@ -1121,7 +1126,7 @@ const TitleScreen: React.FC = () => {
     }
 
     function getAvatarColor(x) {
-        if (game !== null && game.players !== null && PlayerCycle !== null && game.players.length > x && PlayerColor !== {}) {
+        if (game !== null && game.players !== null && PlayerCycle !== null && game.players.length > x && PlayerColor.length !== 0) {
             if (game.players[x].playerId === currentPlayerId) {
                 return `6px double ${PlayerColor[game.players[x].playerId]}`;
             } else {
@@ -1136,6 +1141,7 @@ const TitleScreen: React.FC = () => {
         const avatarElement = document.getElementById(avatar);
         if (avatarElement) {
             avatarElement.style.transform = 'scale(1.2)'; // Increase the size by 20%
+            avatarElement.style.cursor = 'pointer';
         }
     };
 
@@ -1143,6 +1149,7 @@ const TitleScreen: React.FC = () => {
         const avatarElement = document.getElementById(avatar);
         if (avatarElement) {
             avatarElement.style.transform = 'scale(1)'; // Reset the size to normal
+            avatarElement.style.cursor = 'default';
         }
     };
 
@@ -1161,7 +1168,7 @@ const TitleScreen: React.FC = () => {
                             cursor: 'pointer'
                         }}
                         onClick={() => {
-                            if (troopBonus !== 0 && phase === "REINFORCEMENT") {
+                            if (currentTroopBonus !== 0 && phase === "REINFORCEMENT") {
                                 // Handle button click logic here
                             } else {
                                 const cur = nextState();
@@ -1172,7 +1179,7 @@ const TitleScreen: React.FC = () => {
                         {CurrentText}
                     </button>
 
-                    {troopBonus !== 0 && phase === "REINFORCEMENT" && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
+                    {currentTroopBonus !== 0 && phase === "REINFORCEMENT" && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
                         <div
                             id="nextState"
                             className="dynbut gamescreen-buttons-container"
@@ -1182,12 +1189,12 @@ const TitleScreen: React.FC = () => {
                                 transform: 'translateY(-50%)',
                                 backgroundColor: 'red',
                             }}
-                            onClick={() => {
+                            /*onClick={() => {
                                 setTroopBonus(prevState => prevState + 10);
-                            }}
+                            }}*/
                             disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                         >
-                            Troop Amount: {troopBonus}
+                            Troop Amount: {currentTroopBonus}
                         </div>
                     )}
                 </div>
@@ -1201,6 +1208,7 @@ const TitleScreen: React.FC = () => {
                     top: '50%',
                     backgroundColor: 'red',
                     transform: 'translateY(-50%)',
+                    cursor: 'pointer'
                 }}
                 onClick={() => {
                     //setIsLeaveModalOpen(true);
@@ -1224,6 +1232,8 @@ const TitleScreen: React.FC = () => {
                                           style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][1]}</span>
                                     <span className="avatarfont"
                                           style={{display: 'block'}}>{CyclewithTroopsandTerritories[0][2]}</span>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{"+" + game.players[0].troopBonus}</span>
                                 </div>
                             ) : (<div></div>)}
                             <div className="avatar" id={'avatar0'}
@@ -1265,6 +1275,8 @@ const TitleScreen: React.FC = () => {
                                           style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][1]}</span>
                                     <span className="avatarfont"
                                           style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][2]}</span>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{"+" + game.players[1].troopBonus}</span>
                                 </div>
                             ) : (<div></div>)}
                             <div className="avatar" id={'avatar1'}
@@ -1306,6 +1318,8 @@ const TitleScreen: React.FC = () => {
                                           style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][1]}</span>
                                     <span className="avatarfont"
                                           style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][2]}</span>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{"+" + game.players[2].troopBonus}</span>
                                 </div>
                             ) : (<div></div>)}
                             <div className="avatar" id={'avatar2'}
@@ -1347,6 +1361,8 @@ const TitleScreen: React.FC = () => {
                                           style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][1]}</span>
                                     <span className="avatarfont"
                                           style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][2]}</span>
+                                    <span className="avatarfont"
+                                          style={{display: 'block'}}>{"+" + game.players[3].troopBonus}</span>
                                 </div>
                             ) : (<div></div>)}
                             <div className="avatar" id={'avatar3'}
