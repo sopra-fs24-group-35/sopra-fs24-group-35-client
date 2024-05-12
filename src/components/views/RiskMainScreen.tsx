@@ -1257,7 +1257,7 @@ const TitleScreen: React.FC = () => {
                                     }} // Moved the onClick event handler inside the img tag
                                 />
                                 {game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id")) && (
-                                    <button onClick={() => console.log("I Clicked this avatar555")}>Click me</button>
+                                    <button onClick={() => openCardModal}>Click me</button>
                                 )}
                             </div>
                         </div>
@@ -1300,7 +1300,7 @@ const TitleScreen: React.FC = () => {
                                     }} // Moved the onClick event handler inside the img tag
                                 />
                                 {game !== null && game.players[1].playerId === parseInt(localStorage.getItem("user_id")) && (
-                                    <button onClick={() => console.log("I Clicked this avatar1")}>Click me</button>
+                                    <button onClick={() => openCardModal}>Click me</button>
                                 )}
                             </div>
                         </div>
@@ -1343,7 +1343,7 @@ const TitleScreen: React.FC = () => {
                                     }} // Moved the onClick event handler inside the img tag
                                 />
                                 {game !== null && game.players[2].playerId === parseInt(localStorage.getItem("user_id")) && (
-                                    <button onClick={() => console.log("I Clicked this avatar2")}>Click me</button>
+                                    <button onClick={() => openCardModal}>Click me</button>
                                 )}
                             </div>
                         </div>
@@ -1386,7 +1386,7 @@ const TitleScreen: React.FC = () => {
                                     }} // Moved the onClick event handler inside the img tag
                                 />
                                 {game !== null && game.players[3].playerId === parseInt(localStorage.getItem("user_id")) && (
-                                    <button onClick={() => console.log("I Clicked this avatar555")}>Click me</button>
+                                    <button onClick={() => openCardModal}>Click me</button>
                                 )}
                             </div>
                         </div>
