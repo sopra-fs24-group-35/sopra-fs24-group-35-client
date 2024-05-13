@@ -4,8 +4,7 @@ import { Spinner } from "components/ui/Spinner";
 import PropTypes from "prop-types";
 import { api, handleError } from "helpers/api";
 import RiskCard from "../ui/RiskCard";
-import { Player, Card } from "types";
-import ApiStyles from "helpers/avatarApiStyles";
+import { Card } from "types";
 import {Button} from "../ui/Button";
 import Game from "models/Game";
 

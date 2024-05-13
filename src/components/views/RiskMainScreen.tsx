@@ -102,6 +102,7 @@ const TitleScreen: React.FC = () => {
     const [traded, setTraded] = useState(false);
 
     const openCardModal = () => {
+        console.log("hello?");
         setIsCardModalOpen(true);
     };
 
@@ -1236,7 +1237,7 @@ const TitleScreen: React.FC = () => {
                             <div style={{position: 'absolute', right: '100%', top: `${checkforheightoftexts()}%`}}>
                                 <span className="avatarfont" style={{display: 'block'}}>{troopBonuses[1]}</span>
                                 <span className="avatarfont" style={{display: 'block'}}>{troopBonuses[2]}</span>
-                                <span className="avatarfont" style={{display: 'block'}}>{"+" + player.troopBonus}</span>
+                                <span className="avatarfont" style={{display: 'block'}}>{player.troopBonus > 0 && ("+" + player.troopBonus)}</span>
                             </div>
                         )}
                         <div style={{position: 'relative'}}>
@@ -1257,12 +1258,10 @@ const TitleScreen: React.FC = () => {
                                         }
                                     }}
                                     onClick={() => {
+                                        ((game && player.playerId === parseInt(localStorage.getItem("user_id"))) && openCardModal());
                                         console.log(`I Clicked this avatar${index}`);
                                     }}
                                 />
-                                {game !== null && player.playerId === parseInt(localStorage.getItem("user_id")) && (
-                                    <button onClick={openCardModal}>Click me</button>
-                                )}
                             </div>
                             {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && (
                                 <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
