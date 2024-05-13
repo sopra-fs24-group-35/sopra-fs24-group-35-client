@@ -141,12 +141,10 @@
 }
 
 .avatar-container {
-  //display: flex; /* Use flexbox */
   display: inline-block;
-  flex-direction: column; /* Arrange items vertically */
-  align-items: center; /* Align items horizontally in the center */
-  justify-content: center; /* Align items vertically in the center */
-  //position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   border-radius: $borderRadius;
   background-color: rgba(112, 97, 70, 0.32);
   position: absolute;
@@ -154,17 +152,40 @@
   left: 0;
   width: 100%;
   transform: translateY(-50%);
-  text-align: center; /* Center the buttons horizontally */
-  padding: 20px 0; /* Increase top and bottom padding */
+  text-align: center;
+  padding: 10px 0;
   z-index: 0;
-
-
+  max-height: 100%; /* Set the maximum height to 80% */
 }
 
-.avatar-overlay{
+.avatar-overlay3{
   position: absolute;
   top: 5%;
   left: 3%;
+  /* Adjust the z-index to ensure the overlay is displayed above the base image */
+  z-index: 1;
+  /* Add any additional styling as needed */
+}
+.avatar-overlay4{
+  position: absolute;
+  top: 5%;
+  left: 3%;
+  /* Adjust the z-index to ensure the overlay is displayed above the base image */
+  z-index: 1;
+  /* Add any additional styling as needed */
+}
+.avatar-overlay5{
+  position: absolute;
+  top: -15%;
+  left: -15%;
+  /* Adjust the z-index to ensure the overlay is displayed above the base image */
+  z-index: 1;
+  /* Add any additional styling as needed */
+}
+.avatar-overlay6{
+  position: absolute;
+  top: -24%;
+  left: -20%;
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
   z-index: 1;
   /* Add any additional styling as needed */
@@ -177,6 +198,10 @@ avatar-arrow{
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
   z-index: 1;
   /* Add any additional styling as needed */
+}
+
+.avatar{
+  //max-height: 100%;
 }
 
 ///* Styles for the avatars */

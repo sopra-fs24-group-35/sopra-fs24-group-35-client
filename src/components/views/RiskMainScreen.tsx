@@ -520,7 +520,14 @@ const TitleScreen: React.FC = () => {
                         // const defeatImage = new Image();
                         // defeatImage.src = 'defeatIcon1.png';
                         // defeatImage.alt = 'overlay1';
-                        defeat.classList.add('avatar-overlay');
+                        if(game.players.length < 4){
+                        defeat.classList.add('avatar-overlay3');}
+                        if(game.players.length === 4){
+                            defeat.classList.add('avatar-overlay4');}
+                        if(game.players.length === 5){
+                            defeat.classList.add('avatar-overlay5');}
+                        if(game.players.length === 6){
+                            defeat.classList.add('avatar-overlay6');}
 
                         // Append the image element to the avatar button
                         avatar0Button.appendChild(defeat);
@@ -1072,14 +1079,41 @@ const TitleScreen: React.FC = () => {
                     allbuttons = document.querySelectorAll('.avatar');
                     buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
                     for (const but of buttonsArray) {
-                        (but as HTMLButtonElement).style.height = `${buttonHeight * 4}px`;
-                        (but as HTMLButtonElement).style.width = `${buttonWidth * 4}px`;
+                        if(game !== null && game.players.length < 4){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 4}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 4}px`;
+                        }
+                        if(game !== null && game.players.length === 4){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 3}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 3}px`;
+                        }
+                        if(game !== null && game.players.length === 5){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 2.8}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 2.8}px`;
+
+                        }
+                        if(game !== null && game.players.length === 6){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                        }
                     }
 
                     allbuttons = document.querySelectorAll('.avatarfont');
                     buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
                     for (const but of buttonsArray) {
-                        (but as HTMLButtonElement).style.fontSize = `${buttonHeight*0.82}px`;
+                        if(game !== null && game.players.length < 4) {
+                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.82}px`;
+                        }
+                        if(game !== null && game.players.length === 4) {
+                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.82}px`;
+                        }
+                        if(game !== null && game.players.length === 5) {
+                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.55}px`;
+                        }
+                        if(game !== null && game.players.length === 6) {
+                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.48}px`;
+                        }
+
 
                     }
 
@@ -1169,6 +1203,82 @@ const TitleScreen: React.FC = () => {
             avatarElement.style.cursor = 'default';
         }
     };
+//HUHHUHU
+    const checkforheightoftexts = () => {
+        if(game !== null && game.players.length < 4){
+            return 20;
+        }
+        else if(game !== null && game.players.length === 4){
+            return 20;
+        }
+        else if(game !== null && game.players.length === 5){
+            return 11;
+        }
+        else if(game !== null && game.players.length === 6){
+            return 10;
+        } else {
+            return 10;
+        }
+    };
+
+
+    const generateAvatarElement = (index) => {
+        const maxHeight = `${100 / 6}%`; // 6 is the number of avatars
+        const player = game.players[index];
+        const avatarSrc = getAvatarSrc(index);
+        const troopBonuses = CyclewithTroopsandTerritories !== null ? CyclewithTroopsandTerritories[index] : undefined;
+
+        return (
+            <div key={`avatar-${index}`} style={{maxHeight: maxHeight}}>
+                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                    <div style={{position: 'relative'}}>
+                        {troopBonuses !== undefined && (
+                            <div style={{position: 'absolute', right: '100%', top: `${checkforheightoftexts()}%`}}>
+                                <span className="avatarfont" style={{display: 'block'}}>{troopBonuses[1]}</span>
+                                <span className="avatarfont" style={{display: 'block'}}>{troopBonuses[2]}</span>
+                                <span className="avatarfont" style={{display: 'block'}}>{"+" + player.troopBonus}</span>
+                            </div>
+                        )}
+                        <div style={{position: 'relative'}}>
+                            <div className="avatar" id={`avatar${index}`}
+                                 style={{...avatarStyleSide, border: `${getAvatarColor(index)}`}}>
+                                <img
+                                    src={avatarSrc}
+                                    alt="avatar"
+                                    style={imageStyle}
+                                    onMouseEnter={() => {
+                                        if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHover(`avatar${index}`);
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id"))) {
+                                            handleHoverOut(`avatar${index}`);
+                                        }
+                                    }}
+                                    onClick={() => {
+                                        console.log(`I Clicked this avatar${index}`);
+                                    }}
+                                />
+                                {game !== null && player.playerId === parseInt(localStorage.getItem("user_id")) && (
+                                    <button onClick={openCardModal}>Click me</button>
+                                )}
+                            </div>
+                            {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && (
+                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
+                                    position: 'absolute',
+                                    right: '-90px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%) rotate(180deg)'
+                                }}/>
+                            )}
+                        </div>
+                    </div>
+                    <div className="avatarfont" style={{textAlign: 'center'}}>{player.username}</div>
+                </div>
+            </div>
+        );
+    };
 
     let lowerContent = (<div className="gamescreen-innerlower-container">
         <div className="gamescreen-bottomleft-container">
@@ -1237,195 +1347,13 @@ const TitleScreen: React.FC = () => {
         </div>
     </div>);
 
-    let sideContent = (
+    const sideContent = (
         <div className="avatar-container">
-            <div>
-                {getAvatarSrc(0) !== null ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{ position: 'relative' }}>
-                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[0] !== undefined ? (
-                                <div style={{ position: 'absolute', top: '20%', right: '100%' }}>
-                                    <span className="avatarfont" style={{ display: 'block' }}>{CyclewithTroopsandTerritories[0][1]}</span>
-                                    <span className="avatarfont" style={{ display: 'block' }}>{CyclewithTroopsandTerritories[0][2]}</span>
-                                    <span className="avatarfont" style={{ display: 'block' }}>{"+" + game.players[0].troopBonus}</span>
-                                </div>
-                            ) : (<div></div>)}
-                            <div style={{ position: 'relative' }}> {/* Wrap both avatar and arrow in a container */}
-                                <div className="avatar" id={'avatar0'}
-                                     style={{ ...avatarStyleSide, border: `${getAvatarColor(0)}` }}>
-                                    <img
-                                        src={getAvatarSrc(0)}
-                                        alt="avatar"
-                                        style={imageStyle}
-                                        onMouseEnter={() => {
-                                            if (game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                                handleHover("avatar0");
-                                            }
-                                        }}
-                                        onMouseLeave={() => {
-                                            if (game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                                handleHoverOut("avatar0");
-                                            }
-                                        }}
-                                        onClick={() => {
-                                            console.log("I Clicked this avatar0");
-                                        }} // Moved the onClick event handler inside the img tag
-                                    />
-                                    {game !== null && game.players[0].playerId === parseInt(localStorage.getItem("user_id")) && (
-                                        <button onClick={() => openCardModal}>Click me</button>
-                                    )}
-                                </div>
-                                {game !== null && game.turnCycle.currentPlayer.playerId === game.players[0].playerId && (
-                                    <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{ position: 'absolute', right: '-90px', top: '50%', transform: 'translateY(-50%) rotate(180deg)'}} />
-                                )}
-                            </div>
-                        </div>
-                        <div className="avatarfont" style={{ textAlign: 'center' }}>{game.players[0].username}</div>
-                    </div>
-                ) : (
-                    <div></div>
-                )}
-
-                {getAvatarSrc(1) !== null ? (
-                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                        <div style={{position: 'relative'}}>
-                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[1] !== undefined ? (
-                                <div style={{position: 'absolute', top: '20%', right: '100%'}}>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][1]}</span>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[1][2]}</span>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{"+" + game.players[1].troopBonus}</span>
-                                </div>
-                            ) : (<div></div>)}
-                            <div className="avatar" id={'avatar1'}
-                                 style={{...avatarStyleSide, border: `${getAvatarColor(1)}`}}>
-                                <img
-                                    src={getAvatarSrc(1)}
-                                    alt="avatar"
-                                    style={imageStyle}
-                                    onMouseEnter={() => {
-                                        if (game !== null && game.players[1].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHover("avatar1");
-                                        }
-                                    }}
-                                    onMouseLeave={() => {
-                                        if (game !== null && game.players[1].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHoverOut("avatar1");
-                                        }
-                                    }}
-                                    onClick={() => {
-                                        console.log("I Clicked this avatar3");
-                                    }} // Moved the onClick event handler inside the img tag
-                                />
-                                {game !== null && game.players[1].playerId === parseInt(localStorage.getItem("user_id")) && (
-                                    <button onClick={() => openCardModal}>Click me</button>
-                                )}
-                            </div>
-                            {game !== null && game.turnCycle.currentPlayer.playerId === game.players[1].playerId && (
-                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{ position: 'absolute', right: '-90px', top: '50%', transform: 'translateY(-50%) rotate(180deg)'}} />
-                            )}
-                        </div>
-                        <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[1].username}</div>
-                    </div>
-                ) : (
-                    <div></div>
-                )}
-                {getAvatarSrc(2) !== null ? (
-                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                        <div style={{position: 'relative'}}>
-                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[2] !== undefined ? (
-                                <div style={{position: 'absolute', top: '20%', right: '100%'}}>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][1]}</span>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[2][2]}</span>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{"+" + game.players[2].troopBonus}</span>
-                                </div>
-                            ) : (<div></div>)}
-                            <div className="avatar" id={'avatar2'}
-                                 style={{...avatarStyleSide, border: `${getAvatarColor(2)}`}}>
-                                <img
-                                    src={getAvatarSrc(2)}
-                                    alt="avatar"
-                                    style={imageStyle}
-                                    onMouseEnter={() => {
-                                        if (game !== null && game.players[2].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHover("avatar2");
-                                        }
-                                    }}
-                                    onMouseLeave={() => {
-                                        if (game !== null && game.players[2].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHoverOut("avatar2");
-                                        }
-                                    }}
-                                    onClick={() => {
-                                        console.log("I Clicked this avatar2");
-                                    }} // Moved the onClick event handler inside the img tag
-                                />
-                                {game !== null && game.players[2].playerId === parseInt(localStorage.getItem("user_id")) && (
-                                    <button onClick={() => openCardModal}>Click me</button>
-                                )}
-                            </div>
-                            {game !== null && game.turnCycle.currentPlayer.playerId === game.players[2].playerId && (
-                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{ position: 'absolute', right: '-90px', top: '50%', transform: 'translateY(-50%) rotate(180deg)'}} />
-                            )}
-                        </div>
-                        <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[2].username}</div>
-                    </div>
-                ) : (
-                    <div></div>
-                )}
-                {getAvatarSrc(3) !== null ? (
-                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                        <div style={{position: 'relative'}}>
-                            {CyclewithTroopsandTerritories !== null && CyclewithTroopsandTerritories[3] !== undefined ? (
-                                <div style={{position: 'absolute', top: '20%', right: '100%'}}>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][1]}</span>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{CyclewithTroopsandTerritories[3][2]}</span>
-                                    <span className="avatarfont"
-                                          style={{display: 'block'}}>{"+" + game.players[3].troopBonus}</span>
-                                </div>
-                            ) : (<div></div>)}
-                            <div className="avatar" id={'avatar3'}
-                                 style={{...avatarStyleSide, border: `${getAvatarColor(3)}`}}>
-                                <img
-                                    src={getAvatarSrc(3)}
-                                    alt="avatar"
-                                    style={imageStyle}
-                                    onMouseEnter={() => {
-                                        if (game !== null && game.players[3].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHover("avatar3");
-                                        }
-                                    }}
-                                    onMouseLeave={() => {
-                                        if (game !== null && game.players[3].playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHoverOut("avatar3");
-                                        }
-                                    }}
-                                    onClick={() => {
-                                        console.log("I Clicked this avatar3");
-                                    }} // Moved the onClick event handler inside the img tag
-                                />
-                                {game !== null && game.players[3].playerId === parseInt(localStorage.getItem("user_id")) && (
-                                    <button onClick={() => openCardModal}>Click me</button>
-                                )}
-                            </div>
-                            {game !== null && game.turnCycle.currentPlayer.playerId === game.players[3].playerId && (
-                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{ position: 'absolute', right: '-90px', top: '50%', transform: 'translateY(-50%) rotate(180deg)'}} />
-                            )}
-                        </div>
-                        <div className="avatarfont" style={{textAlign: 'center'}}>{game.players[3].username}</div>
-                    </div>
-                ) : (
-                    <div></div>
-                )}
-            </div>
-
+            {[0, 1, 2, 3, 4, 5].map(index => (
+                <div key={`avatar-${index}`}>
+                    {getAvatarSrc(index) !== null ? generateAvatarElement(index) : null}
+                </div>
+            ))}
         </div>
     );
 
