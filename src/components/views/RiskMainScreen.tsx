@@ -1054,6 +1054,79 @@ const TitleScreen: React.FC = () => {
         }
     }
 
+    function LeavePlayerConfirmation() {
+        // Create a leave confirmation modal
+        const leaveModal = document.createElement('div');
+        leaveModal.id = 'leave-modal';
+        leaveModal.innerHTML = `
+        <div>Do you really want to leave this game?</div>
+        <div class="button-container">
+            <button id="leave-yes">Yes</button>
+            <button id="leave-no">No</button>
+        </div>
+    `;
+
+        // Add styles to the modal
+        leaveModal.style.position = 'fixed';
+        leaveModal.style.top = '0';
+        leaveModal.style.left = '0';
+        //leaveModal.style.transform = 'translate(-50%, -50%)';
+        leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
+        leaveModal.style.padding = '20px';
+        leaveModal.style.zIndex = '9999';
+        leaveModal.style.textAlign = 'center';
+        leaveModal.style.width = '100%';
+        leaveModal.style.height = '100%';
+        leaveModal.style.color = '#fff';
+        leaveModal.style.display = 'flex';
+        leaveModal.style.justifyContent = 'center';
+        leaveModal.style.alignItems = 'center';
+
+
+        // Style the buttons
+        const leaveYesBtn = leaveModal.querySelector('#leave-yes') as HTMLButtonElement;
+        const leaveNoBtn = leaveModal.querySelector('#leave-no') as HTMLButtonElement;
+        leaveYesBtn.style.marginRight = '40px'; // Add some space between buttons
+        leaveYesBtn.style.padding = '10px 30px'; // Adjust padding for better appearance
+        leaveYesBtn.style.backgroundColor = '#d32f2f'; // Red color for "Yes" button
+        leaveYesBtn.style.color = '#fff'; // White text color
+        leaveYesBtn.style.border = 'none'; // Remove border
+        leaveYesBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveYesBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+
+        leaveNoBtn.style.padding = '10px 30px'; // Adjust padding for better appearance
+        leaveNoBtn.style.backgroundColor = '#2196f3'; // Blue color for "No" button
+        leaveNoBtn.style.color = '#fff'; // White text color
+        leaveNoBtn.style.border = 'none'; // Remove border
+        leaveNoBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveNoBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+
+        // Add event listeners to the buttons
+        leaveYesBtn.addEventListener('click', () => {
+            // Perform leave action here
+            // For now, just console log
+            LeavePlayer();
+            leaveModal.remove(); // Remove the modal after leaving
+        });
+
+        leaveNoBtn.addEventListener('click', () => {
+            leaveModal.remove(); // Remove the modal if user chooses not to leave
+        });
+
+        // Append the modal to the body
+        document.body.appendChild(leaveModal);
+
+        // Style the button container if it exists
+        const buttonContainer = leaveModal.querySelector('.button-container') as HTMLButtonElement;
+        if (buttonContainer) {
+            buttonContainer.style.marginTop = '100px'; // Add some space between text and buttons
+            buttonContainer.style.marginLeft = '-250px';
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.alignItems = 'center'; // Center buttons horizontally
+        }
+    }
+
+
     useEffect(() => {
         // Function to preload the image
         const preloadImage = (url) => {
@@ -1545,7 +1618,7 @@ const TitleScreen: React.FC = () => {
                 }}
                 onClick={() => {
                     //setIsLeaveModalOpen(true);
-                    LeavePlayer();
+                    LeavePlayerConfirmation();
                 }}
             >
                 Leave Game
