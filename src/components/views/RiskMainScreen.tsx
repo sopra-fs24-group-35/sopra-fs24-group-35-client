@@ -4,6 +4,34 @@ import "styles/views/GameScreen.scss";
 import defeatIcon from "./defeatIcon1.png";
 // @ts-ignore
 import currentPlayerArrow from "./currentPlayerIconV2.png";
+// @ts-ignore
+import bonusIcon from "../../styles/views/Pictures/bonusIcon.png";
+// @ts-ignore
+import territoryIcon from "styles/views/Pictures/territoryIcon.png";
+// @ts-ignore
+import troopsIcon from "styles/views/Pictures/troopsIcon.png";
+
+// @ts-ignore
+import cardIcon0 from "styles/views/Pictures/rc0.png";
+// @ts-ignore
+import cardIcon1 from "styles/views/Pictures/rc1.png";
+// @ts-ignore
+import cardIcon2 from "styles/views/Pictures/rc2.png";
+// @ts-ignore
+import cardIcon3 from "styles/views/Pictures/rc3.png";
+// @ts-ignore
+import cardIcon4 from "styles/views/Pictures/rc4.png";
+// @ts-ignore
+import cardIcon5 from "styles/views/Pictures/rc5.png";
+// @ts-ignore
+import cardIcon6 from "styles/views/Pictures/rc6.png";
+// @ts-ignore
+import cardIcon7 from "styles/views/Pictures/rc7.png";
+// @ts-ignore
+import cardIcon8 from "styles/views/Pictures/rc8.png";
+// @ts-ignore
+import cardIcon9 from "styles/views/Pictures/rc9.png";
+
 
 import { api, handleError } from "helpers/api";
 import { useNavigate, useParams } from "react-router-dom";
@@ -16,10 +44,7 @@ import RiskCardModal from "../ui/RiskCardModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
 
-
-
 const TitleScreen: React.FC = () => {
-
     const [game, setGame] = useState<Game>(null);
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
@@ -64,6 +89,40 @@ const TitleScreen: React.FC = () => {
     defeat.src = defeatIcon;
     const arrow = new Image();
     arrow.src = currentPlayerArrow;
+    const BonusIcon = new Image();
+    BonusIcon.src = bonusIcon;
+    const TroopIcon = new Image();
+    TroopIcon.src = troopsIcon;
+    const TerritoryIcon = new Image();
+    TerritoryIcon.src = territoryIcon;
+
+    const CardIcon0 = new Image();
+    CardIcon0.src = cardIcon0;
+    const CardIcon1 = new Image();
+    CardIcon1.src = cardIcon1;
+    const CardIcon2 = new Image();
+    CardIcon2.src = cardIcon2;
+    const CardIcon3 = new Image();
+    CardIcon3.src = cardIcon3;
+    const CardIcon4 = new Image();
+    CardIcon4.src = cardIcon4;
+    const CardIcon5 = new Image();
+    CardIcon5.src = cardIcon5;
+    const CardIcon6 = new Image();
+    CardIcon6.src = cardIcon6;
+    const CardIcon7 = new Image();
+    CardIcon7.src = cardIcon7;
+    const CardIcon8 = new Image();
+    CardIcon8.src = cardIcon8;
+    const CardIcon9 = new Image();
+    CardIcon9.src = cardIcon9;
+
+
+
+
+
+
+
 
     /*---------------Attack Modal Setup----------------*/
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -327,6 +386,12 @@ const TitleScreen: React.FC = () => {
     const config = {Authorization: localStorage.getItem("lobbyToken")};
 
     useEffect(() => {
+        if (game === null){
+            showLoadingScreen();
+        } else {
+            hideLoadingScreen();
+        }
+        // hello
         // Define the function to fetch game data
         async function getGame() {
             try {
@@ -387,72 +452,63 @@ const TitleScreen: React.FC = () => {
     }, [currentPlayerId]);
 
     useEffect(() => {
-
-        if(game === null){
-            /*console.log("huhuhuhuhhuuhuu");
-            console.log("CHECKER: " + game);*/
-            showLoadingScreen();
-
-        } else {
-            hideLoadingScreen();
-            // hello
-            if (game !== null) {
-                console.log("game: ", game);
-                console.log("current phase: ", phase);
-                console.log("current player id: ", currentPlayerId);
-                console.log("playerCycle:", PlayerCycle);
-                if (currentPlayerId !== null) {
-                    setCurrentPlayerId(currentPlayerId);
-                }
-
-                if (CyclewithTroopsandTerritories !== null) {
-                    // console.log("0 : " + CyclewithTroopsandTerritories[0]);
-                    // console.log("0 : " + CyclewithTroopsandTerritories[1]);
-                    // console.log("0 : " + CyclewithTroopsandTerritories[2]);
-                    // console.log("0 : " + CyclewithTroopsandTerritories[3]);
-                }
-
-                let PlayerwithColors = {};
-                let x = 0;
-                if (game !== null) {
-                    for (const player of game.players) {
-                        PlayerwithColors[player.playerId] = colors[x];
-                        x++;
-                    }
-                }
-                setPlayerColor(PlayerwithColors);
-
-                for (let i = 0; i < buttonData.length; i++) {
-                    const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
-                    const button = buttonData[i];
-                    if (territory) {
-                        button.troops = territory.troops;
-                        button.playerid = territory.playerId;
-
-                    } else {
-
-                    }
-                    setButtonData([...buttonData]);
-                }
-                if (phase === "REINFORCEMENT") {
-                    setCurrentText(NameCycle[0]);
-                } else if (phase === "ATTACK") {
-                    setCurrentText(NameCycle[1]);
-                } else if (phase === "MOVE") {
-                    setCurrentText(NameCycle[2]);
-                }
-
-                if (phase === "MOVE" && moved) {
-                    nextState();
-                }
-
-                setStartTimer(prevState => prevState + 1);
-                console.log("Current Timer: " + StartTimer);
-                checkifyouHaveLostOrWon();
-                setdeathsymbol()
+        if (game !== null) {
+            console.log("game: ", game);
+            console.log("current phase: ", phase);
+            console.log("current player id: ", currentPlayerId);
+            console.log("playerCycle:", PlayerCycle);
+            if (currentPlayerId !== null) {
+                setCurrentPlayerId(currentPlayerId);
             }
 
+            if (CyclewithTroopsandTerritories !== null) {
+                // console.log("0 : " + CyclewithTroopsandTerritories[0]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[1]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[2]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[3]);
+            }
+
+            let PlayerwithColors = {};
+            let x = 0;
+            if (game !== null) {
+                for (const player of game.players) {
+                    PlayerwithColors[player.playerId] = colors[x];
+                    x++;
+                }
+            }
+            setPlayerColor(PlayerwithColors);
+
+            for (let i = 0; i < buttonData.length; i++) {
+                const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
+                const button = buttonData[i];
+                if (territory) {
+                    button.troops = territory.troops;
+                    button.playerid = territory.playerId;
+
+                } else {
+
+                }
+                setButtonData([...buttonData]);
+            }
+            if (phase === "REINFORCEMENT") {
+                setCurrentText(NameCycle[0]);
+            } else if (phase === "ATTACK") {
+                setCurrentText(NameCycle[1]);
+            } else if (phase === "MOVE") {
+                setCurrentText(NameCycle[2]);
+            }
+
+            if (phase === "MOVE" && moved) {
+                nextState();
+            }
+
+            setStartTimer(prevState => prevState + 1);
+            console.log("Current Timer: " + StartTimer);
+            checkifyouHaveLostOrWon();
+            setdeathsymbol()
         }
+
+
     }, [game, phase, currentPlayerId]);
 
     function pause(milliseconds) {
@@ -515,14 +571,9 @@ const TitleScreen: React.FC = () => {
                         list[count] = x.playerId;
                         setLoseList(list);
                         const avatar0Button = document.getElementById(`avatar${count}`);
-                        //avatar0Button.style.backgroundColor = "black";
-                        //avatar0Button.style.borderRadius = "10px";
 
-                        // const defeatImage = new Image();
-                        // defeatImage.src = 'defeatIcon1.png';
-                        // defeatImage.alt = 'overlay1';
                         if(game.players.length < 4){
-                        defeat.classList.add('avatar-overlay3');}
+                            defeat.classList.add('avatar-overlay3');}
                         if(game.players.length === 4){
                             defeat.classList.add('avatar-overlay4');}
                         if(game.players.length === 5){
@@ -552,12 +603,13 @@ const TitleScreen: React.FC = () => {
         loadingScreen.style.left = '0';
         loadingScreen.style.width = '100%';
         loadingScreen.style.height = '100%';
-        loadingScreen.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        loadingScreen.style.backgroundColor = 'black'; // Set background color to black
         loadingScreen.style.color = '#fff';
         loadingScreen.style.display = 'flex';
         loadingScreen.style.justifyContent = 'center';
         loadingScreen.style.alignItems = 'center';
         loadingScreen.style.zIndex = '9999';
+
 
         // Append the loading screen to the body
         document.body.appendChild(loadingScreen);
@@ -942,6 +994,11 @@ const TitleScreen: React.FC = () => {
     }
 
     const fetchData = async () => {
+        if(game === null){
+            showLoadingScreen();
+        }else{
+            hideLoadingScreen();
+        }
         try {
             const config = {Authorization: localStorage.getItem("lobbyToken")};
             // get lobby info
@@ -1142,24 +1199,28 @@ const TitleScreen: React.FC = () => {
 
     }, [PlayerColor, game]);
 
+    let renderButtons = null; // Initialize renderButtons as null initially
 
-    let renderButtons = (
-        buttonData.map((button) => (
-            <button
-                key={button.id}
-                id={button.id}
-                ref={(buttonRef) => {
-                    if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
-                }}
-                className="button"
-                style={{}}
-                onClick={() => handleButtonClick(button.id)}
-                disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
-            >
-                {button.troops}
-            </button>
-        ))
-    );
+    if (game !== null) { // Only render buttons if game data is available
+        renderButtons = (
+            buttonData.map((button) => (
+                <button
+                    key={button.id}
+                    id={button.id}
+                    ref={(buttonRef) => {
+                        if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
+                    }}
+                    className="button"
+                    style={{}}
+                    onClick={() => handleButtonClick(button.id)}
+                    disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
+                >
+                    {button.troops}
+                </button>
+            ))
+        );
+    }
+
 
     function getAvatarSrc(x: number) {
         if (game !== null && game.players !== null && game.players.length > x && AllIDwithAvatar.length !== 0) {
@@ -1207,13 +1268,13 @@ const TitleScreen: React.FC = () => {
 //HUHHUHU
     const checkforheightoftexts = () => {
         if(game !== null && game.players.length < 4){
-            return 20;
+            return 10;
         }
         else if(game !== null && game.players.length === 4){
-            return 20;
+            return -5;
         }
         else if(game !== null && game.players.length === 5){
-            return 11;
+            return 5;
         }
         else if(game !== null && game.players.length === 6){
             return 10;
@@ -1222,12 +1283,78 @@ const TitleScreen: React.FC = () => {
         }
     };
 
+    const UpdateIconSizes = () => {
+        if(game !== null && game.players.length < 4){
+            return { Iconwidth: 30, Iconheight: 30 };
+        }
+        else if(game !== null && game.players.length === 4){
+            return { Iconwidth: 30, Iconheight: 30 };
+        }
+        else if(game !== null && game.players.length === 5){
+            return { Iconwidth: 25, Iconheight: 25 };
+        }
+        else if(game !== null && game.players.length === 6){
+            return { Iconwidth: 20, Iconheight: 20 };
+        }
+    };
+
+    const UpdateCardSizes = () => {
+        if(game !== null && game.players.length < 4){
+            return { Cardwidth: 45, Cardheight: 45};
+        }
+        else if(game !== null && game.players.length === 4){
+            return { Cardwidth: 40, Cardheight: 40};
+        }
+        else if(game !== null && game.players.length === 5){
+            return { Cardwidth: 40, Cardheight: 40};
+        }
+        else if(game !== null && game.players.length === 6){
+            return { Cardwidth: 30, Cardheight: 30};
+        }
+    };
+    const GetCorrectCard = (player) => {
+        if(game !== null && player.riskCards.length === 0){
+            return CardIcon0.src;
+        }
+        else if(game !== null && player.riskCards.length === 1){
+            return CardIcon1.src;
+        }
+        else if(game !== null && player.riskCards.length === 2){
+            return CardIcon2.src;
+        }
+        else if(game !== null && player.riskCards.length === 3){
+            return CardIcon3.src;
+        }
+        if(game !== null && player.riskCards.length === 4){
+            return CardIcon4.src;
+        }
+        else if(game !== null && player.riskCards.length === 5){
+            return CardIcon5.src;
+        }
+        else if(game !== null && player.riskCards.length === 6){
+            return CardIcon6.src;
+        }
+        else if(game !== null && player.riskCards.length === 7){
+            return CardIcon7.src;
+        }
+        else if(game !== null && player.riskCards.length === 8){
+            return CardIcon8.src;
+        }
+        else if(game !== null && player.riskCards.length === 9){
+            return CardIcon9.src;
+        }
+    };
+
+
 
     const generateAvatarElement = (index) => {
         const maxHeight = `${100 / 6}%`; // 6 is the number of avatars
         const player = game.players[index];
         const avatarSrc = getAvatarSrc(index);
         const troopBonuses = CyclewithTroopsandTerritories !== null ? CyclewithTroopsandTerritories[index] : undefined;
+        const { Iconwidth, Iconheight } = UpdateIconSizes();
+        const { Cardwidth, Cardheight} = UpdateCardSizes();
+        const cardIcon = GetCorrectCard(player);
 
         return (
             <div key={`avatar-${index}`} style={{maxHeight: maxHeight}}>
@@ -1235,9 +1362,31 @@ const TitleScreen: React.FC = () => {
                     <div style={{position: 'relative'}}>
                         {troopBonuses !== undefined && (
                             <div style={{position: 'absolute', right: '100%', top: `${checkforheightoftexts()}%`}}>
-                                <span className="avatarfont" style={{display: 'block'}}>{troopBonuses[1]}</span>
-                                <span className="avatarfont" style={{display: 'block'}}>{troopBonuses[2]}</span>
-                                <span className="avatarfont" style={{display: 'block'}}>{player.troopBonus > 0 && ("+" + player.troopBonus)}</span>
+                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                    <img src={TerritoryIcon.src} alt="icon"
+                                         style={{
+                                             marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
+                                             height: `${Iconheight}px`
+                                         }}/>
+                                    <span className="avatarfont">{troopBonuses[1]}</span>
+                                </div>
+                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                    <img src={TroopIcon.src} alt="icon"
+                                         style={{
+                                             marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
+                                             height: `${Iconheight}px`
+                                         }}/>
+                                    <span className="avatarfont">{troopBonuses[2]}</span>
+                                </div>
+                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                    <img src={BonusIcon.src} alt="icon"
+                                         style={{
+                                             marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
+                                             height: `${Iconheight}px`
+                                         }}/>
+                                    <span
+                                        className="avatarfont">{player.troopBonus > 0 && ("+" + player.troopBonus)}</span>
+                                </div>
                             </div>
                         )}
                         <div style={{position: 'relative'}}>
@@ -1263,14 +1412,71 @@ const TitleScreen: React.FC = () => {
                                     }}
                                 />
                             </div>
-                            {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && (
+                            {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length <= 3 && (
                                 <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
                                     position: 'absolute',
-                                    right: '-90px',
+                                    right: '-73px',
                                     top: '50%',
-                                    transform: 'translateY(-50%) rotate(180deg)'
+                                    transform: 'translateY(-50%) rotate(180deg)',
+                                    width: '80px', // Adjust the width as needed
+                                    height: '80px' // Adjust the height as needed
                                 }}/>
                             )}
+                            {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 4 && (
+                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
+                                    position: 'absolute',
+                                    right: '-77px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%) rotate(180deg)',
+                                    width: '80px', // Adjust the width as needed
+                                    height: '80px' // Adjust the height as needed
+                                }}/>
+                            )}
+                            {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 5 && (
+                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
+                                    position: 'absolute',
+                                    right: '-77px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%) rotate(180deg)',
+                                    width: '80px', // Adjust the width as needed
+                                    height: '80px' // Adjust the height as needed
+                                }}/>
+                            )}
+                            {game !== null && (
+                                <>
+                                    {game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 6 && (
+                                        <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
+                                            position: 'absolute',
+                                            right: '-60px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%) rotate(180deg)',
+                                            width: '70px', // Adjust the width as needed
+                                            height: '70px' // Adjust the height as needed
+                                        }}/>
+                                    )}
+                                    {game.players.length < 4 && (
+                                    <img src={cardIcon} alt="overlay" style={{
+                                        position: 'absolute',
+                                        top: '-5px',
+                                        left: '65px',
+                                        width: `${Cardwidth}px`, // Adjust the width as needed
+                                        height: `${Cardheight}px`,
+                                        zIndex: 2
+                                    }}/>
+                                        )}
+                                    {game.players.length >= 4 && (
+                                        <img src={cardIcon} alt="overlay" style={{
+                                            position: 'absolute',
+                                            top: '-10px',
+                                            left: '50px',
+                                            width: `${Cardwidth}px`, // Adjust the width as needed
+                                            height: `${Cardheight}px`,
+                                            zIndex: 2
+                                        }}/>
+                                    )}
+                                </>
+                            )}
+
                         </div>
                     </div>
                     <div className="avatarfont" style={{textAlign: 'center'}}>{player.username}</div>
@@ -1281,7 +1487,7 @@ const TitleScreen: React.FC = () => {
 
     let lowerContent = (<div className="gamescreen-innerlower-container">
         <div className="gamescreen-bottomleft-container">
-            { WinLoseWasShown === false && (
+            {WinLoseWasShown === false && (
                 <div>
                     <button
                         id="nextState"
