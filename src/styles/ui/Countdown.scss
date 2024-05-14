@@ -1,0 +1,30 @@
+.countdown {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 15px;
+    color: white;
+}
+
+.barContainer {
+    background-color: rgb(192, 166, 118);
+    width: 500px;
+    height: 30px;
+    border-radius: 6px;
+}
+
+.bar {
+    background-color: rgb(57, 179, 0);
+    height: 30px;
+    position: relative;
+    z-index: 1; /* Ensure the bar is behind the text */
+    border-radius: 6px;
+}
+  
+.timeLeftText {
+    position: absolute; /* Position the text absolutely */
+    top: -12px; /* Place the text vertically centered */
+    left: 20px; /* Place the text on the left side of the bar */
+    z-index: 2; /* Ensure the text is in front of the bar */
+    white-space: nowrap;
+  }

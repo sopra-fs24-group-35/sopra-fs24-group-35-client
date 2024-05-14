@@ -15,6 +15,7 @@ import LeaveModal from "../ui/LeaveModal";
 import RiskCardModal from "../ui/RiskCardModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
+import Countdown from "../ui/Countdown";
 
 
 
@@ -1303,8 +1304,7 @@ const TitleScreen: React.FC = () => {
                         disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                     >
                         {CurrentText}
-                    </button>
-
+                    </button> 
                     {currentTroopBonus !== 0 && phase === "REINFORCEMENT" && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
                         <div
                             id="nextState"
@@ -1359,6 +1359,7 @@ const TitleScreen: React.FC = () => {
     return (
         <div className="gamescreen-container">
             <div className="gamescreen-innerupper-container">
+                <Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} />  
                 {/*Attack Modal Section*/}
                 <section>
                     <AttackModal
