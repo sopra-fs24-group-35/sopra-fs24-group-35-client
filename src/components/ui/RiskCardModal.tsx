@@ -142,9 +142,9 @@ const RiskCardModal = ({ isModalOpen, onClose, onTrade, lobbyId, gameId}) => {
     }
 
     return (
-        <div className="modal-cards" onClick={(cards && cards.length >= 5 && isCurrentPlayer) ? null : (onClose)}>
+        <div className="modal-cards" onClick={(cards && cards.length >= 5 && !selectedCards && isCurrentPlayer) ? null : (onClose)}>
         <div className="modal-contentCards" onClick={e => e.stopPropagation()}>
-            <button className="close" onClick={(cards && cards.length >= 5 && isCurrentPlayer) ? null : (onClose)}>
+            <button className="close" onClick={(cards && cards.length >= 5 && !selectedCards && isCurrentPlayer) ? null : (onClose)}>
             &times;
             </button>
             <main className="modal-mainContents">

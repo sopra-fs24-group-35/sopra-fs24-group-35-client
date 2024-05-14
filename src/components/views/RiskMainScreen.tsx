@@ -49,6 +49,9 @@ const TitleScreen: React.FC = () => {
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [currentTroopBonus, setCurrentTroopBonus] = useState(null);
+    const [selectedTroops, setSelectedTroops] = useState(1);
+    const [tooManyCards, setTooManyCards] = useState(false);
+
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -176,6 +179,7 @@ const TitleScreen: React.FC = () => {
         
         setTraded(false);
         setIsCardModalOpen(false);
+        tooManyCards(false);
     };
 
     const trading = () => {
@@ -412,6 +416,7 @@ const TitleScreen: React.FC = () => {
 
                 if (gameResponse.data.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === gameResponse.data.turnCycle.currentPlayer.playerId){
                     openCardModal();
+                    setTooManyCards(true);
                 }
             } catch (error) {
                 console.error("Error fetching game data:", error);
@@ -700,7 +705,7 @@ const TitleScreen: React.FC = () => {
 
     const handleButtonClick = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if (phase === "REINFORCEMENT") {
+        if (phase === "REINFORCEMENT" || (phase === "ATTACK" && tooManyCards)) {
             deploytroops(id);
         }
         if (phase === "ATTACK") {
@@ -778,17 +783,29 @@ const TitleScreen: React.FC = () => {
         const territory = game.board.territories.find(territory => territory.name === territory_id);
         const button = buttonData.find(button => button.id === territory_id); // Find the button data for the startId
 
-        if (button && currentTroopBonus !== 0 && territory.owner === currentPlayerId) {
-            territory.troops += 1; // Increment the troops count
+        if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId) {
+            if ((currentTroopBonus - selectedTroops) > 0) {
+                territory.troops = territory.troops + parseInt(selectedTroops);
+            }
+            else {
+                territory.troops = territory.troops + parseInt(currentTroopBonus);
+            }
             button.troops = territory.troops; // set troop count to server troop count
 
             let troops = currentTroopBonus;
-            setCurrentTroopBonus(troops - 1);
+            if ((troops - selectedTroops) > 0) {
+                setCurrentTroopBonus(troops - selectedTroops);
+            }
+            else {
+                setCurrentTroopBonus(0);
+            }
             setButtonData([...buttonData]); // Update the button data array in the state
             setGame(game);
-            if(troops - 1 === 0) {
-                nextState();
-            }
+            
+            // add back if we want the game to automatically change phase after placing troops
+            // if(troops - 1 === 0) {
+            //     nextState();
+            // }
         }
     };
 
@@ -1521,13 +1538,21 @@ const TitleScreen: React.FC = () => {
                                 transform: 'translateY(-50%)',
                                 backgroundColor: 'red',
                             }}
-                            /*onClick={() => {
-                                setTroopBonus(prevState => prevState + 10);
-                            }}*/
+                            onClick={() => {
+                                setCurrentTroopBonus(prevState => prevState + 100);
+                            }}
                             disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                         >
-                            Troop Amount: {currentTroopBonus}
+                            Troop Amount: {currentTroopBonus} 
+                            <label className="select-label">
+                                <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
+                                    <option value={1}>1</option>
+                                    <option value={5}>5</option>
+                                    <option value={10}>10</option>
+                                </select>
+                            </label>
                         </div>
+                            
                     )}
                 </div>
             )}
