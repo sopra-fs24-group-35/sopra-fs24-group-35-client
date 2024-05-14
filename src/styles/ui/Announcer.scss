@@ -1,0 +1,59 @@
+.announcer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 10%);
+    padding: 20px;
+    color: white;
+    text-align: center;
+    font-size: 40px;
+    font-family: Arial, Helvetica, sans-serif;
+    z-index: 1001;
+  
+    // Initial state for animation
+    opacity: 0;
+    transform: translate(-150%, -50%);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  
+    &.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  
+    &.hidden {
+      opacity: 0;
+      transform: translate(-150%, -50%); // Move to the right when hidden
+    }
+  }
+
+  .announcerContainer {
+    position: fixed;
+    top: 50%;
+    left: -5%;
+    width: 110%;
+    height: 100px;
+    padding: 20px;
+    background-color: rgb(49, 30, 221);
+    border: 10px solid rgb(0, 2, 112);
+    border-radius: 5px;
+    z-index: 1001;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+  
+    // Initial state for animation
+    opacity: 0;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  
+    &.visible {
+      opacity: 1;
+    }
+  
+    &.hidden {
+      opacity: 0;
+      
+    }
+    &.turnOverColor {
+        background-color: rgb(11, 128, 0);
+        border: 10px solid rgb(22, 95, 0);
+    }
+  }
+  

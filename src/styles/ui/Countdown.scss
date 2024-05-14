@@ -7,24 +7,52 @@
 }
 
 .barContainer {
-    background-color: rgb(192, 166, 118);
-    width: 500px;
-    height: 30px;
-    border-radius: 6px;
-}
-
-.bar {
-    background-color: rgb(57, 179, 0);
-    height: 30px;
+    background-color: rgb(206, 177, 127);
+    width: 506px;
+    height: 42px;
+    border: 3px solid rgba(104, 87, 55, 1);
+    box-shadow: 0px 0px 18px rgba(87, 66, 39, 0.5);
+    border-radius: 9px;
     position: relative;
     z-index: 1; /* Ensure the bar is behind the text */
+}
+
+.countdownIcon {
+    width: 36px; // Adjust the size as needed
+    height: 36px; // Adjust the size as needed
+    margin-right: 10px; // Space between the image and the bar
+    filter: drop-shadow(0px 0px 3px #000000);
+    transform: scale(1.5);
+    transition: transform 1s ease-in-out;
+    &.large {
+        transform: scale(2);
+    }
+  }
+
+.bar {
+    background-color: rgb(48, 151, 0);
+    height: 36px;
+    position: relative;
+    z-index: 2; /* Ensure the bar is behind the text */
     border-radius: 6px;
+    transition: width 1s linear, background-color 1s linear;
+
+    &.yellow {
+        background-color: rgb(248, 161, 0);
+    }
+
+    &.red {
+        background-color: rgb(235, 48, 1);
+    }
 }
   
 .timeLeftText {
     position: absolute; /* Position the text absolutely */
-    top: -12px; /* Place the text vertically centered */
-    left: 20px; /* Place the text on the left side of the bar */
+    top: -25px; /* Place the text vertically centered */
+    left: 40px; /* Place the text on the left side of the bar */
     z-index: 2; /* Ensure the text is in front of the bar */
     white-space: nowrap;
+    font-size: 28px;
+    font-family: Arial, Helvetica, sans-serif;
+    filter: drop-shadow(0px 0px 3px #ffffff);
   }
