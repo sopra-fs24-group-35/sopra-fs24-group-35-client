@@ -148,7 +148,7 @@ const RiskCardModal = ({ isModalOpen, onClose, onTrade, lobbyId, gameId}) => {
             &times;
             </button>
             <main className="modal-mainContents">
-                {(currentPhase === "REINFORCEMENT" || (cards && (cards.length + selectedCards.length) >= 5) && isCurrentPlayer) &&
+                {((currentPhase === "REINFORCEMENT" || (cards && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) &&
                 <div className="modal-selectedRiskCards">  
                     <div className="modal-first" onClick={() => handleCardClick(selectedCards[0].troops, selectedCards[0].territoryName)}>
                         {selectedCards.length >= 1 && 
@@ -168,13 +168,13 @@ const RiskCardModal = ({ isModalOpen, onClose, onTrade, lobbyId, gameId}) => {
                 </div>
                 }
                 <div className="modal-explain">
-                    {(currentPhase === "REINFORCEMENT" || (cards && (cards.length + selectedCards.length) >= 5) && isCurrentPlayer) && "Trade three cards with the same troops or one of each kind! (Jokers count as any troop)"}
+                    {((currentPhase === "REINFORCEMENT" || (cards && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) && "Trade three cards with the same troops or one of each kind! (Jokers count as any troop)"}
                 </div>
                 <div className="modal-riskcards">
                     {content}
                 </div>
                 <div className="button-div">
-                    {(currentPhase === "REINFORCEMENT" || (cards && (cards.length + selectedCards.length) >= 5) && isCurrentPlayer) && <Button width="50%" disabled={!tradable} onClick={trade}>Trade</Button>}
+                    {((currentPhase === "REINFORCEMENT" || (cards && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) && <Button width="50%" disabled={!tradable} onClick={trade}>Trade</Button>}
                 </div>
             </main>
         </div>
