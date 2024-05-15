@@ -51,6 +51,9 @@ const TitleScreen: React.FC = () => {
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [currentTroopBonus, setCurrentTroopBonus] = useState(null);
+    const [selectedTroops, setSelectedTroops] = useState(1);
+    const [isPlacing, setIsPlacing] = useState(false);
+    const [cardBonus, setCardBonus] = useState(null);
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -172,8 +175,16 @@ const TitleScreen: React.FC = () => {
         //setGame(updatedGame.data);
 
         if (traded) {
-            let troops = currentTroopBonus;
-            setCurrentTroopBonus(troops + updatedGame.data.turnCycle.currentPlayer.cardBonus);
+
+            if(updatedGame.data.turnCycle.currentPhase === "ATTACK"){
+                setCurrentTroopBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
+            }
+            else {
+                let troops = currentTroopBonus;
+                setCurrentTroopBonus(troops + updatedGame.data.turnCycle.currentPlayer.cardBonus);
+            }
+            setCardBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
+            setIsPlacing(true);
         }
         
         setTraded(false);
@@ -403,6 +414,7 @@ const TitleScreen: React.FC = () => {
                 setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
                 console.log("current player: " + gameResponse.data.turnCycle.currentPlayer.playerId);
                 setCurrentTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
+                setCardBonus(gameResponse.data.turnCycle.currentPlayer.cardBonus);
                 setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
 
                 /*for (let player of gameResponse.data.players){
@@ -412,9 +424,6 @@ const TitleScreen: React.FC = () => {
                     setTroopBonuses(troopBonusList);
                 }*/
 
-                if (gameResponse.data.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === gameResponse.data.turnCycle.currentPlayer.playerId){
-                    openCardModal();
-                }
             } catch (error) {
                 console.error("Error fetching game data:", error);
                 if(error.message === "Request failed with status code 404"){
@@ -459,6 +468,15 @@ const TitleScreen: React.FC = () => {
             console.log("current phase: ", phase);
             console.log("current player id: ", currentPlayerId);
             console.log("playerCycle:", PlayerCycle);
+            console.log("cardBonus", cardBonus);
+
+            if (phase === "REINFORCEMENT" && game.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId){
+                openCardModal();
+            }
+            else if (phase === "ATTACK" && game.turnCycle.currentPlayer.riskCards.length > 5 && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId){
+                openCardModal();
+            }
+
             if (currentPlayerId !== null) {
                 setCurrentPlayerId(currentPlayerId);
             }
@@ -498,11 +516,12 @@ const TitleScreen: React.FC = () => {
                 setCurrentText(NameCycle[1]);
             } else if (phase === "MOVE") {
                 setCurrentText(NameCycle[2]);
+                if (moved) {
+                    nextState();
+                }
             }
 
-            if (phase === "MOVE" && moved) {
-                nextState();
-            }
+            
 
             setStartTimer(prevState => prevState + 1);
             console.log("Current Timer: " + StartTimer);
@@ -512,6 +531,10 @@ const TitleScreen: React.FC = () => {
 
 
     }, [game, phase, currentPlayerId]);
+
+    useEffect(() => {
+        console.log("isPlacing:", isPlacing);
+    }, [isPlacing]);
 
     function pause(milliseconds) {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -702,13 +725,13 @@ const TitleScreen: React.FC = () => {
 
     const handleButtonClick = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if (phase === "REINFORCEMENT") {
+        if (phase === "REINFORCEMENT" || (phase === "ATTACK" && cardBonus && cardBonus > 0)) {
             deploytroops(id);
         }
-        if (phase === "ATTACK") {
+        else if (phase === "ATTACK") {
             attackTerritory(id);
         }
-        if (phase === "MOVE") {
+        else if (phase === "MOVE") {
             reinforceTroops(id);
         }
     };
@@ -785,13 +808,20 @@ const TitleScreen: React.FC = () => {
             button.troops = territory.troops; // set troop count to server troop count
 
             let troops = currentTroopBonus;
-            setCurrentTroopBonus(troops - 1);
+            if ((troops - selectedTroops) > 0) {
+                setCurrentTroopBonus(troops - selectedTroops);
+            }
+            else {
+                setCurrentTroopBonus(0);
+                setIsPlacing(false);
+            }
             setButtonData([...buttonData]); // Update the button data array in the state
             setGame(game);
             if(troops - 1 === 0) {
                 nextState();
             }
         }
+
     };
 
     const redirectTroops = (id: string) => {
@@ -1584,7 +1614,8 @@ const TitleScreen: React.FC = () => {
                         disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                     >
                         {CurrentText}
-                    </button> 
+                    </button>
+
                     {currentTroopBonus !== 0 && phase === "REINFORCEMENT" && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
                         <div
                             id="nextState"
@@ -1639,8 +1670,6 @@ const TitleScreen: React.FC = () => {
     return (
         <div className="gamescreen-container">
             <div className="gamescreen-innerupper-container">
-                <Announcer phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} />
-                <Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} />  
                 {/*Attack Modal Section*/}
                 <section>
                     <AttackModal
