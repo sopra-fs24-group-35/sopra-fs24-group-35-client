@@ -1614,9 +1614,8 @@ const TitleScreen: React.FC = () => {
                         disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                     >
                         {CurrentText}
-                    </button>
-
-                    {currentTroopBonus !== 0 && phase === "REINFORCEMENT" && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
+                    </button> 
+                    {(currentTroopBonus !== 0) && (phase === "REINFORCEMENT" || (phase === "ATTACK" && cardBonus && cardBonus > 0)) && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
                         <div
                             id="nextState"
                             className="dynbut gamescreen-buttons-container"
@@ -1632,6 +1631,14 @@ const TitleScreen: React.FC = () => {
                             disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                         >
                             Troop Amount: {currentTroopBonus}
+                        
+                            <label className="select-label">
+                                <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
+                                    <option value={1}>1</option>
+                                    <option value={5}>5</option>
+                                    <option value={10}>10</option>
+                                </select>
+                            </label>
                         </div>
                     )}
                 </div>
@@ -1670,6 +1677,8 @@ const TitleScreen: React.FC = () => {
     return (
         <div className="gamescreen-container">
             <div className="gamescreen-innerupper-container">
+                <Announcer phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} />
+                {/*<Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} />*/  }
                 {/*Attack Modal Section*/}
                 <section>
                     <AttackModal
