@@ -796,15 +796,20 @@ const TitleScreen: React.FC = () => {
         setGame(updateGame.data);
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
-        
+        setCurrentTroopBonus(updateGame.data.turnCycle.currentPlayer.troopBonus);
     };
 
     const increaseTroops = (territory_id: string) => {
         const territory = game.board.territories.find(territory => territory.name === territory_id);
         const button = buttonData.find(button => button.id === territory_id); // Find the button data for the startId
 
-        if (button && currentTroopBonus !== 0 && territory.owner === currentPlayerId) {
-            territory.troops += 1; // Increment the troops count
+        if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId) {
+            if ((currentTroopBonus - selectedTroops) > 0) {
+                territory.troops = territory.troops + parseInt(selectedTroops);
+            }
+            else {
+                territory.troops = territory.troops + parseInt(currentTroopBonus);
+            }
             button.troops = territory.troops; // set troop count to server troop count
 
             let troops = currentTroopBonus;
@@ -813,13 +818,10 @@ const TitleScreen: React.FC = () => {
             }
             else {
                 setCurrentTroopBonus(0);
-                setIsPlacing(false);
             }
+
             setButtonData([...buttonData]); // Update the button data array in the state
             setGame(game);
-            if(troops - 1 === 0) {
-                nextState();
-            }
         }
 
     };
