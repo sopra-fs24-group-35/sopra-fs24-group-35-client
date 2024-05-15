@@ -43,15 +43,14 @@ import LeaveModal from "../ui/LeaveModal";
 import RiskCardModal from "../ui/RiskCardModal";
 import Game from "models/Game";
 import ApiStyles from "helpers/avatarApiStyles";
+import Countdown from "../ui/Countdown";
+import Announcer from "../ui/Announcer";
 
 const TitleScreen: React.FC = () => {
     const [game, setGame] = useState<Game>(null);
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
     const [currentTroopBonus, setCurrentTroopBonus] = useState(null);
-    const [selectedTroops, setSelectedTroops] = useState(1);
-    const [tooManyCards, setTooManyCards] = useState(false);
-
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -179,7 +178,6 @@ const TitleScreen: React.FC = () => {
         
         setTraded(false);
         setIsCardModalOpen(false);
-        tooManyCards(false);
     };
 
     const trading = () => {
@@ -416,7 +414,6 @@ const TitleScreen: React.FC = () => {
 
                 if (gameResponse.data.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === gameResponse.data.turnCycle.currentPlayer.playerId){
                     openCardModal();
-                    setTooManyCards(true);
                 }
             } catch (error) {
                 console.error("Error fetching game data:", error);
@@ -705,7 +702,7 @@ const TitleScreen: React.FC = () => {
 
     const handleButtonClick = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if (phase === "REINFORCEMENT" || (phase === "ATTACK" && tooManyCards)) {
+        if (phase === "REINFORCEMENT") {
             deploytroops(id);
         }
         if (phase === "ATTACK") {
@@ -783,29 +780,17 @@ const TitleScreen: React.FC = () => {
         const territory = game.board.territories.find(territory => territory.name === territory_id);
         const button = buttonData.find(button => button.id === territory_id); // Find the button data for the startId
 
-        if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId) {
-            if ((currentTroopBonus - selectedTroops) > 0) {
-                territory.troops = territory.troops + parseInt(selectedTroops);
-            }
-            else {
-                territory.troops = territory.troops + parseInt(currentTroopBonus);
-            }
+        if (button && currentTroopBonus !== 0 && territory.owner === currentPlayerId) {
+            territory.troops += 1; // Increment the troops count
             button.troops = territory.troops; // set troop count to server troop count
 
             let troops = currentTroopBonus;
-            if ((troops - selectedTroops) > 0) {
-                setCurrentTroopBonus(troops - selectedTroops);
-            }
-            else {
-                setCurrentTroopBonus(0);
-            }
+            setCurrentTroopBonus(troops - 1);
             setButtonData([...buttonData]); // Update the button data array in the state
             setGame(game);
-            
-            // add back if we want the game to automatically change phase after placing troops
-            // if(troops - 1 === 0) {
-            //     nextState();
-            // }
+            if(troops - 1 === 0) {
+                nextState();
+            }
         }
     };
 
@@ -1068,6 +1053,79 @@ const TitleScreen: React.FC = () => {
             navigate("/lobby");
         }
     }
+
+    function LeavePlayerConfirmation() {
+        // Create a leave confirmation modal
+        const leaveModal = document.createElement('div');
+        leaveModal.id = 'leave-modal';
+        leaveModal.innerHTML = `
+        <div>Do you really want to leave this game?</div>
+        <div class="button-container">
+            <button id="leave-yes">Yes</button>
+            <button id="leave-no">No</button>
+        </div>
+    `;
+
+        // Add styles to the modal
+        leaveModal.style.position = 'fixed';
+        leaveModal.style.top = '0';
+        leaveModal.style.left = '0';
+        //leaveModal.style.transform = 'translate(-50%, -50%)';
+        leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
+        leaveModal.style.padding = '20px';
+        leaveModal.style.zIndex = '9999';
+        leaveModal.style.textAlign = 'center';
+        leaveModal.style.width = '100%';
+        leaveModal.style.height = '100%';
+        leaveModal.style.color = '#fff';
+        leaveModal.style.display = 'flex';
+        leaveModal.style.justifyContent = 'center';
+        leaveModal.style.alignItems = 'center';
+
+
+        // Style the buttons
+        const leaveYesBtn = leaveModal.querySelector('#leave-yes') as HTMLButtonElement;
+        const leaveNoBtn = leaveModal.querySelector('#leave-no') as HTMLButtonElement;
+        leaveYesBtn.style.marginRight = '40px'; // Add some space between buttons
+        leaveYesBtn.style.padding = '10px 30px'; // Adjust padding for better appearance
+        leaveYesBtn.style.backgroundColor = '#d32f2f'; // Red color for "Yes" button
+        leaveYesBtn.style.color = '#fff'; // White text color
+        leaveYesBtn.style.border = 'none'; // Remove border
+        leaveYesBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveYesBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+
+        leaveNoBtn.style.padding = '10px 30px'; // Adjust padding for better appearance
+        leaveNoBtn.style.backgroundColor = '#2196f3'; // Blue color for "No" button
+        leaveNoBtn.style.color = '#fff'; // White text color
+        leaveNoBtn.style.border = 'none'; // Remove border
+        leaveNoBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveNoBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+
+        // Add event listeners to the buttons
+        leaveYesBtn.addEventListener('click', () => {
+            // Perform leave action here
+            // For now, just console log
+            LeavePlayer();
+            leaveModal.remove(); // Remove the modal after leaving
+        });
+
+        leaveNoBtn.addEventListener('click', () => {
+            leaveModal.remove(); // Remove the modal if user chooses not to leave
+        });
+
+        // Append the modal to the body
+        document.body.appendChild(leaveModal);
+
+        // Style the button container if it exists
+        const buttonContainer = leaveModal.querySelector('.button-container') as HTMLButtonElement;
+        if (buttonContainer) {
+            buttonContainer.style.marginTop = '100px'; // Add some space between text and buttons
+            buttonContainer.style.marginLeft = '-250px';
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.alignItems = 'center'; // Center buttons horizontally
+        }
+    }
+
 
     useEffect(() => {
         // Function to preload the image
@@ -1526,8 +1584,7 @@ const TitleScreen: React.FC = () => {
                         disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                     >
                         {CurrentText}
-                    </button>
-
+                    </button> 
                     {currentTroopBonus !== 0 && phase === "REINFORCEMENT" && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
                         <div
                             id="nextState"
@@ -1538,21 +1595,13 @@ const TitleScreen: React.FC = () => {
                                 transform: 'translateY(-50%)',
                                 backgroundColor: 'red',
                             }}
-                            onClick={() => {
-                                setCurrentTroopBonus(prevState => prevState + 100);
-                            }}
+                            /*onClick={() => {
+                                setTroopBonus(prevState => prevState + 10);
+                            }}*/
                             disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                         >
-                            Troop Amount: {currentTroopBonus} 
-                            <label className="select-label">
-                                <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
-                                    <option value={1}>1</option>
-                                    <option value={5}>5</option>
-                                    <option value={10}>10</option>
-                                </select>
-                            </label>
+                            Troop Amount: {currentTroopBonus}
                         </div>
-                            
                     )}
                 </div>
             )}
@@ -1569,7 +1618,7 @@ const TitleScreen: React.FC = () => {
                 }}
                 onClick={() => {
                     //setIsLeaveModalOpen(true);
-                    LeavePlayer();
+                    LeavePlayerConfirmation();
                 }}
             >
                 Leave Game
@@ -1590,12 +1639,14 @@ const TitleScreen: React.FC = () => {
     return (
         <div className="gamescreen-container">
             <div className="gamescreen-innerupper-container">
+                <Announcer phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} />
+                <Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} />  
                 {/*Attack Modal Section*/}
                 <section>
                     <AttackModal
                         isModalOpen={isModalOpen}
                         modalContent={modalContent}
-                        onClose={closeModal}
+                        onClose={closeModal} 
                         onMove={moving}
                         lobbyId={lobbyId}
                         gameId={gameId}

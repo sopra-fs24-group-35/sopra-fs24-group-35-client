@@ -57,7 +57,7 @@ const RiskCard = ({ troop, territoryName}) => {
 };
 
 RiskCard.propTypes = {
-    troop: PropTypes.string.isRequired,
+    troop: PropTypes.number.isRequired,
     territoryName: PropTypes.string.isRequired
 };
 
