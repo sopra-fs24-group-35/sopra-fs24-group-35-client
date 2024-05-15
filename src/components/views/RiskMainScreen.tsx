@@ -1678,7 +1678,7 @@ const TitleScreen: React.FC = () => {
         <div className="gamescreen-container">
             <div className="gamescreen-innerupper-container">
                 <Announcer phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} />
-                {/*<Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} />*/  }
+                <Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} />
                 {/*Attack Modal Section*/}
                 <section>
                     <AttackModal
