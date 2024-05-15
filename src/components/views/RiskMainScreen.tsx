@@ -426,16 +426,16 @@ const TitleScreen: React.FC = () => {
 
             } catch (error) {
                 console.error("Error fetching game data:", error);
-                if(error.message === "Request failed with status code 404"){
-                    console.log('Before Pause');
-                    pause(10000)
-                        .then(() => {
-                            console.log('After 10 seconds');
-                            localStorage.removeItem("lobbyToken");
-                            localStorage.removeItem("lobbyId");
-                            navigate("/lobby");
-                        });
-                }
+                // if(error.message === "Request failed with status code 404"){
+                //     console.log('Before Pause');
+                //     pause(10000)
+                //         .then(() => {
+                //             console.log('After 10 seconds');
+                //             localStorage.removeItem("lobbyToken");
+                //             localStorage.removeItem("lobbyId");
+                //             navigate("/lobby");
+                //         });
+                // }
                 // Handle error if needed
                 //if(game)
             }
