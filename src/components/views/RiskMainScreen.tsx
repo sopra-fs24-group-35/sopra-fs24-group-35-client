@@ -54,6 +54,7 @@ const TitleScreen: React.FC = () => {
     const [selectedTroops, setSelectedTroops] = useState(1);
     const [isPlacing, setIsPlacing] = useState(false);
     const [cardBonus, setCardBonus] = useState(null);
+    const [isMidTurn, setIsMidTurn] = useState(false);
 
     const buttonRefs = React.useRef<{ [key: string]: HTMLButtonElement }>({});
     const navigate = useNavigate();
@@ -177,16 +178,16 @@ const TitleScreen: React.FC = () => {
         if (traded) {
 
             if(updatedGame.data.turnCycle.currentPhase === "ATTACK"){
-                setCurrentTroopBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
+                setCardBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
             }
             else {
                 let troops = currentTroopBonus;
                 setCurrentTroopBonus(troops + updatedGame.data.turnCycle.currentPlayer.cardBonus);
             }
-            setCardBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
             setIsPlacing(true);
         }
         
+        setIsMidTurn(false);
         setTraded(false);
         setIsCardModalOpen(false);
     };
@@ -475,6 +476,7 @@ const TitleScreen: React.FC = () => {
             }
             else if (phase === "ATTACK" && game.turnCycle.currentPlayer.riskCards.length > 5 && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId){
                 openCardModal();
+                setIsMidTurn(true);
             }
 
             if (currentPlayerId !== null) {
@@ -725,7 +727,7 @@ const TitleScreen: React.FC = () => {
 
     const handleButtonClick = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if (phase === "REINFORCEMENT" || (phase === "ATTACK" && cardBonus && cardBonus > 0)) {
+        if (phase === "REINFORCEMENT" || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) {
             deploytroops(id);
         }
         else if (phase === "ATTACK") {
@@ -797,13 +799,14 @@ const TitleScreen: React.FC = () => {
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
         setCurrentTroopBonus(updateGame.data.turnCycle.currentPlayer.troopBonus);
+        setCardBonus(updateGame.data.turnCycle.currentPlayer.cardBonus);
     };
 
     const increaseTroops = (territory_id: string) => {
         const territory = game.board.territories.find(territory => territory.name === territory_id);
         const button = buttonData.find(button => button.id === territory_id); // Find the button data for the startId
 
-        if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId) {
+        if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId && phase === "REINFORCEMENT") {
             if ((currentTroopBonus - selectedTroops) > 0) {
                 territory.troops = territory.troops + parseInt(selectedTroops);
             }
@@ -818,6 +821,26 @@ const TitleScreen: React.FC = () => {
             }
             else {
                 setCurrentTroopBonus(0);
+            }
+
+            setButtonData([...buttonData]); // Update the button data array in the state
+            setGame(game);
+        }
+        else if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId && phase === "ATTACK"){
+            if ((cardBonus - selectedTroops) > 0) {
+                territory.troops = territory.troops + parseInt(selectedTroops);
+            }
+            else {
+                territory.troops = territory.troops + parseInt(cardBonus);
+            }
+            button.troops = territory.troops; // set troop count to server troop count
+
+            let troops = cardBonus;
+            if ((troops - selectedTroops) > 0) {
+                setCardBonus(troops - selectedTroops);
+            }
+            else {
+                setCardBonus(0);
             }
 
             setButtonData([...buttonData]); // Update the button data array in the state
@@ -1617,7 +1640,7 @@ const TitleScreen: React.FC = () => {
                     >
                         {CurrentText}
                     </button> 
-                    {(currentTroopBonus !== 0) && (phase === "REINFORCEMENT" || (phase === "ATTACK" && cardBonus && cardBonus > 0)) && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
+                    {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
                         <div
                             id="nextState"
                             className="dynbut gamescreen-buttons-container"
@@ -1627,12 +1650,12 @@ const TitleScreen: React.FC = () => {
                                 transform: 'translateY(-50%)',
                                 backgroundColor: 'red',
                             }}
-                            /*onClick={() => {
-                                setTroopBonus(prevState => prevState + 10);
-                            }}*/
+                            onClick={() => {
+                                setCurrentTroopBonus(prevState => prevState + 100);
+                            }}
                             disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
                         >
-                            Troop Amount: {currentTroopBonus}
+                            Troop Amount: {(phase === "REINFORCEMENT") ? currentTroopBonus : cardBonus}
                         
                             <label className="select-label">
                                 <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
@@ -1693,6 +1716,7 @@ const TitleScreen: React.FC = () => {
                     />
                     <RiskCardModal
                         isModalOpen={isCardModalOpen}
+                        isMidTurn={isMidTurn}
                         onClose={closeCardModal}
                         onTrade={trading}
                         lobbyId={lobbyId}

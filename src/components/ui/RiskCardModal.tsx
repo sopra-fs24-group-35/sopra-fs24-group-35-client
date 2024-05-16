@@ -8,7 +8,7 @@ import { Card } from "types";
 import {Button} from "../ui/Button";
 import Game from "models/Game";
 
-const RiskCardModal = ({ isModalOpen, onClose, onTrade, lobbyId, gameId}) => {
+const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, gameId}) => {
     if (!isModalOpen) {
         return null;
     }
@@ -99,29 +99,37 @@ const RiskCardModal = ({ isModalOpen, onClose, onTrade, lobbyId, gameId}) => {
     }, [isCurrentPlayer, currentPhase]);
 
     const handleCardClick = (troopNum: number, terName: string) => {
-        
-        const newCard: Card = {
-            troops: troopNum,
-            territoryName: terName
-        };
 
-        // Check if the card is already selected
-        const isSelected = selectedCards.some(card => card.troops === newCard.troops && card.territoryName === newCard.territoryName);
+        console.log("cards", cards.length);
+        console.log("phase", currentPhase);
+        if ((currentPhase === "REINFORCEMENT") || (currentPhase === "ATTACK" && ((cards.length + selectedCards.length) >= 5) && isMidTurn)){
+            
+            const newCard: Card = {
+                troops: troopNum,
+                territoryName: terName
+            };
 
-        // Check if the card is already selected
-        if (isSelected) {
-            // If already selected, remove it from the selected cards
-            setSelectedCards(selectedCards.filter(card => card.troops !== newCard.troops || card.territoryName !== newCard.territoryName));
-            setCards([...cards, newCard]);
-        } else {
-            if (selectedCards.length === 3) {
-                // If maximum length is reached, prevent adding a new card
-                console.log("Maximum number of cards selected");
-                return;
+            // Check if the card is already selected
+            const isSelected = selectedCards.some(card => card.troops === newCard.troops && card.territoryName === newCard.territoryName);
+
+            // Check if the card is already selected
+            if (isSelected) {
+                // If already selected, remove it from the selected cards
+                setSelectedCards(selectedCards.filter(card => card.troops !== newCard.troops || card.territoryName !== newCard.territoryName));
+                setCards([...cards, newCard]);
+            } else {
+                if (selectedCards.length === 3) {
+                    // If maximum length is reached, prevent adding a new card
+                    console.log("Maximum number of cards selected");
+                    return;
+                }
+                // If not selected, add it to the selected cards
+                setSelectedCards([...selectedCards, newCard]);
+                setCards(cards.filter(card => card.troops !== newCard.troops || card.territoryName !== newCard.territoryName));
             }
-            // If not selected, add it to the selected cards
-            setSelectedCards([...selectedCards, newCard]);
-            setCards(cards.filter(card => card.troops !== newCard.troops || card.territoryName !== newCard.territoryName));
+        } 
+        else {
+            console.log('Condition not met for REINFORCEMENT or ATTACK phases', currentPhase, cards.length);
         }
     };
 
@@ -142,13 +150,13 @@ const RiskCardModal = ({ isModalOpen, onClose, onTrade, lobbyId, gameId}) => {
     }
 
     return (
-        <div className="modal-cards" onClick={(cards && (cards.length + selectedCards.length) >= 5 && isCurrentPlayer) ? null : (onClose)}>
+        <div className="modal-cards" onClick={(((currentPhase === "REINFORCEMENT" && (cards.length + selectedCards.length) >= 5) || (currentPhase === "ATTACK" && cards && isMidTurn && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) ? null : (onClose)}>
         <div className="modal-contentCards" onClick={e => e.stopPropagation()}>
-            <button className="close" onClick={(cards && (cards.length + selectedCards.length) >= 5 && isCurrentPlayer) ? null : (onClose)}>
+            <button className="close" onClick={(((currentPhase === "REINFORCEMENT" && (cards.length + selectedCards.length) >= 5) || (currentPhase === "ATTACK" && cards && isMidTurn && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) ? null : (onClose)}>
             &times;
             </button>
             <main className="modal-mainContents">
-                {((currentPhase === "REINFORCEMENT" || (cards && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) &&
+                {((currentPhase === "REINFORCEMENT" || (currentPhase === "ATTACK" && cards && isMidTurn && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) &&
                 <div className="modal-selectedRiskCards">  
                     <div className="modal-first" onClick={() => handleCardClick(selectedCards[0].troops, selectedCards[0].territoryName)}>
                         {selectedCards.length >= 1 && 
@@ -168,13 +176,13 @@ const RiskCardModal = ({ isModalOpen, onClose, onTrade, lobbyId, gameId}) => {
                 </div>
                 }
                 <div className="modal-explain">
-                    {((currentPhase === "REINFORCEMENT" || (cards && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) && "Trade three cards with the same troops or one of each kind! (Jokers count as any troop)"}
+                    {((currentPhase === "REINFORCEMENT" || (currentPhase === "ATTACK" && cards && isMidTurn && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) && "Trade three cards with the same troops or one of each kind! (Jokers count as any troop)"}
                 </div>
                 <div className="modal-riskcards">
                     {content}
                 </div>
                 <div className="button-div">
-                    {((currentPhase === "REINFORCEMENT" || (cards && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) && <Button width="50%" disabled={!tradable} onClick={trade}>Trade</Button>}
+                    {((currentPhase === "REINFORCEMENT" || (currentPhase === "ATTACK" && cards && isMidTurn && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) && <Button width="50%" disabled={!tradable} onClick={trade}>Trade</Button>}
                 </div>
             </main>
         </div>
@@ -184,6 +192,7 @@ const RiskCardModal = ({ isModalOpen, onClose, onTrade, lobbyId, gameId}) => {
 
 RiskCardModal.propTypes = {
 isModalOpen: PropTypes.bool.isRequired,
+isMidTurn: PropTypes.bool.isRequired,
 onClose: PropTypes.func.isRequired,
 onTrade: PropTypes.func.isRequired,
 lobbyId: PropTypes.string.isRequired,
