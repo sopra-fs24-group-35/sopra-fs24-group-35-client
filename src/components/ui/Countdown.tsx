@@ -59,13 +59,13 @@ const Countdown = ({ onComplete, phase, currentPlayerId, userId, closeWindow1, c
 
   return (
     <div className="countdown">
-      {running && (
-      <div className="barContainer">
-        <div className={`bar ${count < 7 ? "red" : `bar ${count < 12 ? "yellow" : ""}`}`} style={{ width: `${500 * count / max}px` }}>
-        <img src={require(`../../styles/views/Pictures/waitIcon.png`)} className={`countdownIcon ${count % 2 === 0 ? "large" : ""}`} />
-          <p className="timeLeftText">{count}</p>
+      {running && localStorage.getItem("WinLooseScreenWasShown") === "false" &&(
+        <div className="barContainer">
+          <div className={`bar ${count < 7 ? "red" : `bar ${count < 12 ? "yellow" : ""}`}`} style={{ width: `${500 * count / max}px` }}>
+            <img src={require(`../../styles/views/Pictures/waitIcon.png`)} className={`countdownIcon ${count % 2 === 0 ? "large" : ""}`} />
+            <p className="timeLeftText">{count}</p>
+          </div>
         </div>
-      </div>
       )}
     </div>
   );

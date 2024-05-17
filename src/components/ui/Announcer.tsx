@@ -78,11 +78,13 @@ const Announcer = ({ phase, currentPlayerId, userId }) => {
 
   return (
     <div>
+      {localStorage.getItem("WinLooseScreenWasShown") === "false" &&(
         <div className={`announcerContainer ${isVisible ? "visible" : "hidden"} ${currentPlayerId !== userId ? "turnOverColor" : ""}`}>
-            <div className={`announcer ${isVisible ? "visible" : "hidden"}`}>
+          <div className={`announcer ${isVisible ? "visible" : "hidden"}`}>
             {message}
-            </div>
+          </div>
         </div>
+      )}
     </div>
   );
 };

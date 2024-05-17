@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState , useEffect } from "react" ;
 import "styles/views/GameScreen.scss";
 // @ts-ignore
 import defeatIcon from "./defeatIcon1.png";
@@ -68,7 +68,7 @@ const TitleScreen: React.FC = () => {
     const lobbyId = localStorage.getItem("lobbyId")
     const [startButton, setStartButton] = useState<string | null>(null);
     const adjDict = new AdjDict();
-    //reload idea
+//reload idea
 
     const [curx, setX] = useState(0);
     const [cury, setY] = useState(0);
@@ -90,7 +90,7 @@ const TitleScreen: React.FC = () => {
     const [LoseList, setLoseList] = useState([]);
     const [CyclewithTroopsandTerritories, setCyclewithTroopsandTerritories] = useState({});
 
-    //ALL imagens
+//ALL imagens
     const defeat = new Image();
     defeat.src = defeatIcon;
     const arrow = new Image();
@@ -173,7 +173,7 @@ const TitleScreen: React.FC = () => {
 
     const closeCardModal = async () => {
         const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
-        //setGame(updatedGame.data);
+//setGame(updatedGame.data);
 
         if (traded) {
 
@@ -186,7 +186,7 @@ const TitleScreen: React.FC = () => {
             }
             setIsPlacing(true);
         }
-        
+
         setIsMidTurn(false);
         setTraded(false);
         setIsCardModalOpen(false);
@@ -197,7 +197,7 @@ const TitleScreen: React.FC = () => {
     };
 
     useEffect(() => {
-        //console.log("traded", traded);
+//console.log("traded", traded);
 
         //these functions are only here to update the useState
     }, [isCardModalOpen, traded]);
@@ -405,7 +405,7 @@ const TitleScreen: React.FC = () => {
         } else {
             hideLoadingScreen();
         }
-        // hello
+// hello
         // Define the function to fetch game data
         async function getGame() {
             try {
@@ -419,33 +419,34 @@ const TitleScreen: React.FC = () => {
                 setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
 
                 /*for (let player of gameResponse.data.players){
-                    let troopBonusList = [];
-                    let troops = player.troopBonus;
-                    troopBonusList.push(troops);
-                    setTroopBonuses(troopBonusList);
-                }*/
+                                    let troopBonusList = [];
+                                    let troops = player.troopBonus;
+                                    troopBonusList.push(troops);
+                                    setTroopBonuses(troopBonusList);
+                                }*/
 
             } catch (error) {
                 console.error("Error fetching game data:", error);
-                // if(error.message === "Request failed with status code 404"){
-                //     console.log('Before Pause');
-                //     pause(10000)
-                //         .then(() => {
-                //             console.log('After 10 seconds');
-                //             localStorage.removeItem("lobbyToken");
-                //             localStorage.removeItem("lobbyId");
-                //             navigate("/lobby");
-                //         });
-                // }
-                // Handle error if needed
+                if(error.message === "Request failed with status code 404"){
+                    console.log('Before Pause');
+                    pause(10000)
+                      .then(() => {
+                          console.log('After 10 seconds');
+                          localStorage.removeItem("lobbyToken");
+                          localStorage.removeItem("lobbyId");
+                          localStorage.removeItem("WinLooseScreenWasShown");
+                          navigate("/lobby");
+                      });
+                }
+// Handle error if needed
                 //if(game)
             }
         }
 
-        // Call getGame initially
+// Call getGame initially
         getGame();
 
-        // Set up the interval to call getGame every 2 seconds
+// Set up the interval to call getGame every 2 seconds
         const intervalId = setInterval(() => {
             if (game !== null) {
             }
@@ -459,7 +460,7 @@ const TitleScreen: React.FC = () => {
             }
         }, 2000);
 
-        // Clean up the interval when the component unmounts or when the dependency array changes
+// Clean up the interval when the component unmounts or when the dependency array changes
         return () => clearInterval(intervalId);
     }, [currentPlayerId]);
 
@@ -484,7 +485,7 @@ const TitleScreen: React.FC = () => {
             }
 
             if (CyclewithTroopsandTerritories !== null) {
-                // console.log("0 : " + CyclewithTroopsandTerritories[0]);
+// console.log("0 : " + CyclewithTroopsandTerritories[0]);
                 // console.log("0 : " + CyclewithTroopsandTerritories[1]);
                 // console.log("0 : " + CyclewithTroopsandTerritories[2]);
                 // console.log("0 : " + CyclewithTroopsandTerritories[3]);
@@ -523,7 +524,7 @@ const TitleScreen: React.FC = () => {
                 }
             }
 
-            
+
 
             setStartTimer(prevState => prevState + 1);
             console.log("Current Timer: " + StartTimer);
@@ -566,13 +567,14 @@ const TitleScreen: React.FC = () => {
             console.log("0 : " + CyclewithTroopsandTerritories[2]);
             console.log("0 : " + CyclewithTroopsandTerritories[3]);
             setCyclewithTroopsandTerritories(dic);
-            if (won === true && WinLoseWasShown === false) {
-                setIsWinModalOpen(true);
-                setWinLoseWasShown(true);
+            if (won === true && localStorage.getItem("WinLooseScreenWasShown") === "false") {
+                WinScreen();
+                localStorage.setItem("WinLooseScreenWasShown", "true");
                 nextState();
 
-            } else if (loose === true && WinLoseWasShown === false) {
-                setIsLoseModalOpen(true);
+            } else if (loose === true && localStorage.getItem("WinLooseScreenWasShown") === "false") {
+                LooseScreen();
+                localStorage.setItem("WinLooseScreenWasShown", "true");
                 setWinLoseWasShown(true);
             }
         }
@@ -608,7 +610,7 @@ const TitleScreen: React.FC = () => {
                         if(game.players.length === 6){
                             defeat.classList.add('avatar-overlay6');}
 
-                        // Append the image element to the avatar button
+// Append the image element to the avatar button
                         avatar0Button.appendChild(defeat);
                     }
 
@@ -619,7 +621,7 @@ const TitleScreen: React.FC = () => {
     };
 
     function showLoadingScreen() {
-        // Create a loading screen element
+// Create a loading screen element
         const loadingScreen = document.createElement('div');
         loadingScreen.id = 'loading-screen';
         loadingScreen.innerHTML = 'Loading...'; // You can customize the loading text here
@@ -638,12 +640,12 @@ const TitleScreen: React.FC = () => {
         loadingScreen.style.zIndex = '9999';
 
 
-        // Append the loading screen to the body
+// Append the loading screen to the body
         document.body.appendChild(loadingScreen);
     };
 
     function hideLoadingScreen() {
-        // Find and remove the loading screen
+// Find and remove the loading screen
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
             loadingScreen.parentNode.removeChild(loadingScreen);
@@ -682,7 +684,7 @@ const TitleScreen: React.FC = () => {
         while (buttonqueue.length !== 0) {
             const curbut = buttonqueue.shift(); // Use shift() to dequeue the first element
             validbuttonid.push(curbut);
-            // Iterate through adjacent territories
+// Iterate through adjacent territories
             for (const iterterritory of adjDict.dict[curbut]) {
                 const nextterritory = game.board.territories.find(territory => territory.name === iterterritory);
                 if (!visited[iterterritory] && nextterritory.owner === playerid) {
@@ -747,7 +749,7 @@ const TitleScreen: React.FC = () => {
             if (territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)) {
                 dehighlightadjbutton(startButton);
                 drawLine(startButton, id);
-                //setDrawingLine(true); // Enable drawing line mode
+//setDrawingLine(true); // Enable drawing line mode
                 const territory_def = id;
                 const territory_atk = startButton;
                 const cont = JSON.stringify({territory_def, territory_atk});
@@ -758,15 +760,15 @@ const TitleScreen: React.FC = () => {
                 dehighlightadjbutton(startButton);
             } else{
                 if(territory.owner === currentPlayerId && checkifthereareenemies(id) && territory.troops > 1){
-                dehighlightadjbutton(startButton);
-                setStartButton(id);
-                highlightadjbutton(id);}
+                    dehighlightadjbutton(startButton);
+                    setStartButton(id);
+                    highlightadjbutton(id);}
             }
         } else {
             if(territory.owner === currentPlayerId && checkifthereareenemies(id) && territory.troops > 1){
-            setStartButton(id);
-            highlightadjbutton(id);
-        }}
+                setStartButton(id);
+                highlightadjbutton(id);
+            }}
     };
 
     const reinforceTroops = (id: string) => {
@@ -866,20 +868,20 @@ const TitleScreen: React.FC = () => {
                     setGame(game);
                     drawLine(startButton, id);
                 }
-                
+
             }
             else if (startButton === id && !moved) {
                 setStartButton(null);
                 dehighlightadjbutton(startButton);
             }
         } else if (currentPlayerId === territory.owner && checkifthereareneighbors(id) && territory.troops > 1 && !moved) {
-                setStartButton(id);
-                checkForAllValidReinforcements(id);
+            setStartButton(id);
+            checkForAllValidReinforcements(id);
         }
     };
 
     const highlightadjbutton = (startId: string) => {
-        //increaseTroops(startId);
+//increaseTroops(startId);
         if (phase === "ATTACK") {
             const adjacentTerritories = adjDict.dict[startId];
             let enemyAdjacentTerritories = [];
@@ -925,7 +927,7 @@ const TitleScreen: React.FC = () => {
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
 
-        // Calculate a new endpoint that is 90% of the distance from the start point to the end point
+// Calculate a new endpoint that is 90% of the distance from the start point to the end point
         const distance = Math.sqrt(Math.pow(endx - startx, 2) + Math.pow(endy - starty, 2));
 
         let scaledPercentage = 0.8 + (0.99 - 0.8) * (distance - 50) / (200 - 50);
@@ -938,28 +940,28 @@ const TitleScreen: React.FC = () => {
         const newEndx = startx + ratio * (endx - startx);
         const newEndy = starty + ratio * (endy - starty);
 
-        // Begin the path
+// Begin the path
         ctx.beginPath();
-        // Move to the start point
+// Move to the start point
         ctx.moveTo(startx, starty);
-        // Draw a line to the new endpoint
+// Draw a line to the new endpoint
         ctx.lineTo(newEndx, newEndy);
         ctx.lineWidth = 5;
-        // Set line style
+// Set line style
         ctx.strokeStyle = 'black'; // You can set any color you want
         // Draw the line
         ctx.stroke();
 
         const angle = Math.atan2(endy - starty, endx - startx);
         ctx.beginPath();
-        // Calculate arrowhead points
+// Calculate arrowhead points
         ctx.moveTo(newEndx, newEndy);
         ctx.lineTo(newEndx - 20 * Math.cos(angle - Math.PI / 6), newEndy - 20 * Math.sin(angle - Math.PI / 6));
         ctx.moveTo(newEndx, newEndy);
         ctx.lineTo(newEndx - 20 * Math.cos(angle + Math.PI / 6), newEndy - 20 * Math.sin(angle + Math.PI / 6));
-        // Set arrowhead style
+// Set arrowhead style
         ctx.strokeStyle = 'black';
-        // Draw the arrowhead
+// Draw the arrowhead
         ctx.stroke();
 
     };
@@ -969,11 +971,11 @@ const TitleScreen: React.FC = () => {
         const ctx = canvas.getContext('2d');
         const picture1 = require('../../styles/views/Pictures/RiskMap21.png');
         const image = new Image(picture1);
-        // Clear the canvas
+// Clear the canvas
         ctx.clearRect(curx, cury, curwidth, curheight);
         ctx.drawImage(image, curx, cury, curwidth, curheight);
 
-        //setReload(true);
+//setReload(true);
     };
 
     const getButtonCoordinatesById = (id) => {
@@ -986,7 +988,7 @@ const TitleScreen: React.FC = () => {
         }
     };
 
-    //const redButton = document.getElementById('redButton');
+//const redButton = document.getElementById('redButton');
     const containerStyle: React.CSSProperties = {
         position: 'fixed',
         bottom: '10px',
@@ -1024,7 +1026,7 @@ const TitleScreen: React.FC = () => {
         marginRight: '5px', // Adjust the space between image
         marginLeft: '5px', // Adjust the space between images
         textAlign: 'center',
-        //cursor: 'pointer'
+//cursor: 'pointer'
     };
 
     const avatarStylePlayingSide: React.CSSProperties = {
@@ -1058,11 +1060,11 @@ const TitleScreen: React.FC = () => {
         }
         try {
             const config = {Authorization: localStorage.getItem("lobbyToken")};
-            // get lobby info
+// get lobby info
             const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, {headers: config});
             const lobbyData = getLobbyResponse.data;
 
-            // set the userIdList to an array of longs consisting of all the user IDs in the lobby
+// set the userIdList to an array of longs consisting of all the user IDs in the lobby
             let userIdList = lobbyData.players;
 
             let playeridwithavatar = {};
@@ -1101,34 +1103,38 @@ const TitleScreen: React.FC = () => {
             const gameResponse = await api.put(`lobbies/${lobbyId}/game/${gameId}/user/${userId}`, {},  {headers: config1});
             localStorage.removeItem("lobbyToken");
             localStorage.removeItem("lobbyId");
+            localStorage.removeItem("WinLooseScreenWasShown");
             navigate("/lobby");
         } else {
             localStorage.removeItem("lobbyToken");
             localStorage.removeItem("lobbyId");
+            localStorage.removeItem("WinLooseScreenWasShown");
             navigate("/lobby");
         }
     }
 
     function LeavePlayerConfirmation() {
-        // Create a leave confirmation modal
+// Create a leave confirmation modal
         const leaveModal = document.createElement('div');
         leaveModal.id = 'leave-modal';
         leaveModal.innerHTML = `
-        <div>Do you really want to leave this game?</div>
-        <div class="button-container">
-            <button id="leave-yes">Yes</button>
-            <button id="leave-no">No</button>
+        <div className="gamescreen-container">
+            <h1 style="display: block; margin-top: 0px;">Do you really want to leave this game?</h1>
+            <div class="button-container">
+                <button id="leave-yes">Yes</button>
+                <button id="leave-no">No</button>
+            </div>
         </div>
     `;
 
-        // Add styles to the modal
+// Add styles to the modal
         leaveModal.style.position = 'fixed';
         leaveModal.style.top = '0';
         leaveModal.style.left = '0';
-        //leaveModal.style.transform = 'translate(-50%, -50%)';
+//leaveModal.style.transform = 'translate(-50%, -50%)';
         leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
         leaveModal.style.padding = '20px';
-        leaveModal.style.zIndex = '9999';
+        leaveModal.style.zIndex = '1000';
         leaveModal.style.textAlign = 'center';
         leaveModal.style.width = '100%';
         leaveModal.style.height = '100%';
@@ -1138,27 +1144,32 @@ const TitleScreen: React.FC = () => {
         leaveModal.style.alignItems = 'center';
 
 
-        // Style the buttons
+// Style the buttons
         const leaveYesBtn = leaveModal.querySelector('#leave-yes') as HTMLButtonElement;
         const leaveNoBtn = leaveModal.querySelector('#leave-no') as HTMLButtonElement;
-        leaveYesBtn.style.marginRight = '40px'; // Add some space between buttons
-        leaveYesBtn.style.padding = '10px 30px'; // Adjust padding for better appearance
+        leaveYesBtn.style.marginRight = '50px'; // Add some space between buttons
+        leaveYesBtn.style.padding = '10px 50px'; // Adjust padding for better appearance
         leaveYesBtn.style.backgroundColor = '#d32f2f'; // Red color for "Yes" button
         leaveYesBtn.style.color = '#fff'; // White text color
         leaveYesBtn.style.border = 'none'; // Remove border
         leaveYesBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
         leaveYesBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+        leaveYesBtn.style.display = 'flex';
+        leaveYesBtn.style.justifyContent = 'center';
+        leaveYesBtn.style.alignItems = 'center';
 
-        leaveNoBtn.style.padding = '10px 30px'; // Adjust padding for better appearance
+        leaveNoBtn.style.padding = '10px 50px'; // Adjust padding for better appearance
         leaveNoBtn.style.backgroundColor = '#2196f3'; // Blue color for "No" button
         leaveNoBtn.style.color = '#fff'; // White text color
         leaveNoBtn.style.border = 'none'; // Remove border
         leaveNoBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
         leaveNoBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
-
-        // Add event listeners to the buttons
+        leaveNoBtn.style.display = 'flex';
+        leaveNoBtn.style.justifyContent = 'center';
+        leaveNoBtn.style.alignItems = 'center';
+// Add event listeners to the buttons
         leaveYesBtn.addEventListener('click', () => {
-            // Perform leave action here
+// Perform leave action here
             // For now, just console log
             LeavePlayer();
             leaveModal.remove(); // Remove the modal after leaving
@@ -1168,14 +1179,175 @@ const TitleScreen: React.FC = () => {
             leaveModal.remove(); // Remove the modal if user chooses not to leave
         });
 
-        // Append the modal to the body
+// Append the modal to the body
         document.body.appendChild(leaveModal);
 
-        // Style the button container if it exists
+// Style the button container if it exists
         const buttonContainer = leaveModal.querySelector('.button-container') as HTMLButtonElement;
         if (buttonContainer) {
-            buttonContainer.style.marginTop = '100px'; // Add some space between text and buttons
-            buttonContainer.style.marginLeft = '-250px';
+            buttonContainer.style.marginTop = '50px'; // Add some space between text and buttons
+            buttonContainer.style.marginLeft = '25%';
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.alignItems = 'center'; // Center buttons horizontally
+        }
+    }
+
+
+    function WinScreen() {
+// Create a leave confirmation modal
+        const leaveModal = document.createElement('div');
+        leaveModal.id = 'leave-modal';
+        leaveModal.innerHTML = `
+        <div className="gamescreen-container">
+            <h1 style="display: block; margin-top: -100px;">Congratulations! You have won this Game</h1>
+            <h2 style="display: block; margin-top: 50px;">Do you want to leave the game or go back to the board? </h2>
+            <div class="button-container">
+                <button id="leave-yes">I want to leave</button>
+                <button id="leave-no">I want to go back to the board</button>
+            </div>
+        </div>
+    `;
+
+// Add styles to the modal
+        leaveModal.style.position = 'fixed';
+        leaveModal.style.top = '0';
+        leaveModal.style.left = '0';
+//leaveModal.style.transform = 'translate(-50%, -50%)';
+        leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
+        leaveModal.style.padding = '20px';
+        leaveModal.style.zIndex = '100';
+        leaveModal.style.textAlign = 'center';
+        leaveModal.style.width = '100%';
+        leaveModal.style.height = '100%';
+        leaveModal.style.color = '#fff';
+        leaveModal.style.display = 'flex';
+        leaveModal.style.justifyContent = 'center';
+        leaveModal.style.alignItems = 'center';
+
+
+// Style the buttons
+        const leaveYesBtn = leaveModal.querySelector('#leave-yes') as HTMLButtonElement;
+        const leaveNoBtn = leaveModal.querySelector('#leave-no') as HTMLButtonElement;
+        leaveYesBtn.style.marginRight = '50px'; // Add some space between buttons
+        leaveYesBtn.style.padding = '10px 20px'; // Adjust padding for better appearance
+        leaveYesBtn.style.backgroundColor = '#d32f2f'; // Red color for "Yes" button
+        leaveYesBtn.style.color = '#fff'; // White text color
+        leaveYesBtn.style.border = 'none'; // Remove border
+        leaveYesBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveYesBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+        leaveYesBtn.style.display = 'flex';
+        leaveYesBtn.style.justifyContent = 'center';
+        leaveYesBtn.style.alignItems = 'center';
+
+        leaveNoBtn.style.padding = '10px 20px'; // Adjust padding for better appearance
+        leaveNoBtn.style.backgroundColor = '#2196f3'; // Blue color for "No" button
+        leaveNoBtn.style.color = '#fff'; // White text color
+        leaveNoBtn.style.border = 'none'; // Remove border
+        leaveNoBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveNoBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+        leaveNoBtn.style.display = 'flex';
+        leaveNoBtn.style.justifyContent = 'center';
+        leaveNoBtn.style.alignItems = 'center';
+// Add event listeners to the buttons
+        leaveYesBtn.addEventListener('click', () => {
+// Perform leave action here
+            // For now, just console log
+            LeavePlayer();
+            leaveModal.remove(); // Remove the modal after leaving
+        });
+
+        leaveNoBtn.addEventListener('click', () => {
+            leaveModal.remove(); // Remove the modal if user chooses not to leave
+        });
+
+// Append the modal to the body
+        document.body.appendChild(leaveModal);
+
+// Style the button container if it exists
+        const buttonContainer = leaveModal.querySelector('.button-container') as HTMLButtonElement;
+        if (buttonContainer) {
+            buttonContainer.style.marginTop = '50px'; // Add some space between text and buttons
+            buttonContainer.style.marginLeft = '14%';
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.alignItems = 'center'; // Center buttons horizontally
+        }
+    }
+
+    function LooseScreen() {
+// Create a leave confirmation modal
+        const leaveModal = document.createElement('div');
+        leaveModal.id = 'leave-modal';
+        leaveModal.innerHTML = `
+        <div className="gamescreen-container">
+            <h1 style="display: block; margin-top: -100px;">Too Bad! You have been defeated!</h1>
+            <h2 style="display: block; margin-top: 50px;">Do you want to leave the game or continue to spectate the game? </h2>
+            <div class="button-container">
+                <button id="leave-yes">I want to leave</button>
+                <button id="leave-no">I want to continue spectating</button>
+            </div>
+        </div>
+    `;
+
+// Add styles to the modal
+        leaveModal.style.position = 'fixed';
+        leaveModal.style.top = '0';
+        leaveModal.style.left = '0';
+//leaveModal.style.transform = 'translate(-50%, -50%)';
+        leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
+        leaveModal.style.padding = '20px';
+        leaveModal.style.zIndex = '100';
+        leaveModal.style.textAlign = 'center';
+        leaveModal.style.width = '100%';
+        leaveModal.style.height = '100%';
+        leaveModal.style.color = '#fff';
+        leaveModal.style.display = 'flex';
+        leaveModal.style.justifyContent = 'center';
+        leaveModal.style.alignItems = 'center';
+
+
+// Style the buttons
+        const leaveYesBtn = leaveModal.querySelector('#leave-yes') as HTMLButtonElement;
+        const leaveNoBtn = leaveModal.querySelector('#leave-no') as HTMLButtonElement;
+        leaveYesBtn.style.marginRight = '50px'; // Add some space between buttons
+        leaveYesBtn.style.padding = '10px 20px'; // Adjust padding for better appearance
+        leaveYesBtn.style.backgroundColor = '#d32f2f'; // Red color for "Yes" button
+        leaveYesBtn.style.color = '#fff'; // White text color
+        leaveYesBtn.style.border = 'none'; // Remove border
+        leaveYesBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveYesBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+        leaveYesBtn.style.display = 'flex';
+        leaveYesBtn.style.justifyContent = 'center';
+        leaveYesBtn.style.alignItems = 'center';
+
+        leaveNoBtn.style.padding = '10px 20px'; // Adjust padding for better appearance
+        leaveNoBtn.style.backgroundColor = '#2196f3'; // Blue color for "No" button
+        leaveNoBtn.style.color = '#fff'; // White text color
+        leaveNoBtn.style.border = 'none'; // Remove border
+        leaveNoBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveNoBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+        leaveNoBtn.style.display = 'flex';
+        leaveNoBtn.style.justifyContent = 'center';
+        leaveNoBtn.style.alignItems = 'center';
+// Add event listeners to the buttons
+        leaveYesBtn.addEventListener('click', () => {
+// Perform leave action here
+            // For now, just console log
+            LeavePlayer();
+            leaveModal.remove(); // Remove the modal after leaving
+        });
+
+        leaveNoBtn.addEventListener('click', () => {
+            leaveModal.remove(); // Remove the modal if user chooses not to leave
+        });
+
+// Append the modal to the body
+        document.body.appendChild(leaveModal);
+
+// Style the button container if it exists
+        const buttonContainer = leaveModal.querySelector('.button-container') as HTMLButtonElement;
+        if (buttonContainer) {
+            buttonContainer.style.marginTop = '50px'; // Add some space between text and buttons
+            buttonContainer.style.marginLeft = '18%';
             buttonContainer.style.display = 'flex';
             buttonContainer.style.alignItems = 'center'; // Center buttons horizontally
         }
@@ -1183,7 +1355,7 @@ const TitleScreen: React.FC = () => {
 
 
     useEffect(() => {
-        // Function to preload the image
+// Function to preload the image
         const preloadImage = (url) => {
             return new Promise((resolve, reject) => {
                 const image = new Image();
@@ -1193,138 +1365,138 @@ const TitleScreen: React.FC = () => {
             });
         };
 
-        // Preload the image
+// Preload the image
         const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
         preloadImage(imageSrc).then((image: HTMLImageElement) => {
 
-                // Once the image is fully loaded, update the canvas
-                fetchData();
-                const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-                const ctx = canvas.getContext('2d');
+// Once the image is fully loaded, update the canvas
+              fetchData();
+              const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+              const ctx = canvas.getContext('2d');
 
-                const resizeCanvas = () => {
-                    canvas.width = canvas.parentElement.clientWidth;
-                    canvas.height = canvas.parentElement.clientHeight;
-                    let aspectRatio = 0
+              const resizeCanvas = () => {
+                  canvas.width = canvas.parentElement.clientWidth;
+                  canvas.height = canvas.parentElement.clientHeight;
+                  let aspectRatio = 0
 
-                    aspectRatio = image.width / image.height;
+                  aspectRatio = image.width / image.height;
 
-                    let drawWidth = canvas.width;
-                    let drawHeight = canvas.height;
+                  let drawWidth = canvas.width;
+                  let drawHeight = canvas.height;
 
-                    // Adjust the size of the image to maintain aspect ratio
-                    if (drawWidth / drawHeight > aspectRatio) {
-                        drawWidth = drawHeight * aspectRatio;
-                    } else {
-                        drawHeight = drawWidth / aspectRatio;
-                    }
+// Adjust the size of the image to maintain aspect ratio
+                  if (drawWidth / drawHeight > aspectRatio) {
+                      drawWidth = drawHeight * aspectRatio;
+                  } else {
+                      drawHeight = drawWidth / aspectRatio;
+                  }
 
-                    const x = (canvas.width - drawWidth) / 2;
-                    const y = (canvas.height - drawHeight) / 2;
+                  const x = (canvas.width - drawWidth) / 2;
+                  const y = (canvas.height - drawHeight) / 2;
 
-                    setCurHeight(drawHeight);
-                    setCurWidth(drawWidth);
-                    setX(x);
-                    setY(y);
+                  setCurHeight(drawHeight);
+                  setCurWidth(drawWidth);
+                  setX(x);
+                  setY(y);
 
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(image, x, y, drawWidth, drawHeight);
-                    resizeButtons(x, y, drawWidth, drawHeight);
-                };
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+                  ctx.drawImage(image, x, y, drawWidth, drawHeight);
+                  resizeButtons(x, y, drawWidth, drawHeight);
+              };
 
-                const resizeButtons = (startx: number, starty: number, drawWidth: number, drawHeight: number) => {
-                    const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
-                    const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
+              const resizeButtons = (startx: number, starty: number, drawWidth: number, drawHeight: number) => {
+                  const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
+                  const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
 
-                    Object.keys(buttonRefs.current).forEach((buttonId: string) => {
-                        const button = buttonRefs.current[buttonId];
-                        const {x, y} = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
+                  Object.keys(buttonRefs.current).forEach((buttonId: string) => {
+                      const button = buttonRefs.current[buttonId];
+                      const {x, y} = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
 
-                        button.style.left = `${x}px`;
-                        button.style.top = `${y}px`;
-                        button.style.width = `${buttonWidth}px`;
-                        button.style.height = `${buttonHeight}px`;
-                        button.style.fontSize = `${buttonHeight * 0.35}px`;
-
-
-                        if (game !== null) {
-                            const territory = game.board.territories.find(territory => territory.name === buttonId);
-                            button.style.backgroundColor = PlayerColor[territory.owner];
-                        }
-
-                    });
-
-                    //Dynamically Adjust heigh and Widgt of the lower Textboxes
-                    //const troopAmountDiv = document.getElementById('nextState');
-                    let allbuttons = document.querySelectorAll('.dynbut');
-                    let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                    for (const but of buttonsArray) {
-                        (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                        (but as HTMLButtonElement).style.width = `${buttonWidth * 9}px`;
-                        (but as HTMLButtonElement).style.fontSize = `${buttonHeight * 0.3 * 2.5}px`;
-                    }
-
-                    allbuttons = document.querySelectorAll('.avatar');
-                    buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                    for (const but of buttonsArray) {
-                        if(game !== null && game.players.length < 4){
-                            (but as HTMLButtonElement).style.height = `${buttonHeight * 4}px`;
-                            (but as HTMLButtonElement).style.width = `${buttonWidth * 4}px`;
-                        }
-                        if(game !== null && game.players.length === 4){
-                            (but as HTMLButtonElement).style.height = `${buttonHeight * 3}px`;
-                            (but as HTMLButtonElement).style.width = `${buttonWidth * 3}px`;
-                        }
-                        if(game !== null && game.players.length === 5){
-                            (but as HTMLButtonElement).style.height = `${buttonHeight * 2.8}px`;
-                            (but as HTMLButtonElement).style.width = `${buttonWidth * 2.8}px`;
-
-                        }
-                        if(game !== null && game.players.length === 6){
-                            (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                            (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
-                        }
-                    }
-
-                    allbuttons = document.querySelectorAll('.avatarfont');
-                    buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                    for (const but of buttonsArray) {
-                        if(game !== null && game.players.length < 4) {
-                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.82}px`;
-                        }
-                        if(game !== null && game.players.length === 4) {
-                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.82}px`;
-                        }
-                        if(game !== null && game.players.length === 5) {
-                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.55}px`;
-                        }
-                        if(game !== null && game.players.length === 6) {
-                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.48}px`;
-                        }
+                      button.style.left = `${x}px`;
+                      button.style.top = `${y}px`;
+                      button.style.width = `${buttonWidth}px`;
+                      button.style.height = `${buttonHeight}px`;
+                      button.style.fontSize = `${buttonHeight * 0.35}px`;
 
 
-                    }
+                      if (game !== null) {
+                          const territory = game.board.territories.find(territory => territory.name === buttonId);
+                          button.style.backgroundColor = PlayerColor[territory.owner];
+                      }
 
-                };
+                  });
 
-                const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
-                    const {xratio, yratio} = getButtonRatiosById(buttonId)
-                    let x = startx + drawWidth * xratio; // Default left position
-                    let y = starty + drawHeight * yratio; // Default top position
+//Dynamically Adjust heigh and Widgt of the lower Textboxes
+                  //const troopAmountDiv = document.getElementById('nextState');
+                  let allbuttons = document.querySelectorAll('.dynbut');
+                  let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                  for (const but of buttonsArray) {
+                      (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                      (but as HTMLButtonElement).style.width = `${buttonWidth * 9}px`;
+                      (but as HTMLButtonElement).style.fontSize = `${buttonHeight * 0.3 * 2.5}px`;
+                  }
 
-                    return {x, y};
-                };
+                  allbuttons = document.querySelectorAll('.avatar');
+                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                  for (const but of buttonsArray) {
+                      if(game !== null && game.players.length < 4){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 4}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 4}px`;
+                      }
+                      if(game !== null && game.players.length === 4){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 3}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 3}px`;
+                      }
+                      if(game !== null && game.players.length === 5){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.8}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.8}px`;
 
-                // Initial setup
-                resizeCanvas();
+                      }
+                      if(game !== null && game.players.length === 6){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                      }
+                  }
 
-                // Handle resize event
-                window.addEventListener('resize', resizeCanvas);
+                  allbuttons = document.querySelectorAll('.avatarfont');
+                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                  for (const but of buttonsArray) {
+                      if(game !== null && game.players.length < 4) {
+                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.82}px`;
+                      }
+                      if(game !== null && game.players.length === 4) {
+                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.82}px`;
+                      }
+                      if(game !== null && game.players.length === 5) {
+                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.55}px`;
+                      }
+                      if(game !== null && game.players.length === 6) {
+                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.48}px`;
+                      }
 
-                return () => {
-                    window.removeEventListener('resize', resizeCanvas);
-                };
-            }
+
+                  }
+
+              };
+
+              const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
+                  const {xratio, yratio} = getButtonRatiosById(buttonId)
+                  let x = startx + drawWidth * xratio; // Default left position
+                  let y = starty + drawHeight * yratio; // Default top position
+
+                  return {x, y};
+              };
+
+// Initial setup
+              resizeCanvas();
+
+// Handle resize event
+              window.addEventListener('resize', resizeCanvas);
+
+              return () => {
+                  window.removeEventListener('resize', resizeCanvas);
+              };
+          }
         );
 
     }, [PlayerColor, game]);
@@ -1333,21 +1505,21 @@ const TitleScreen: React.FC = () => {
 
     if (game !== null) { // Only render buttons if game data is available
         renderButtons = (
-            buttonData.map((button) => (
-                <button
-                    key={button.id}
-                    id={button.id}
-                    ref={(buttonRef) => {
-                        if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
-                    }}
-                    className="button"
-                    style={{}}
-                    onClick={() => handleButtonClick(button.id)}
-                    disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
-                >
-                    {button.troops}
-                </button>
-            ))
+          buttonData.map((button) => (
+            <button
+              key={button.id}
+              id={button.id}
+              ref={(buttonRef) => {
+                  if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
+              }}
+              className="button"
+              style={{}}
+              onClick={() => handleButtonClick(button.id)}
+              disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id")) || localStorage.getItem("WinLooseScreenWasShown") === "true"}
+            >
+                {button.troops}
+            </button>
+          ))
         );
     }
 
@@ -1487,202 +1659,202 @@ const TitleScreen: React.FC = () => {
         const cardIcon = GetCorrectCard(player);
 
         return (
-            <div key={`avatar-${index}`} style={{maxHeight: maxHeight}}>
-                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                    <div style={{position: 'relative'}}>
-                        {troopBonuses !== undefined && (
-                            <div style={{position: 'absolute', right: '100%', top: `${checkforheightoftexts()}%`}}>
-                                <div style={{display: 'flex', alignItems: 'center'}}>
-                                    <img src={TerritoryIcon.src} alt="icon"
-                                         style={{
-                                             marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
-                                             height: `${Iconheight}px`
-                                         }}/>
-                                    <span className="avatarfont">{troopBonuses[1]}</span>
-                                </div>
-                                <div style={{display: 'flex', alignItems: 'center'}}>
-                                    <img src={TroopIcon.src} alt="icon"
-                                         style={{
-                                             marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
-                                             height: `${Iconheight}px`
-                                         }}/>
-                                    <span className="avatarfont">{troopBonuses[2]}</span>
-                                </div>
-                                <div style={{display: 'flex', alignItems: 'center'}}>
-                                    <img src={BonusIcon.src} alt="icon"
-                                         style={{
-                                             marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
-                                             height: `${Iconheight}px`
-                                         }}/>
-                                    <span
-                                        className="avatarfont">{player.troopBonus > 0 && ("+" + player.troopBonus)}</span>
-                                </div>
+          <div key={`avatar-${index}`} style={{maxHeight: maxHeight}}>
+              <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                  <div style={{position: 'relative'}}>
+                      {troopBonuses !== undefined && (
+                        <div style={{position: 'absolute', right: '100%', top: `${checkforheightoftexts()}%`}}>
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                <img src={TerritoryIcon.src} alt="icon"
+                                     style={{
+                                         marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
+                                         height: `${Iconheight}px`
+                                     }}/>
+                                <span className="avatarfont">{troopBonuses[1]}</span>
                             </div>
-                        )}
-                        <div style={{position: 'relative'}}>
-                            <div className="avatar" id={`avatar${index}`}
-                                 style={{...avatarStyleSide, border: `${getAvatarColor(index)}`}}>
-                                <img
-                                    src={avatarSrc}
-                                    alt="avatar"
-                                    style={imageStyle}
-                                    onMouseEnter={() => {
-                                        if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHover(`avatar${index}`);
-                                        }
-                                    }}
-                                    onMouseLeave={() => {
-                                        if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id"))) {
-                                            handleHoverOut(`avatar${index}`);
-                                        }
-                                    }}
-                                    onClick={() => {
-                                        ((game && player.playerId === parseInt(localStorage.getItem("user_id"))) && openCardModal());
-                                        console.log(`I Clicked this avatar${index}`);
-                                    }}
-                                />
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                <img src={TroopIcon.src} alt="icon"
+                                     style={{
+                                         marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
+                                         height: `${Iconheight}px`
+                                     }}/>
+                                <span className="avatarfont">{troopBonuses[2]}</span>
                             </div>
-                            {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length <= 3 && (
-                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
-                                    position: 'absolute',
-                                    right: '-73px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%) rotate(180deg)',
-                                    width: '80px', // Adjust the width as needed
-                                    height: '80px' // Adjust the height as needed
-                                }}/>
-                            )}
-                            {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 4 && (
-                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
-                                    position: 'absolute',
-                                    right: '-77px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%) rotate(180deg)',
-                                    width: '80px', // Adjust the width as needed
-                                    height: '80px' // Adjust the height as needed
-                                }}/>
-                            )}
-                            {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 5 && (
-                                <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
-                                    position: 'absolute',
-                                    right: '-77px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%) rotate(180deg)',
-                                    width: '80px', // Adjust the width as needed
-                                    height: '80px' // Adjust the height as needed
-                                }}/>
-                            )}
-                            {game !== null && (
-                                <>
-                                    {game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 6 && (
-                                        <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
-                                            position: 'absolute',
-                                            right: '-60px',
-                                            top: '50%',
-                                            transform: 'translateY(-50%) rotate(180deg)',
-                                            width: '70px', // Adjust the width as needed
-                                            height: '70px' // Adjust the height as needed
-                                        }}/>
-                                    )}
-                                    {game.players.length < 4 && (
-                                    <img src={cardIcon} alt="overlay" style={{
-                                        position: 'absolute',
-                                        top: '-5px',
-                                        left: '65px',
-                                        width: `${Cardwidth}px`, // Adjust the width as needed
-                                        height: `${Cardheight}px`,
-                                        zIndex: 2
-                                    }}/>
-                                        )}
-                                    {game.players.length >= 4 && (
-                                        <img src={cardIcon} alt="overlay" style={{
-                                            position: 'absolute',
-                                            top: '-10px',
-                                            left: '50px',
-                                            width: `${Cardwidth}px`, // Adjust the width as needed
-                                            height: `${Cardheight}px`,
-                                            zIndex: 2
-                                        }}/>
-                                    )}
-                                </>
-                            )}
-
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                <img src={BonusIcon.src} alt="icon"
+                                     style={{
+                                         marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
+                                         height: `${Iconheight}px`
+                                     }}/>
+                                <span
+                                  className="avatarfont">{player.troopBonus > 0 && ("+" + player.troopBonus)}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div className="avatarfont" style={{textAlign: 'center'}}>{player.username}</div>
-                </div>
-            </div>
+                      )}
+                      <div style={{position: 'relative'}}>
+                          <div className="avatar" id={`avatar${index}`}
+                               style={{...avatarStyleSide, border: `${getAvatarColor(index)}`}}>
+                              <img
+                                src={avatarSrc}
+                                alt="avatar"
+                                style={imageStyle}
+                                onMouseEnter={() => {
+                                    if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id"))) {
+                                        handleHover(`avatar${index}`);
+                                    }
+                                }}
+                                onMouseLeave={() => {
+                                    if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id"))) {
+                                        handleHoverOut(`avatar${index}`);
+                                    }
+                                }}
+                                onClick={() => {
+                                    ((game && player.playerId === parseInt(localStorage.getItem("user_id"))) && openCardModal());
+                                    console.log(`I Clicked this avatar${index}`);
+                                }}
+                              />
+                          </div>
+                          {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length <= 3 && (
+                            <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
+                                position: 'absolute',
+                                right: '-73px',
+                                top: '50%',
+                                transform: 'translateY(-50%) rotate(180deg)',
+                                width: '80px', // Adjust the width as needed
+                                height: '80px' // Adjust the height as needed
+                            }}/>
+                          )}
+                          {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 4 && (
+                            <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
+                                position: 'absolute',
+                                right: '-77px',
+                                top: '50%',
+                                transform: 'translateY(-50%) rotate(180deg)',
+                                width: '80px', // Adjust the width as needed
+                                height: '80px' // Adjust the height as needed
+                            }}/>
+                          )}
+                          {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 5 && (
+                            <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
+                                position: 'absolute',
+                                right: '-77px',
+                                top: '50%',
+                                transform: 'translateY(-50%) rotate(180deg)',
+                                width: '80px', // Adjust the width as needed
+                                height: '80px' // Adjust the height as needed
+                            }}/>
+                          )}
+                          {game !== null && (
+                            <>
+                                {game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 6 && (
+                                  <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
+                                      position: 'absolute',
+                                      right: '-60px',
+                                      top: '50%',
+                                      transform: 'translateY(-50%) rotate(180deg)',
+                                      width: '70px', // Adjust the width as needed
+                                      height: '70px' // Adjust the height as needed
+                                  }}/>
+                                )}
+                                {game.players.length < 4 && (
+                                  <img src={cardIcon} alt="overlay" style={{
+                                      position: 'absolute',
+                                      top: '-5px',
+                                      left: '65px',
+                                      width: `${Cardwidth}px`, // Adjust the width as needed
+                                      height: `${Cardheight}px`,
+                                      zIndex: 2
+                                  }}/>
+                                )}
+                                {game.players.length >= 4 && (
+                                  <img src={cardIcon} alt="overlay" style={{
+                                      position: 'absolute',
+                                      top: '-10px',
+                                      left: '50px',
+                                      width: `${Cardwidth}px`, // Adjust the width as needed
+                                      height: `${Cardheight}px`,
+                                      zIndex: 2
+                                  }}/>
+                                )}
+                            </>
+                          )}
+
+                      </div>
+                  </div>
+                  <div className="avatarfont" style={{textAlign: 'center'}}>{player.username}</div>
+              </div>
+          </div>
         );
     };
 
     let lowerContent = (<div className="gamescreen-innerlower-container">
         <div className="gamescreen-bottomleft-container">
-            {WinLoseWasShown === false && (
-                <div>
-                    <button
-                        id="nextState"
-                        className="dynbut gamescreen-buttons-container"
-                        style={{
-                            left: '7%',
-                            top: '50%',
-                            backgroundColor: 'red',
-                            transform: 'translateY(-50%)',
-                            cursor: 'pointer'
-                        }}
-                        onClick={() => {
-                            if (currentTroopBonus !== 0 && phase === "REINFORCEMENT") {
-                                // Handle button click logic here
-                            } else {
-                                const cur = nextState();
-                            }
-                        }}
-                        disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
+            {localStorage.getItem("WinLooseScreenWasShown") === "false" && (
+              <div>
+                  <button
+                    id="nextState"
+                    className="dynbut gamescreen-buttons-container"
+                    style={{
+                        left: '7%',
+                        top: '50%',
+                        backgroundColor: 'red',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => {
+                        if (currentTroopBonus !== 0 && phase === "REINFORCEMENT") {
+// Handle button click logic here
+                        } else {
+                            const cur = nextState();
+                        }
+                    }}
+                    disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id")) || localStorage.getItem("WinLooseScreenWasShown") === "true"}
+                  >
+                      {CurrentText}
+                  </button>
+                  {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) && localStorage.getItem("WinLooseScreenWasShown") === "false" &&(
+                    <div
+                      id="nextState"
+                      className="dynbut gamescreen-buttons-container"
+                      style={{
+                          left: 'calc(55% + 25px)',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          backgroundColor: 'red',
+                      }}
+                      onClick={() => {
+                          setCurrentTroopBonus(prevState => prevState + 100);
+                      }}
+                      disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id")) || localStorage.getItem("WinLooseScreenWasShown") === "true"}
                     >
-                        {CurrentText}
-                    </button> 
-                    {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) &&(
-                        <div
-                            id="nextState"
-                            className="dynbut gamescreen-buttons-container"
-                            style={{
-                                left: 'calc(55% + 25px)',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                backgroundColor: 'red',
-                            }}
-                            onClick={() => {
-                                setCurrentTroopBonus(prevState => prevState + 100);
-                            }}
-                            disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))}
-                        >
-                            Troop Amount: {(phase === "REINFORCEMENT") ? currentTroopBonus : cardBonus}
-                        
-                            <label className="select-label">
-                                <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
-                                    <option value={1}>1</option>
-                                    <option value={5}>5</option>
-                                    <option value={10}>10</option>
-                                </select>
-                            </label>
-                        </div>
-                    )}
-                </div>
+                        Troop Amount: {(phase === "REINFORCEMENT") ? currentTroopBonus : cardBonus}
+
+                        <label className="select-label">
+                            <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
+                                <option value={1}>1</option>
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                            </select>
+                        </label>
+                    </div>
+                  )}
+              </div>
             )}
         </div>
         <div className="gamescreen-bottomright-container">
             <button
-                id="nextState"
-                className="dynbut gamescreen-buttons-container"
-                style={{
-                    top: '50%',
-                    backgroundColor: 'red',
-                    transform: 'translateY(-50%)',
-                    cursor: 'pointer'
-                }}
-                onClick={() => {
-                    //setIsLeaveModalOpen(true);
-                    LeavePlayerConfirmation();
-                }}
+              id="nextState"
+              className="dynbut gamescreen-buttons-container"
+              style={{
+                  top: '50%',
+                  backgroundColor: 'red',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer'
+              }}
+              onClick={() => {
+                  LeavePlayerConfirmation();
+
+              }}
             >
                 Leave Game
             </button>
@@ -1690,63 +1862,62 @@ const TitleScreen: React.FC = () => {
     </div>);
 
     const sideContent = (
-        <div className="avatar-container">
-            {[0, 1, 2, 3, 4, 5].map(index => (
-                <div key={`avatar-${index}`}>
-                    {getAvatarSrc(index) !== null ? generateAvatarElement(index) : null}
-                </div>
-            ))}
-        </div>
+      <div className="avatar-container">
+          {[0, 1, 2, 3, 4, 5].map(index => (
+            <div key={`avatar-${index}`}>
+                {getAvatarSrc(index) !== null ? generateAvatarElement(index) : null}
+            </div>
+          ))}
+      </div>
     );
 
     return (
-        <div className="gamescreen-container">
-            <div className="gamescreen-innerupper-container">
-                <Announcer phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} />
-                <Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} />
-                {/*Attack Modal Section*/}
-                <section>
-                    <AttackModal
-                        isModalOpen={isModalOpen}
-                        modalContent={modalContent}
-                        onClose={closeModal} 
-                        onMove={moving}
-                        lobbyId={lobbyId}
-                        gameId={gameId}
-                    />
-                    <RiskCardModal
-                        isModalOpen={isCardModalOpen}
-                        isMidTurn={isMidTurn}
-                        onClose={closeCardModal}
-                        onTrade={trading}
-                        lobbyId={lobbyId}
-                        gameId={gameId}
-                    />
-                    <LoseModal
-                        isModalOpen={isLoseModalOpen}
-                        onClose={closeModal}
-                    />
-                    <ModalWin
-                        isModalOpen={isWinModalOpen}
-                        onClose={closeModal}
-                    />
-                    <LeaveModal
-                        isModalOpen={isLeaveModalOpen}
-                        onClose={closeModal}
-                    />
+      <div className="gamescreen-container">
+          <div className="gamescreen-innerupper-container">
+              <Announcer phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} />
+              <Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} />
+              {/*Attack Modal Section*/}
+              <section>
+                  <AttackModal
+                    isModalOpen={isModalOpen}
+                    modalContent={modalContent}
+                    onClose={closeModal}
+                    onMove={moving}
+                    lobbyId={lobbyId}
+                    gameId={gameId}
+                  />
+                  <RiskCardModal
+                    isModalOpen={isCardModalOpen}
+                    isMidTurn={isMidTurn}
+                    onClose={closeCardModal}
+                    onTrade={trading}
+                    lobbyId={lobbyId}
+                    gameId={gameId}
+                  />
+                  <LoseModal
+                    isModalOpen={isLoseModalOpen}
+                    onClose={closeModal}
+                  />
+                  <ModalWin
+                    isModalOpen={isWinModalOpen}
+                    onClose={closeModal}
+                  />
+                  <LeaveModal
+                    isModalOpen={isLeaveModalOpen}
+                    onClose={closeModal}
+                  />
 
-                </section>
-                <canvas id="myCanvas"></canvas>
-                {renderButtons}
-            </div>
-            {lowerContent}
-            <div className="container-80-20">
-                {sideContent}
-            </div>
-        </div>
+              </section>
+              <canvas id="myCanvas"></canvas>
+              {renderButtons}
+          </div>
+          {lowerContent}
+          <div className="container-80-20">
+              {sideContent}
+          </div>
+      </div>
     );
 }
 
 export default TitleScreen;
-
 
