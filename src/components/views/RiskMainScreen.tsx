@@ -50,6 +50,7 @@ const TitleScreen: React.FC = () => {
     const [game, setGame] = useState<Game>(null);
     const [phase, setPhase] = useState(null);
     const [currentPlayerId, setCurrentPlayerId] = useState(null);
+    const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
     const [currentTroopBonus, setCurrentTroopBonus] = useState(null);
     const [selectedTroops, setSelectedTroops] = useState(1);
     const [isPlacing, setIsPlacing] = useState(false);
@@ -194,6 +195,7 @@ const TitleScreen: React.FC = () => {
 
     const trading = () => {
         setTraded(true);
+        console.log("cards.length: ", game.turnCycle.currentPlayer.riskCards.length);
     };
 
     useEffect(() => {
@@ -418,6 +420,13 @@ const TitleScreen: React.FC = () => {
                 setCardBonus(gameResponse.data.turnCycle.currentPlayer.cardBonus);
                 setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
 
+                if(gameResponse.data.turnCycle.currentPlayer.playerId === localStorage.getItem("user_id")){
+                    setIsCurrentPlayer(true);
+                }
+                else {
+                    setIsCurrentPlayer(false);
+                }
+
                 /*for (let player of gameResponse.data.players){
                                     let troopBonusList = [];
                                     let troops = player.troopBonus;
@@ -485,7 +494,7 @@ const TitleScreen: React.FC = () => {
             }
 
             if (CyclewithTroopsandTerritories !== null) {
-// console.log("0 : " + CyclewithTroopsandTerritories[0]);
+                // console.log("0 : " + CyclewithTroopsandTerritories[0]);
                 // console.log("0 : " + CyclewithTroopsandTerritories[1]);
                 // console.log("0 : " + CyclewithTroopsandTerritories[2]);
                 // console.log("0 : " + CyclewithTroopsandTerritories[3]);
@@ -524,7 +533,7 @@ const TitleScreen: React.FC = () => {
                 }
             }
 
-
+            const sC = sideContent;
 
             setStartTimer(prevState => prevState + 1);
             console.log("Current Timer: " + StartTimer);
@@ -1790,55 +1799,57 @@ const TitleScreen: React.FC = () => {
     let lowerContent = (<div className="gamescreen-innerlower-container">
         <div className="gamescreen-bottomleft-container">
             {localStorage.getItem("WinLooseScreenWasShown") === "false" && (
-              <div>
-                  <button
-                    id="nextState"
-                    className="dynbut gamescreen-buttons-container"
-                    style={{
-                        left: '7%',
-                        top: '50%',
-                        backgroundColor: 'red',
-                        transform: 'translateY(-50%)',
-                        cursor: 'pointer'
-                    }}
-                    onClick={() => {
-                        if (currentTroopBonus !== 0 && phase === "REINFORCEMENT") {
-// Handle button click logic here
-                        } else {
-                            const cur = nextState();
-                        }
-                    }}
-                    disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id")) || localStorage.getItem("WinLooseScreenWasShown") === "true"}
-                  >
-                      {CurrentText}
-                  </button>
-                  {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) && parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id")) && localStorage.getItem("WinLooseScreenWasShown") === "false" &&(
-                    <div
-                      id="nextState"
-                      className="dynbut gamescreen-buttons-container"
-                      style={{
-                          left: 'calc(55% + 25px)',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          backgroundColor: 'red',
-                      }}
-                      onClick={() => {
-                          setCurrentTroopBonus(prevState => prevState + 100);
-                      }}
-                      disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id")) || localStorage.getItem("WinLooseScreenWasShown") === "true"}
+                <div>
+                    <button
+                        id="nextState"
+                        className="dynbut gamescreen-buttons-container"
+                        style={{
+                            left: '7%',
+                            top: '50%',
+                            backgroundColor: 'red',
+                            transform: 'translateY(-50%)',
+                            cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                            if (currentTroopBonus !== 0 && phase === "REINFORCEMENT") {
+                            // Handle button click logic here
+                            } else {
+                                const cur = nextState();
+                            }
+                        }}
+                        disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id")) || localStorage.getItem("WinLooseScreenWasShown") === "true"}
                     >
-                        Troop Amount: {(phase === "REINFORCEMENT") ? currentTroopBonus : cardBonus}
+                    {CurrentText}
+                    </button>
+                    {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) && (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) && (localStorage.getItem("WinLooseScreenWasShown") === "false") &&(
+                        <div
+                            id="nextState"
+                            className="dynbut gamescreen-buttons-container"
+                            style={{
+                                left: 'calc(55% + 25px)',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                backgroundColor: 'red',
+                            }}
+                            onClick={() => {
+                                //setCurrentTroopBonus(prevState => prevState + 100);
+                            }}
+                            disabled={!isCurrentPlayer || localStorage.getItem("WinLooseScreenWasShown") === "true"}
+                        >
+                        {"Troop Amount:" + ((phase === "REINFORCEMENT") ? currentTroopBonus : (isMidTurn && cardBonus))}
 
-                        <label className="select-label">
-                            <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
-                                <option value={1}>1</option>
-                                <option value={5}>5</option>
-                                <option value={10}>10</option>
-                            </select>
-                        </label>
-                    </div>
-                  )}
-              </div>
+                        {(phase === "REINFORCEMENT") && (
+                            <label className="select-label">
+                                <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
+                                    <option value={1}>1</option>
+                                    <option value={5}>5</option>
+                                    <option value={10}>10</option>
+                                </select>
+                            </label>
+                        )}
+                        </div>
+                    )}
+                </div>
             )}
         </div>
         <div className="gamescreen-bottomright-container">

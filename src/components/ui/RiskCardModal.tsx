@@ -21,6 +21,7 @@ const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, game
     const [tradable, setTradable] = useState(false);
     const [owned, setOwned] = useState<Card[]>([]);
     const [troopBonus, setTroopBonus] = useState(0);
+    const [traded, setTraded] = useState(false);
 
     useEffect(() => {
         async function fetchData() {
@@ -65,9 +66,11 @@ const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, game
             "card3Name": selectedCards[2].territoryName
         });
         const tradeResponse = await api.post(`/lobbies/${lobbyId}/game/${gameId}/cards`, requestBody, { headers: config });
-        onTrade(true);
+        
         setSelectedCards([]);
         setGame(tradeResponse.data);
+        onTrade(true);
+        setTraded(true);
     };
 
     useEffect(() => {
@@ -111,6 +114,12 @@ const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, game
     useEffect(() => {
         console.log("owned", owned);
     }, [owned])
+
+    useEffect(() => {
+        if (game && cards.length < 3 && traded) {
+            onClose(true);
+        }
+    }, [game])
 
     function calculateTroopBonus(selectedCards: Card[]): number {
         if (selectedCards.length !== 3) {
