@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 
 
-const RiskCard = ({ troop, territoryName}) => {
+const RiskCard = ({ troop, territoryName, isOwned}) => {
     let imageFileName;
     let color;
 
@@ -45,8 +45,12 @@ const RiskCard = ({ troop, territoryName}) => {
         color = "rgba(5, 163, 76, 1)";
     }
 
+    const cardStyle = {
+        border: isOwned ? '3px solid white' : '1px solid #a18041',
+    };
+
     return (
-        <div className="risk-card">
+        <div className="risk-card" style={cardStyle}>
             <div className="border">
                 
                 <img src={require(`../../styles/views/Pictures/${imageFileName}`)} style={{ width: '120px', position: 'relative', top: '-20px'}} alt="My Image" />
@@ -58,7 +62,8 @@ const RiskCard = ({ troop, territoryName}) => {
 
 RiskCard.propTypes = {
     troop: PropTypes.number.isRequired,
-    territoryName: PropTypes.string.isRequired
+    territoryName: PropTypes.string.isRequired,
+    isOwned: PropTypes.bool.isRequired
 };
 
 export default RiskCard;

@@ -101,6 +101,18 @@
     font-size: medium;
     margin-top: 40px;
 }
+.troopCount-container {
+    display: flex;
+    justify-content: center;
+    min-height: 12px;
+    color: $textColor;
+    font-weight: 500;
+    font-family: $fontDefault;
+    line-height: 10px;
+    font-size: medium;
+    margin: 20px;
+}
+
 .modal-riskcards {
     display: flex;
     justify-content: center;
