@@ -153,7 +153,7 @@
   width: 100%;
   transform: translateY(-50%);
   text-align: center;
-  padding: 10px 0;
+  padding: 20px 0;
   z-index: 0;
   max-height: 100%; /* Set the maximum height to 80% */
 }
@@ -209,8 +209,10 @@ avatar-cards{
   /* Add any additional styling as needed */
 }
 
-.avatar{
-  //max-height: 100%;
+.statspicture{
+  position: absolute;
+  right: 100%
+
 }
 
 ///* Styles for the avatars */

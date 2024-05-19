@@ -1449,8 +1449,8 @@ const TitleScreen: React.FC = () => {
                   buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
                   for (const but of buttonsArray) {
                       if(game !== null && game.players.length < 4){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 4}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 4}px`;
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 3.5}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth *3.5}px`;
                       }
                       if(game !== null && game.players.length === 4){
                           (but as HTMLButtonElement).style.height = `${buttonHeight * 3}px`;
@@ -1467,14 +1467,39 @@ const TitleScreen: React.FC = () => {
                       }
                   }
 
+                  allbuttons = document.querySelectorAll('.statspicture');
+                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                  for (const but of buttonsArray) {
+                      if(game !== null && game.players.length < 4){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
+                          // (but as HTMLButtonElement).style.alignItems = `left`;
+                          // (but as HTMLButtonElement).style.alignContent = `left`;
+                          (but as HTMLButtonElement).style.textAlign = `left`;
+                      }
+                      if(game !== null && game.players.length === 4){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
+                      }
+                      if(game !== null && game.players.length === 5){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
+
+                      }
+                      if(game !== null && game.players.length === 6){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
+                      }
+                  }
+
                   allbuttons = document.querySelectorAll('.avatarfont');
                   buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
                   for (const but of buttonsArray) {
                       if(game !== null && game.players.length < 4) {
-                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.82}px`;
+                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.6}px`;
                       }
                       if(game !== null && game.players.length === 4) {
-                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.82}px`;
+                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.6}px`;
                       }
                       if(game !== null && game.players.length === 5) {
                           (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.55}px`;
@@ -1596,10 +1621,10 @@ const TitleScreen: React.FC = () => {
 
     const UpdateIconSizes = () => {
         if(game !== null && game.players.length < 4){
-            return { Iconwidth: 30, Iconheight: 30 };
+            return { Iconwidth: 25, Iconheight: 25 };
         }
         else if(game !== null && game.players.length === 4){
-            return { Iconwidth: 30, Iconheight: 30 };
+            return { Iconwidth: 25, Iconheight: 25 };
         }
         else if(game !== null && game.players.length === 5){
             return { Iconwidth: 25, Iconheight: 25 };
@@ -1672,34 +1697,31 @@ const TitleScreen: React.FC = () => {
               <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                   <div style={{position: 'relative'}}>
                       {troopBonuses !== undefined && (
-                        <div style={{position: 'absolute', right: '100%', top: `${checkforheightoftexts()}%`}}>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <img src={TerritoryIcon.src} alt="icon"
-                                     style={{
-                                         marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
-                                         height: `${Iconheight}px`
-                                     }}/>
-                                <span className="avatarfont">{troopBonuses[1]}</span>
-                            </div>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <img src={TroopIcon.src} alt="icon"
-                                     style={{
-                                         marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
-                                         height: `${Iconheight}px`
-                                     }}/>
-                                <span className="avatarfont">{troopBonuses[2]}</span>
-                            </div>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <img src={BonusIcon.src} alt="icon"
-                                     style={{
-                                         marginRight: '5px', width: '${Iconwidth}px', // Adjust the width as needed
-                                         height: `${Iconheight}px`
-                                     }}/>
-                                <span
-                                  className="avatarfont">{player.troopBonus > 0 && ("+" + player.troopBonus)}</span>
-                            </div>
-                        </div>
+                          <div style={{ position: 'absolute', right: '100%', top: `${checkforheightoftexts()}%`, alignSelf: 'flex-start' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+                                  <div style={{ display: 'flex', alignItems: 'left' }}>
+                                      <img className="statspicture" src={TerritoryIcon.src} alt="icon" style={{
+                                          marginRight: '0px', width: `${Iconwidth}px`, height: `${Iconheight}px`
+                                      }} />
+                                      <span className="avatarfont">{troopBonuses[1]}</span>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'left' }}>
+                                      <img className="statspicture" src={TroopIcon.src} alt="icon" style={{
+                                          marginRight: '0px', width: `${Iconwidth}px`, height: `${Iconheight}px`
+                                      }} />
+                                      <span className="avatarfont">{troopBonuses[2]}</span>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'left' }}>
+                                      <img className="statspicture" src={BonusIcon.src} alt="icon" style={{
+                                          marginRight: '0px', width: `${Iconwidth}px`, height: `${Iconheight}px`
+                                      }} />
+                                      <span className="avatarfont">{player.troopBonus > 0 && ("+" + player.troopBonus)}</span>
+                                  </div>
+                              </div>
+                          </div>
                       )}
+
+
                       <div style={{position: 'relative'}}>
                           <div className="avatar" id={`avatar${index}`}
                                style={{...avatarStyleSide, border: `${getAvatarColor(index)}`}}>
@@ -1707,19 +1729,21 @@ const TitleScreen: React.FC = () => {
                                 src={avatarSrc}
                                 alt="avatar"
                                 style={imageStyle}
+
                                 onMouseEnter={() => {
-                                    if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id"))) {
+                                    if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id")) && localStorage.getItem("WinLooseScreenWasShown") === "false") {
                                         handleHover(`avatar${index}`);
                                     }
                                 }}
                                 onMouseLeave={() => {
-                                    if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id"))) {
+                                    if (game !== null && player.playerId === parseInt(localStorage.getItem("user_id")) && localStorage.getItem("WinLooseScreenWasShown") === "false") {
                                         handleHoverOut(`avatar${index}`);
                                     }
                                 }}
                                 onClick={() => {
+                                    if(localStorage.getItem("WinLooseScreenWasShown") === "false"){
                                     ((game && player.playerId === parseInt(localStorage.getItem("user_id"))) && openCardModal());
-                                    console.log(`I Clicked this avatar${index}`);
+                                    console.log(`I Clicked this avatar${index}`);}
                                 }}
                               />
                           </div>
