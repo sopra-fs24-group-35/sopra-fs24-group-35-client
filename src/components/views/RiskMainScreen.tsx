@@ -1911,7 +1911,7 @@ const TitleScreen: React.FC = () => {
                     >
                     {CurrentText}
                     </button>
-                    {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && cardBonus && cardBonus !== 0 && isMidTurn)) && (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) && (localStorage.getItem("WinLooseScreenWasShown") === "false") &&(
+                    {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && isMidTurn)) && (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) && (localStorage.getItem("WinLooseScreenWasShown") === "false") &&(
                         <div
                             id="nextState"
                             className="dynbut gamescreen-buttons-container"
