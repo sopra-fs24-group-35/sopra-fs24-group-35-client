@@ -88,7 +88,7 @@ const TitleScreen: React.FC = () => {
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
     const [WinLoseWasShown, setWinLoseWasShown] = useState(false)
     const [StartTimer, setStartTimer] = useState(0);
-    const [LoseList, setLoseList] = useState([]);
+    const [LoseList, setLoseList] = useState([0, 0, 0, 0, 0, 0]);
     const [CyclewithTroopsandTerritories, setCyclewithTroopsandTerritories] = useState({});
 
 //ALL imagens
@@ -590,6 +590,7 @@ const TitleScreen: React.FC = () => {
     };
 
     const setdeathsymbol = () => {
+        console.log("BEGINNING LOOSELIST: " + LoseList);
         if(game !== null) {
             if (PlayerCycle !== null) {
                 let count = -1;
@@ -605,9 +606,12 @@ const TitleScreen: React.FC = () => {
                     console.log(game);
                     console.log(LoseList);
                     if (bool === false && !LoseList.includes(x.playerId)) {
-                        const list = LoseList;
-                        list[count] = x.playerId;
-                        setLoseList(list);
+                        console.log("BOOL INSIDE: "+ bool + "  playerid: " + x.playerId + "  count: " + count);
+                        setLoseList(prevList => {
+                            const newList = [...prevList];
+                            newList[count] = x.playerId;
+                            return newList;
+                        });
                         const avatar0Button = document.getElementById(`avatar${count}`);
 
                         if(game.players.length < 4){
@@ -622,8 +626,6 @@ const TitleScreen: React.FC = () => {
 // Append the image element to the avatar button
                         avatar0Button.appendChild(defeat);
                     }
-
-
                 }
             }
         }
@@ -1482,13 +1484,13 @@ const TitleScreen: React.FC = () => {
                           (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
                       }
                       if(game !== null && game.players.length === 5){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * .9}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * .9}px`;
 
                       }
                       if(game !== null && game.players.length === 6){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * .75}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * .75}px`;
                       }
                   }
 
@@ -1510,6 +1512,70 @@ const TitleScreen: React.FC = () => {
 
 
                   }
+
+                  allbuttons = document.querySelectorAll('.avatar-arrow');
+                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                  for (const but of buttonsArray) {
+                      if(game !== null && game.players.length < 4){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                          // (but as HTMLButtonElement).style.alignItems = `left`;
+                          // (but as HTMLButtonElement).style.alignContent = `left`;
+                          (but as HTMLButtonElement).style.left = '100%';
+                      }
+                      if(game !== null && game.players.length === 4){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                          (but as HTMLButtonElement).style.left = '100%';
+                      }
+                      if(game !== null && game.players.length === 5){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                          (but as HTMLButtonElement).style.left = '100%';
+
+                      }
+                      if(game !== null && game.players.length === 6){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                          (but as HTMLButtonElement).style.left = '100%';
+                      }
+                  }
+
+                  allbuttons = document.querySelectorAll('.avatar-cards');
+                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                  const totalWidth = document.documentElement.scrollWidth;
+                  const totalHeight = document.documentElement.scrollHeight;
+                  let crtratio = totalWidth/totalHeight;
+                  let normalratio = 1.553;
+                  let changetoleft = Math.abs(normalratio-crtratio);
+                  for (const but of buttonsArray) {
+                      if(game !== null && game.players.length < 4){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1.7}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1.7}px`;
+                          (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
+                          // (but as HTMLButtonElement).style.alignContent = `left`;
+
+                      }
+                      if(game !== null && game.players.length === 4){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1.4}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1.4}px`;
+                          (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
+                      }
+                      if(game !== null && game.players.length === 5){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1.4}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1.4}px`;
+                          (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
+
+                      }
+                      if(game !== null && game.players.length === 6){
+                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1.4}px`;
+                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1.4}px`;
+                          (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
+                      }
+                  }
+                  defeat.style.height = `${buttonHeight * 4}px`;
+                  defeat.style.width = `${buttonWidth * 4}px`;
+
 
               };
 
@@ -1607,7 +1673,7 @@ const TitleScreen: React.FC = () => {
             return 10;
         }
         else if(game !== null && game.players.length === 4){
-            return -5;
+            return 3;
         }
         else if(game !== null && game.players.length === 5){
             return 5;
@@ -1697,7 +1763,7 @@ const TitleScreen: React.FC = () => {
               <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                   <div style={{position: 'relative'}}>
                       {troopBonuses !== undefined && (
-                          <div style={{ position: 'absolute', right: '100%', top: `${checkforheightoftexts()}%`, alignSelf: 'flex-start' }}>
+                          <div style={{ position: 'absolute', right: '100%', top: `${checkforheightoftexts()}%`, alignSelf: 'flex-start', alignText: "left", alignContent: "left" }}>
                               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                                   <div style={{ display: 'flex', alignItems: 'left' }}>
                                       <img className="statspicture" src={TerritoryIcon.src} alt="icon" style={{
@@ -1790,19 +1856,19 @@ const TitleScreen: React.FC = () => {
                                   }}/>
                                 )}
                                 {game.players.length < 4 && (
-                                  <img src={cardIcon} alt="overlay" style={{
+                                  <img className="avatar-cards" src={cardIcon} alt="overlay" style={{
                                       position: 'absolute',
                                       top: '-5px',
-                                      left: '65px',
+                                      left: '50px',
                                       width: `${Cardwidth}px`, // Adjust the width as needed
                                       height: `${Cardheight}px`,
                                       zIndex: 2
                                   }}/>
                                 )}
                                 {game.players.length >= 4 && (
-                                  <img src={cardIcon} alt="overlay" style={{
+                                  <img className="avatar-cards" src={cardIcon} alt="overlay" style={{
                                       position: 'absolute',
-                                      top: '-10px',
+                                      top: '0px',
                                       left: '50px',
                                       width: `${Cardwidth}px`, // Adjust the width as needed
                                       height: `${Cardheight}px`,
@@ -1845,7 +1911,7 @@ const TitleScreen: React.FC = () => {
                     >
                     {CurrentText}
                     </button>
-                    {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) && (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) && (localStorage.getItem("WinLooseScreenWasShown") === "false") &&(
+                    {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && cardBonus && cardBonus !== 0 && isMidTurn)) && (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) && (localStorage.getItem("WinLooseScreenWasShown") === "false") &&(
                         <div
                             id="nextState"
                             className="dynbut gamescreen-buttons-container"

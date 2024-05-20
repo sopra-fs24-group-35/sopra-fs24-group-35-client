@@ -160,34 +160,42 @@
 
 .avatar-overlay3{
   position: absolute;
-  top: 5%;
-  left: 3%;
+  top: -10%;
+  left: -5%;
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
   z-index: 1;
+  background-size: cover; /* Scale the background image to cover the entire container */
+  background-position: center; /* Center the background image */
   /* Add any additional styling as needed */
 }
 .avatar-overlay4{
   position: absolute;
-  top: 5%;
-  left: 3%;
+  top: -20%;
+  left: -10%;
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
   z-index: 1;
+  background-size: cover; /* Scale the background image to cover the entire container */
+  background-position: center; /* Center the background image */
   /* Add any additional styling as needed */
 }
 .avatar-overlay5{
   position: absolute;
-  top: -15%;
+  top: -25%;
   left: -15%;
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
   z-index: 1;
+  background-size: cover; /* Scale the background image to cover the entire container */
+  background-position: center; /* Center the background image */
   /* Add any additional styling as needed */
 }
 .avatar-overlay6{
   position: absolute;
-  top: -24%;
-  left: -20%;
+  top: -30%;
+  left: -18%;
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
   z-index: 1;
+  background-size: cover; /* Scale the background image to cover the entire container */
+  background-position: center; /* Center the background image */
   /* Add any additional styling as needed */
 }
 avatar-arrow{
@@ -209,9 +217,15 @@ avatar-cards{
   /* Add any additional styling as needed */
 }
 
+.allscreen{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
 .statspicture{
   position: absolute;
-  right: 100%
+  right: 100%;
 
 }
 
