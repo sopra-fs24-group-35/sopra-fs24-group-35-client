@@ -33,8 +33,6 @@
     width: 110%;
     height: 100px;
     padding: 20px;
-    background-color: rgb(49, 30, 221);
-    border: 10px solid rgb(0, 2, 112);
     border-radius: 5px;
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
 
@@ -52,9 +50,29 @@
       z-index: -1001;
       
     }
-    &.turnOverColor {
-        background-color: rgb(11, 128, 0);
-        border: 10px solid rgb(22, 95, 0);
+    &.c1 {
+      background-color: rgb(190, 33, 33);
+      border: 10px solid rgb(92, 13, 13);
+    }
+    &.c2 {
+      background-color: rgb(49, 30, 221);
+      border: 10px solid rgb(0, 2, 112);
+    }
+    &.c3 {
+      background-color: rgb(170, 16, 218);
+      border: 10px solid rgb(94, 34, 122);
+    }
+    &.c4 {
+      background-color: rgb(13, 165, 51);
+      border: 10px solid rgb(10, 109, 35);
+    }
+    &.c5 {
+      background-color: rgb(245, 120, 18);
+      border: 10px solid rgb(187, 95, 8);
+    }
+    &.c6 {
+      background-color: rgb(146, 86, 58);
+      border: 10px solid rgb(110, 66, 45);
     }
   }
   
