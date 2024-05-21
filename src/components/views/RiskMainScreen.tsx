@@ -1262,6 +1262,9 @@ const TitleScreen: React.FC = () => {
         preloadImage(imageSrc).then((image: HTMLImageElement) => {
 
 // Once the image is fully loaded, update the canvas
+            if(game === null){
+                pause(2000);
+            }
               fetchData();
               const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
               const ctx = canvas.getContext('2d');
