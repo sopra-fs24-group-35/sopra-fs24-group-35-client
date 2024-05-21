@@ -22,7 +22,8 @@ const joinScreen = () => {
       const lobbyId = response.data.id;
       const token = response.headers["authorization"];
       localStorage.setItem("lobbyToken", token);
-      localStorage . setItem ( "WinLooseScreenWasShown" ,  "false" );
+      localStorage.setItem ( "WinLooseScreenWasShown" ,  "false" );
+      localStorage.setItem ( "GameHasWinner" , "false" );
       navigate("/lobby/" + lobbyId);
 
     } catch (error) {

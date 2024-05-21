@@ -168,7 +168,6 @@ const TitleScreen: React.FC = () => {
     const [traded, setTraded] = useState(false);
 
     const openCardModal = () => {
-        console.log("hello?");
         setIsCardModalOpen(true);
     };
 
@@ -195,7 +194,6 @@ const TitleScreen: React.FC = () => {
 
     const trading = () => {
         setTraded(true);
-        console.log("cards.length: ", game.turnCycle.currentPlayer.riskCards.length);
     };
 
     useEffect(() => {
@@ -206,198 +204,50 @@ const TitleScreen: React.FC = () => {
     /*-------------------------------------------------*/
 
     const [buttonData, setButtonData] = useState([
-        {id: 'Alaska', refKey: 'Alaska', text: 'Alaska', xratio: 0.08, yratio: 0.14, troops: 0, playerid: 0},
-        {
-            id: 'Northwest Territory',
-            refKey: 'Northwest Territory',
-            text: 'Northwest Territory',
-            xratio: 0.18,
-            yratio: 0.145,
-            troops: 0,
-            playerid: 0
-        },
-        {id: 'Greenland', refKey: 'Greenland', text: 'Greenland', xratio: 0.35, yratio: 0.1, troops: 0, playerid: 0},
-        {id: 'Quebec', refKey: 'Quebec', text: 'Quebec', xratio: 0.3, yratio: 0.24, troops: 0, playerid: 0},
-        {id: 'Ontario', refKey: 'Ontario', text: 'Ontario', xratio: 0.23, yratio: 0.24, troops: 0, playerid: 0},
-        {id: 'Alberta', refKey: 'Alberta', text: 'Alberta', xratio: 0.16, yratio: 0.23, troops: 0, playerid: 0},
-        {
-            id: 'Western US',
-            refKey: 'Western US',
-            text: 'Western US',
-            xratio: 0.18,
-            yratio: 0.335,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'Eastern US',
-            refKey: 'Eastern US',
-            text: 'Eastern US',
-            xratio: 0.24,
-            yratio: 0.37,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'Central America',
-            refKey: 'Central America',
-            text: 'Central America',
-            xratio: 0.185,
-            yratio: 0.455,
-            troops: 0,
-            playerid: 0
-        },
-
-        {id: 'Venezuela', refKey: 'Venezuela', text: 'Venezuela', xratio: 0.26, yratio: 0.55, troops: 0, playerid: 0},
-        {id: 'Brazil', refKey: 'Brazil', text: 'Brazil', xratio: 0.31, yratio: 0.63, troops: 0, playerid: 0},
-        {id: 'Peru', refKey: 'Peru', text: 'Peru', xratio: 0.27, yratio: 0.676, troops: 0, playerid: 0},
-        {id: 'Argentina', refKey: 'Argentina', text: 'Argentina', xratio: 0.28, yratio: 0.79, troops: 0, playerid: 0},
-
-        {id: 'Ukraine', refKey: 'Ukraine', text: 'Ukraine', xratio: 0.582, yratio: 0.275, troops: 0, playerid: 0},
-        {
-            id: 'Northern Europe',
-            refKey: 'Northern Europe',
-            text: 'Northern Europe',
-            xratio: 0.50,
-            yratio: 0.33,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'Southern Europe',
-            refKey: 'Southern Europe',
-            text: 'Southern Europe',
-            xratio: 0.51,
-            yratio: 0.425,
-            troops: 0,
-            playerid: 0
-        },
-        {id: 'Iceland', refKey: 'Iceland', text: 'Iceland', xratio: 0.435, yratio: 0.2, troops: 0, playerid: 0},
-        {
-            id: 'Western Europe',
-            refKey: 'Western Europe',
-            text: 'Western Europe',
-            xratio: 0.43,
-            yratio: 0.47,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'Scandinavia',
-            refKey: 'Scandinavia',
-            text: 'Scandinavia',
-            xratio: 0.505,
-            yratio: 0.19,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'Great Britain',
-            refKey: 'Great Britain',
-            text: 'Great Britain',
-            xratio: 0.42,
-            yratio: 0.315,
-            troops: 0,
-            playerid: 0
-        },
-
-        {id: 'Egypt', refKey: 'Egypt', text: 'Egypt', xratio: 0.54, yratio: 0.565, troops: 0, playerid: 0},
-        {
-            id: 'East Africa',
-            refKey: 'East Africa',
-            text: 'East Africa',
-            xratio: 0.58,
-            yratio: 0.656,
-            troops: 0,
-            playerid: 0
-        },
-        {id: 'Congo', refKey: 'Congo', text: 'Congo', xratio: 0.54, yratio: 0.72, troops: 0, playerid: 0},
-        {
-            id: 'South Africa',
-            refKey: 'South Africa',
-            text: 'South Africa',
-            xratio: 0.55,
-            yratio: 0.84,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'North Africa',
-            refKey: 'North Africa',
-            text: 'North Africa',
-            xratio: 0.48,
-            yratio: 0.6,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'Madagascar',
-            refKey: 'Madagascar',
-            text: 'Madagascar',
-            xratio: 0.627,
-            yratio: 0.84,
-            troops: 0,
-            playerid: 0
-        },
-
-        {id: 'Indonesia', refKey: 'Indonesia', text: 'Indonesia', xratio: 0.805, yratio: 0.71, troops: 0, playerid: 0},
-        {
-            id: 'New Guinea',
-            refKey: 'New Guinea',
-            text: 'New Guinea',
-            xratio: 0.884,
-            yratio: 0.68,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'Western Australia',
-            refKey: 'Western Australia',
-            text: 'Western Australia',
-            xratio: 0.84,
-            yratio: 0.85,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'Eastern Australia',
-            refKey: 'Eastern Australia',
-            text: 'Eastern Australia',
-            xratio: 0.915,
-            yratio: 0.82,
-            troops: 0,
-            playerid: 0
-        },
-
-        {id: 'Ural', refKey: 'Ural', text: 'Ural', xratio: 0.685, yratio: 0.25, troops: 0, playerid: 0},
-        {id: 'Siberia', refKey: 'Siberia', text: 'Siberia', xratio: 0.735, yratio: 0.16, troops: 0, playerid: 0},
-        {id: 'Yakutsk', refKey: 'Yakutsk', text: 'Yakutsk', xratio: 0.805, yratio: 0.12, troops: 0, playerid: 0},
-        {id: 'Irkutsk', refKey: 'Irkutsk', text: 'Irkutsk', xratio: 0.792, yratio: 0.25, troops: 0, playerid: 0},
-        {id: 'Kamchatka', refKey: 'Kamchatka', text: 'Kamchatka', xratio: 0.88, yratio: 0.13, troops: 0, playerid: 0},
-        {id: 'Japan', refKey: 'Japan', text: 'Japan', xratio: 0.895, yratio: 0.35, troops: 0, playerid: 0},
-        {id: 'Mongolia', refKey: 'Mongolia', text: 'Mongolia', xratio: 0.805, yratio: 0.345, troops: 0, playerid: 0},
-        {id: 'China', refKey: 'China', text: 'China', xratio: 0.76, yratio: 0.42, troops: 0, playerid: 0},
-        {
-            id: 'Afghanistan',
-            refKey: 'Afghanistan',
-            text: 'Afghanistan',
-            xratio: 0.665,
-            yratio: 0.36,
-            troops: 0,
-            playerid: 0
-        },
-        {
-            id: 'Middle East',
-            refKey: 'Middle East',
-            text: 'Middle East',
-            xratio: 0.61,
-            yratio: 0.535,
-            troops: 0,
-            playerid: 0
-        },
-        {id: 'India', refKey: 'India', text: 'India', xratio: 0.715, yratio: 0.51, troops: 0, playerid: 0},
-        {id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio: 0.55, troops: 0, playerid: 0},
+        {id: 'Alaska', refKey: 'Alaska', text: 'Alaska', xratio: 0.08, yratio: 0.14, troops: 0, owner: 0, color: 0},
+        {id: 'Northwest Territory', refKey: 'Northwest Territory', text: 'Northwest Territory', xratio: 0.18, yratio: 0.145, troops: 0, owner: 0, color: 0},
+        {id: 'Greenland', refKey: 'Greenland', text: 'Greenland', xratio: 0.35, yratio: 0.1, troops: 0, owner: 0, color: 0},
+        {id: 'Quebec', refKey: 'Quebec', text: 'Quebec', xratio: 0.3, yratio: 0.24, troops: 0, owner: 0, color: 0},
+        {id: 'Ontario', refKey: 'Ontario', text: 'Ontario', xratio: 0.23, yratio: 0.24, troops: 0, owner: 0, color: 0},
+        {id: 'Alberta', refKey: 'Alberta', text: 'Alberta', xratio: 0.16, yratio: 0.23, troops: 0, owner: 0, color: 0},
+        {id: 'Western US', refKey: 'Western US', text: 'Western US', xratio: 0.18, yratio: 0.335, troops: 0, owner: 0, color: 0},
+        {id: 'Eastern US', refKey: 'Eastern US', text: 'Eastern US', xratio: 0.24, yratio: 0.37, troops: 0, owner: 0, color: 0},
+        {id: 'Central America', refKey: 'Central America', text: 'Central America', xratio: 0.185, yratio: 0.455, troops: 0, owner: 0, color: 0},
+        {id: 'Venezuela', refKey: 'Venezuela', text: 'Venezuela', xratio: 0.26, yratio: 0.55, troops: 0, owner: 0, color: 0},
+        {id: 'Brazil', refKey: 'Brazil', text: 'Brazil', xratio: 0.31, yratio: 0.63, troops: 0, owner: 0, color: 0},
+        {id: 'Peru', refKey: 'Peru', text: 'Peru', xratio: 0.27, yratio: 0.676, troops: 0, owner: 0, color: 0},
+        {id: 'Argentina', refKey: 'Argentina', text: 'Argentina', xratio: 0.28, yratio: 0.79, troops: 0, owner: 0, color: 0},
+        {id: 'Ukraine', refKey: 'Ukraine', text: 'Ukraine', xratio: 0.582, yratio: 0.275, troops: 0, owner: 0, color: 0},
+        {id: 'Northern Europe', refKey: 'Northern Europe', text: 'Northern Europe', xratio: 0.50, yratio: 0.33, troops: 0, owner: 0, color: 0},
+        {id: 'Southern Europe', refKey: 'Southern Europe', text: 'Southern Europe', xratio: 0.51, yratio: 0.425, troops: 0, owner: 0, color: 0},
+        {id: 'Iceland', refKey: 'Iceland', text: 'Iceland', xratio: 0.435, yratio: 0.2, troops: 0, owner: 0, color: 0},
+        {id: 'Western Europe', refKey: 'Western Europe', text: 'Western Europe', xratio: 0.43, yratio: 0.47, troops: 0, owner: 0, color: 0},
+        {id: 'Scandinavia', refKey: 'Scandinavia', text: 'Scandinavia', xratio: 0.505, yratio: 0.19, troops: 0, owner: 0, color: 0},
+        {id: 'Great Britain', refKey: 'Great Britain', text: 'Great Britain', xratio: 0.42, yratio: 0.315, troops: 0, owner: 0, color: 0},
+        {id: 'Egypt', refKey: 'Egypt', text: 'Egypt', xratio: 0.54, yratio: 0.565, troops: 0, owner: 0, color: 0},
+        {id: 'East Africa', refKey: 'East Africa', text: 'East Africa', xratio: 0.58, yratio: 0.656, troops: 0, owner: 0, color: 0},
+        {id: 'Congo', refKey: 'Congo', text: 'Congo', xratio: 0.54, yratio: 0.72, troops: 0, owner: 0, color: 0},
+        {id: 'South Africa', refKey: 'South Africa', text: 'South Africa', xratio: 0.55, yratio: 0.84, troops: 0, owner: 0, color: 0},
+        {id: 'North Africa', refKey: 'North Africa', text: 'North Africa', xratio: 0.48, yratio: 0.6, troops: 0, owner: 0, color: 0},
+        {id: 'Madagascar', refKey: 'Madagascar', text: 'Madagascar', xratio: 0.627, yratio: 0.84, troops: 0, owner: 0, color: 0},
+        {id: 'Indonesia', refKey: 'Indonesia', text: 'Indonesia', xratio: 0.805, yratio: 0.71, troops: 0, owner: 0, color: 0},
+        {id: 'New Guinea', refKey: 'New Guinea', text: 'New Guinea', xratio: 0.884, yratio: 0.68, troops: 0, owner: 0, color: 0},
+        {id: 'Western Australia', refKey: 'Western Australia', text: 'Western Australia', xratio: 0.84, yratio: 0.85, troops: 0, owner: 0, color: 0},
+        {id: 'Eastern Australia', refKey: 'Eastern Australia', text: 'Eastern Australia', xratio: 0.915, yratio: 0.82, troops: 0, owner: 0, color: 0},
+        {id: 'Ural', refKey: 'Ural', text: 'Ural', xratio: 0.685, yratio: 0.25, troops: 0, owner: 0, color: 0},
+        {id: 'Siberia', refKey: 'Siberia', text: 'Siberia', xratio: 0.735, yratio: 0.16, troops: 0, owner: 0, color: 0},
+        {id: 'Yakutsk', refKey: 'Yakutsk', text: 'Yakutsk', xratio: 0.805, yratio: 0.12, troops: 0, owner: 0, color: 0},
+        {id: 'Irkutsk', refKey: 'Irkutsk', text: 'Irkutsk', xratio: 0.792, yratio: 0.25, troops: 0, owner: 0, color: 0},
+        {id: 'Kamchatka', refKey: 'Kamchatka', text: 'Kamchatka', xratio: 0.88, yratio: 0.13, troops: 0, owner: 0, color: 0},
+        {id: 'Japan', refKey: 'Japan', text: 'Japan', xratio: 0.895, yratio: 0.35, troops: 0, owner: 0, color: 0},
+        {id: 'Mongolia', refKey: 'Mongolia', text: 'Mongolia', xratio: 0.805, yratio: 0.345, troops: 0, owner: 0, color: 0},
+        {id: 'China', refKey: 'China', text: 'China', xratio: 0.76, yratio: 0.42, troops: 0, owner: 0, color: 0},
+        {id: 'Afghanistan', refKey: 'Afghanistan', text: 'Afghanistan', xratio: 0.665, yratio: 0.36, troops: 0, owner: 0, color: 0},
+        {id: 'Middle East', refKey: 'Middle East', text: 'Middle East', xratio: 0.61, yratio: 0.535, troops: 0, owner: 0, color: 0},
+        {id: 'India', refKey: 'India', text: 'India', xratio: 0.715, yratio: 0.51, troops: 0, owner: 0, color: 0},
+        {id: 'Siam', refKey: 'Siam', text: 'Siam', xratio: 0.785, yratio: 0.55, troops: 0, owner: 0, color: 0},
     ]);
+
 
     const config = {Authorization: localStorage.getItem("lobbyToken")};
 
@@ -415,7 +265,6 @@ const TitleScreen: React.FC = () => {
                 setGame(gameResponse.data);
                 setPhase(gameResponse.data.turnCycle.currentPhase);
                 setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
-                console.log("current player: " + gameResponse.data.turnCycle.currentPlayer.playerId);
                 setCurrentTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
                 setCardBonus(gameResponse.data.turnCycle.currentPlayer.cardBonus);
                 setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
@@ -427,25 +276,20 @@ const TitleScreen: React.FC = () => {
                     setIsCurrentPlayer(false);
                 }
 
-                /*for (let player of gameResponse.data.players){
-                                    let troopBonusList = [];
-                                    let troops = player.troopBonus;
-                                    troopBonusList.push(troops);
-                                    setTroopBonuses(troopBonusList);
-                                }*/
-
             } catch (error) {
                 console.error("Error fetching game data:", error);
-                if(error.message === "Request failed with status code 404"){
-                    console.log('Before Pause');
-                    pause(10000)
-                      .then(() => {
-                          console.log('After 10 seconds');
-                          localStorage.removeItem("lobbyToken");
-                          localStorage.removeItem("lobbyId");
-                          localStorage.removeItem("WinLooseScreenWasShown");
-                          navigate("/lobby");
-                      });
+                if(error.message === "Request failed with status code 404") {
+                    //console.log('Before Pause');
+                    //pause(10000)
+                    //.then(() => {
+                    //console.log('After 10 seconds');
+                    localStorage.removeItem("lobbyToken");
+                    localStorage.removeItem("lobbyId");
+                    localStorage.removeItem("WinLooseScreenWasShown");
+                    localStorage.removeItem("GameHasWinner");
+                    navigate("/lobby");
+                //});
+
                 }
 // Handle error if needed
                 //if(game)
@@ -475,12 +319,6 @@ const TitleScreen: React.FC = () => {
 
     useEffect(() => {
         if (game !== null) {
-            console.log("game: ", game);
-            console.log("current phase: ", phase);
-            console.log("current player id: ", currentPlayerId);
-            console.log("playerCycle:", PlayerCycle);
-            console.log("cardBonus", cardBonus);
-
             if (phase === "REINFORCEMENT" && game.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId){
                 openCardModal();
             }
@@ -494,10 +332,6 @@ const TitleScreen: React.FC = () => {
             }
 
             if (CyclewithTroopsandTerritories !== null) {
-                // console.log("0 : " + CyclewithTroopsandTerritories[0]);
-                // console.log("0 : " + CyclewithTroopsandTerritories[1]);
-                // console.log("0 : " + CyclewithTroopsandTerritories[2]);
-                // console.log("0 : " + CyclewithTroopsandTerritories[3]);
             }
 
             let PlayerwithColors = {};
@@ -509,19 +343,39 @@ const TitleScreen: React.FC = () => {
                 }
             }
             setPlayerColor(PlayerwithColors);
+            let buttonDatacopy = [...buttonData]; // Create a shallow copy of buttonData
 
-            for (let i = 0; i < buttonData.length; i++) {
-                const territory = game.board.territories.find(territory => territory.name === buttonData[i].id);
-                const button = buttonData[i];
-                if (territory) {
-                    button.troops = territory.troops;
-                    button.playerid = territory.playerId;
+            for (let i = 0; i < buttonDatacopy.length; i++) {
+                const button = buttonDatacopy[i];
+                const territory1 = game.board.territories.find(territory => territory.name === buttonDatacopy[i].id);
+                const playercolor = PlayerColor[territory1.owner]
+                if(button.owner === 0){
+                    button.troops = territory1.troops;
+                    button.owner = territory1.owner;
+                }
+                else if (game !== null && territory1.troops !== button.troops || button.owner !== territory1.owner) {
+                    if(button.owner !== territory1.owner){
+                        button.troops = territory1.troops;
+                        button.owner = territory1.owner;
+                        showchangeofowner(button.id, "5px solid #8B0000");
+                    } else {
+                        if(button.troops < territory1.troops){
+                            button.troops = territory1.troops;
+                            button.owner = territory1.owner;
+                            showchangeoftroops(button.id, "5px solid lightgreen");
+                        } else {
+                            button.troops = territory1.troops;
+                            button.owner = territory1.owner;
+                            showchangeoftroops(button.id, "5px solid #FF7F7F");
+                        }
+                    }
 
                 } else {
 
                 }
-                setButtonData([...buttonData]);
             }
+
+            setButtonData(buttonDatacopy); // Update the state with the modified copy
             if (phase === "REINFORCEMENT") {
                 setCurrentText(NameCycle[0]);
             } else if (phase === "ATTACK") {
@@ -536,7 +390,6 @@ const TitleScreen: React.FC = () => {
             const sC = sideContent;
 
             setStartTimer(prevState => prevState + 1);
-            console.log("Current Timer: " + StartTimer);
             checkifyouHaveLostOrWon();
             setdeathsymbol()
         }
@@ -545,8 +398,39 @@ const TitleScreen: React.FC = () => {
     }, [game, phase, currentPlayerId]);
 
     useEffect(() => {
-        console.log("isPlacing:", isPlacing);
     }, [isPlacing]);
+
+    async function showchangeoftroops(buttonid, newcolor) {
+        if (game.turnCycle.currentPlayer.playerId !== parseInt(localStorage.getItem("user_id")) || game.turnCycle.currentPhase === "REINFORCEMENT") {
+        const avatar0Button = document.getElementById(buttonid);
+        if (!avatar0Button) {
+            console.error(`Button with id ${buttonid} not found`);
+            return;
+        }
+        const originalColor = avatar0Button.style.border;
+        avatar0Button.style.outline = newcolor;
+
+        await pause(2000);
+
+        avatar0Button.style.outline = "";
+        }
+    }
+
+    async function showchangeofowner(buttonid, newcolor) {
+        if (game.turnCycle.currentPlayer.playerId !== parseInt(localStorage.getItem("user_id"))) {
+            const avatar0Button = document.getElementById(buttonid);
+            if (!avatar0Button) {
+                console.error(`Button with id ${buttonid} not found`);
+                return;
+            }
+            const originalColor = avatar0Button.style.border;
+            avatar0Button.style.outline = newcolor;
+
+            await pause(2000);
+
+            avatar0Button.style.outline = "";
+        }
+    }
 
     function pause(milliseconds) {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -561,6 +445,9 @@ const TitleScreen: React.FC = () => {
         let won = true;
         let loose = true;
         if(game !== null) {
+            if(game.turnCycle.playerCycle.length === 1){
+                localStorage.setItem("GameHasWinner", "true");
+            }
             let dic = setupdictionayforStats();
             for (const x of game.board.territories) {
                 dic = addtroopsandterritories(dic, x);
@@ -570,11 +457,6 @@ const TitleScreen: React.FC = () => {
                     loose = false
                 }
             }
-            console.log("HALLOO");
-            console.log("0 : " + CyclewithTroopsandTerritories[0]);
-            console.log("0 : " + CyclewithTroopsandTerritories[1]);
-            console.log("0 : " + CyclewithTroopsandTerritories[2]);
-            console.log("0 : " + CyclewithTroopsandTerritories[3]);
             setCyclewithTroopsandTerritories(dic);
             if (won === true && localStorage.getItem("WinLooseScreenWasShown") === "false") {
                 WinScreen();
@@ -590,7 +472,6 @@ const TitleScreen: React.FC = () => {
     };
 
     const setdeathsymbol = () => {
-        console.log("BEGINNING LOOSELIST: " + LoseList);
         if(game !== null) {
             if (PlayerCycle !== null) {
                 let count = -1;
@@ -602,11 +483,7 @@ const TitleScreen: React.FC = () => {
                             bool = true;
                         }
                     }
-                    console.log("BOOL: "+ bool + "  playerid: " + x.playerId + "  count: " + count);
-                    console.log(game);
-                    console.log(LoseList);
                     if (bool === false && !LoseList.includes(x.playerId)) {
-                        console.log("BOOL INSIDE: "+ bool + "  playerid: " + x.playerId + "  count: " + count);
                         setLoseList(prevList => {
                             const newList = [...prevList];
                             newList[count] = x.playerId;
@@ -1104,7 +981,6 @@ const TitleScreen: React.FC = () => {
         for(const x of game.turnCycle.playerCycle){
             if (x.playerId === parseInt(localStorage.getItem("user_id"), 10)){
                 bool = true;
-                console.log("HEYHOOO BOOL TRUE for Leave");
             }
         }
         const config1 = {Authorization: localStorage.getItem("lobbyToken")};
@@ -1115,11 +991,13 @@ const TitleScreen: React.FC = () => {
             localStorage.removeItem("lobbyToken");
             localStorage.removeItem("lobbyId");
             localStorage.removeItem("WinLooseScreenWasShown");
+            localStorage.removeItem("GameHasWinner");
             navigate("/lobby");
         } else {
             localStorage.removeItem("lobbyToken");
             localStorage.removeItem("lobbyId");
             localStorage.removeItem("WinLooseScreenWasShown");
+            localStorage.removeItem("GameHasWinner");
             navigate("/lobby");
         }
     }

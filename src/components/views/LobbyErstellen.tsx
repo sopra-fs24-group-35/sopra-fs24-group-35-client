@@ -63,7 +63,8 @@ const LobbyErstellen = () => {
       console.log("lobbytoken: ", token);
 
       localStorage.setItem("lobbyToken", token);
-      localStorage . setItem ( "WinLooseScreenWasShown" , "false" );
+      localStorage.setItem ( "WinLooseScreenWasShown" , "false" );
+      localStorage.setItem ( "GameHasWinner" , "false" );
       navigate("/lobby/" + response.data.id)
     } catch (error) {
       alert(
