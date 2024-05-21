@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import "../../styles/ui/Countdown.scss";
 import PropTypes from "prop-types";
 
-const Countdown = ({ onComplete, phase, currentPlayerId, userId, closeWindow1, closeWindow2 }) => {
+const Countdown = ({ onComplete, phase, currentPlayerId, userId, closeWindow1, closeWindow2, additionalTime, setAdditionalTime }) => {
   const [count, setCount] = useState(0);
+  const [prevAdditionalTime, setPrevAdditionalTime] = useState(0);
   const [max, setMax] = useState(0);
   const [running, setRunning] = useState(false);
   const [prevPhase, setPrevPhase] = useState(null);
@@ -36,6 +37,10 @@ const Countdown = ({ onComplete, phase, currentPlayerId, userId, closeWindow1, c
   useEffect(() => {
     if (running) {
       intervalRef.current = setInterval(() => {
+        if (additionalTime > 0) {
+          setCount(count+additionalTime);
+          setAdditionalTime(0);
+        }
         setCount((prevCount) => {
           if (prevCount > 0) {
             return prevCount - 1;
@@ -77,7 +82,9 @@ Countdown.propTypes = {
   currentPlayerId: PropTypes.number.isRequired,
   userId: PropTypes.number.isRequired,
   closeWindow1: PropTypes.func.isRequired,
-  closeWindow2: PropTypes.func.isRequired
+  closeWindow2: PropTypes.func.isRequired,
+  additionalTime: PropTypes.number.isRequired,
+  setAdditionalTime: PropTypes.func.isRrquired
 };
 
 export default Countdown;
