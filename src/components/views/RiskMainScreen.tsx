@@ -261,6 +261,9 @@ const TitleScreen: React.FC = () => {
         // Define the function to fetch game data
         async function getGame() {
             try {
+                if(game === null){
+                    pause(2000);
+                }
                 const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
                 setGame(gameResponse.data);
                 setPhase(gameResponse.data.turnCycle.currentPhase);
