@@ -278,7 +278,7 @@ const TitleScreen: React.FC = () => {
 
             } catch (error) {
                 console.error("Error fetching game data:", error);
-                if(error.message === "Request failed with status code 404") {
+                if(error.message === "Request failed with status code 404" && localStorage.getItem("GameHasWinner") === "true") {
                     //console.log('Before Pause');
                     //pause(10000)
                     //.then(() => {
