@@ -272,7 +272,7 @@ const TitleScreen: React.FC = () => {
                 setCardBonus(gameResponse.data.turnCycle.currentPlayer.cardBonus);
                 setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
 
-                if(gameResponse.data.turnCycle.currentPlayer.playerId === localStorage.getItem("user_id")){
+                if(game !== null && gameResponse.data.turnCycle.currentPlayer.playerId === localStorage.getItem("user_id")){
                     setIsCurrentPlayer(true);
                 }
                 else {
@@ -1871,6 +1871,7 @@ const TitleScreen: React.FC = () => {
                     lobbyId={lobbyId}
                     gameId={gameId}
                   />
+                  {(localStorage.getItem("GameHasWinner") === "false") && (
                   <RiskCardModal
                     isModalOpen={isCardModalOpen}
                     isMidTurn={isMidTurn}
@@ -1878,7 +1879,7 @@ const TitleScreen: React.FC = () => {
                     onTrade={trading}
                     lobbyId={lobbyId}
                     gameId={gameId}
-                  />
+                  />)}
                   <LoseModal
                     isModalOpen={isLoseModalOpen}
                     onClose={closeModal}
