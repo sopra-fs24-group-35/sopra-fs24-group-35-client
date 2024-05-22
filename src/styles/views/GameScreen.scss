@@ -5,33 +5,126 @@
   transition: transform 0.2s ease;
 }
 
-.gamescreen-buttons-container {
-  border: 5px solid #ff4444;
-  border-radius: 20px;
-  padding: 10px;
+.gamescreen-phase-container {
   display: flex;
-  position: absolute;
+  margin-left: 10%;
+}
+.gamescreen-troops-container {
+  display: flex;
+  margin-right: 10%;
+  margin-top: 15px;
+  margin-bottom: 40px;
+}
+.gamescreen-leave-container {
+  display: flex;
+}
+
+.gamescreen-buttons-container,
+.gamescreen-buttons-container-troops {
+  border: 2px solid #ff4444;
+  border-radius: 10px;
+  padding: 10px 20px;
+  display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-  background-color: rgb(98, 98, 98);
-  background-color: #504536;
-  color: #b03838;
-
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Using a sans-serif font similar to the Risk logo */
-  font-size: 2rem; /* Adjust size as needed */
+  background-color: #e60000;
+  cursor: pointer;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.5rem;
   font-weight: bold;
-  color: #c40505; /* Red color similar to the Risk logo */
-  text-transform: uppercase; /* Making the text uppercase for consistency */
-  letter-spacing: 2px; /* Adjust letter spacing as needed */
-  text-shadow: 1.5px 1.5px 0 #d2d2d2; /* Adding a subtle shadow for depth */
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-sizing: border-box;
+  transition: transform 0.2s, background-color 0.2s;
 }
+
+.dynbut.gamescreen-buttons-container:disabled {
+  background-color: #ccc;
+  border-color: #999;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+  text-shadow: none;
+}
+
+
+.gamescreen-buttons-container-troops {
+  margin-top: 5px;
+  cursor: default;
+}
+
 .gamescreen-buttons-container:hover {
   transform: scale(1.1);
-  transition: transform 0.2s ease;
+  //transition: transform 0.2s ease;
 }
 
-.button {
+.gamescreen-buttons-container-troops:hover {
+  transform: none; /* No hover effect for troops button */
+}
+
+.gamescreen-selection-split {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure select dropdown fits well inside the button */
+/* Container for the selection buttons */
+.game-select-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px; /* Adds space between buttons */
+  max-height: 20px;
+}
+
+/* Base styles for the selection buttons */
+.game-select {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  min-width: 70px;
+  background-color: $accent;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
+  margin-bottom: 2px;
+}
+
+/* Hover effect for buttons */
+.game-select:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.05);
+}
+
+/* Highlighted state for the selected button */
+.game-select.highlighted {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+/* Disabled button state */
+.game-select:disabled {
+  background-color: #ccc;
+  border-color: #999;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.game-select:disabled:hover {
+  transform: none;
+}
+
+
+.game-buttons {
   position: absolute;
   width: 100px; /* Adjust the width of the button */
   height: 100px; /* Adjust the height of the button */
@@ -84,28 +177,38 @@
 
 .gamescreen-innerlower-container{
   position: relative;
+  padding: 5px;
   height: 20%; /* Use viewport height to fill the entire screen */
   width: 100vw; /* Use viewport width to fill the entire screen */
-  background-color: rgb(193, 180, 162);
+  background-color: #9d8963;
   display: flex;
+  align-items: center;
 }
 
 .gamescreen-bottomleft-container{
-  position: relative;
+  display: flex;
+  flex-direction: row; /* Display buttons in a row */
+  justify-content: space-between; /* Center buttons horizontally */
+  align-items: center; /* Center buttons vertically */
+  position: relative; /* Relative positioning to contain buttons */
+  margin: 5px;
+  //border: 1px solid #000000;
   border-radius: $borderRadius;
   height: 100%; /* Use viewport height to fill the entire screen */
   width: 65%; /* Use viewport width to fill the entire screen */
   background-color: #9d8963;
 }
 .gamescreen-bottomright-container{
+  display: flex;
+  justify-content: center; /* Center buttons horizontally */
+  align-items: center;
   position: relative;
+  margin: 5px;
+  //border: 1px solid #000000;
   border-radius: $borderRadius;
   height: 100%; /* Use viewport height to fill the entire screen */
   width: 35%; /* Use viewport width to fill the entire screen */
   background-color: #9d8963;
-  justify-content: center;
-  align-items: center;
-  display: flex;
 }
 
 .container-80-80 {

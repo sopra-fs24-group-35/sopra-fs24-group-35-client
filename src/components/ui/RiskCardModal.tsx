@@ -75,26 +75,38 @@ const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, game
 
     useEffect(() => {
         if (game) {
+
             setOwned([]);
             let tempArray = [];
+            let allCards = [];
+            let selectedOwned = [];
+            allCards = [...cards, ...selectedCards];
+
             for (let territory of game.board.territories) {
+                for (let card of allCards) {
+                    if (card.territoryName === territory.name && territory.owner === game.turnCycle.currentPlayer.playerId) {
+                        tempArray.push(card);
+                    }
+                }
                 for (let selectedCard of selectedCards) {
                     if (selectedCard.territoryName === territory.name && territory.owner === game.turnCycle.currentPlayer.playerId) {
-                        tempArray.push(selectedCard);
+                        selectedOwned.push(selectedCard);
                     }
                 }
             }
             setOwned(tempArray);
 
             let bonus = calculateTroopBonus(selectedCards);
+
+            console.log("tempArray", tempArray);
     
             if (selectedCards.length === 3 && bonus > 0) {
                 
-                if (tempArray.length === 1) {
+                if (selectedOwned.length === 1) {
                     bonus += 1;
-                } else if (tempArray.length === 2) {
+                } else if (selectedOwned.length === 2) {
                     bonus += 2;
-                } else if (tempArray.length === 3) {
+                } else if (selectedOwned.length === 3) {
                     bonus += 6;
                 }
 
@@ -237,17 +249,17 @@ const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, game
                 <main className="modal-mainContents">
                     {((currentPhase === "REINFORCEMENT" || (currentPhase === "ATTACK" && cards && isMidTurn && (cards.length + selectedCards.length) >= 5)) && isCurrentPlayer) &&
                         <div className="modal-selectedRiskCards">
-                            <div className="modal-first" onClick={() => handleCardClick(selectedCards[0].troops, selectedCards[0].territoryName)}>
+                            <div className="modal-first" onClick={selectedCards[0] ?() => handleCardClick(selectedCards[0].troops, selectedCards[0].territoryName) : null}>
                                 {selectedCards.length >= 1 &&
                                     <RiskCard troop={selectedCards[0].troops} territoryName={selectedCards[0].territoryName} isOwned={owned.some(ownedCard => ownedCard.territoryName === selectedCards[0].territoryName)} />
                                 }
                             </div>
-                            <div className="modal-first" onClick={() => handleCardClick(selectedCards[1].troops, selectedCards[1].territoryName)}>
+                            <div className="modal-first" onClick={selectedCards[1] ? () => handleCardClick(selectedCards[1].troops, selectedCards[1].territoryName) : null}>
                                 {selectedCards.length >= 2 &&
                                     <RiskCard troop={selectedCards[1].troops} territoryName={selectedCards[1].territoryName} isOwned={owned.some(ownedCard => ownedCard.territoryName === selectedCards[1].territoryName)} />
                                 }
                             </div>
-                            <div className="modal-first" onClick={() => handleCardClick(selectedCards[2].troops, selectedCards[2].territoryName)}>
+                            <div className="modal-first" onClick={selectedCards[2] ? () => handleCardClick(selectedCards[2].troops, selectedCards[2].territoryName) : null}>
                                 {selectedCards.length === 3 &&
                                     <RiskCard troop={selectedCards[2].troops} territoryName={selectedCards[2].territoryName} isOwned={owned.some(ownedCard => ownedCard.territoryName === selectedCards[2].territoryName)} />
                                 }
