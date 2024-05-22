@@ -59,7 +59,7 @@ const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, game
     }, [gameId, lobbyId]);
 
     const trade = async () => {
-        setAdditionalTime(3);
+        setAdditionalTime(15);
         const config = { Authorization: localStorage.getItem("lobbyToken") };
         const requestBody = JSON.stringify({
             "card1Name": selectedCards[0].territoryName,

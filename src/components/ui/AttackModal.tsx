@@ -92,7 +92,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, game
   }, [game]);
 
   const attack = async() => {
-    setAdditionalTime(3);
+    setAdditionalTime(15);
     const config = { Authorization: localStorage.getItem("lobbyToken") };
     const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedTroops,"repeats" : selectedAttacks});
     console.log("requestBody: ", requestBody);
@@ -102,7 +102,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, game
   }
 
   const move = async() => {
-    setAdditionalTime(3);
+    setAdditionalTime(15);
     const config = { Authorization: localStorage.getItem("lobbyToken") };
     const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedAttacks});
     console.log("requestBody: ", requestBody);
