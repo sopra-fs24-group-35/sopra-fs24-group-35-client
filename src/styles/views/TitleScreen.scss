@@ -39,6 +39,7 @@
     background-color: $background;
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
+    background-image: url('../../styles/views/Pictures/CardBackground.png');
   }
 
   &.title {
@@ -62,7 +63,7 @@
   &.subtitle-container, &.buttons-container {
     margin-bottom: 20px; // !* Add some space between sections *!
     margin-top: 20px;
-    border: 2px solid #ff4444; //!* Red border *!
+    border: 2px solid #d19653; //!* Red border *!
     border-radius: 20px; //!* Rounded corners *!
     padding: 10px; //!* Add padding *!
     display: flex;
