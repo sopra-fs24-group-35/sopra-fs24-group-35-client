@@ -329,6 +329,10 @@ const TitleScreen: React.FC = () => {
                 setIsMidTurn(true);
             }
 
+            if(phase === "REINFORCEMENT" && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId) {
+                checkForAllValidButtons();
+            }
+
             if (currentPlayerId !== null) {
                 setCurrentPlayerId(currentPlayerId);
             }
@@ -574,7 +578,7 @@ const TitleScreen: React.FC = () => {
         while (buttonqueue.length !== 0) {
             const curbut = buttonqueue.shift(); // Use shift() to dequeue the first element
             validbuttonid.push(curbut);
-// Iterate through adjacent territories
+            // Iterate through adjacent territories
             for (const iterterritory of adjDict.dict[curbut]) {
                 const nextterritory = game.board.territories.find(territory => territory.name === iterterritory);
                 if (!visited[iterterritory] && nextterritory.owner === playerid) {
@@ -592,6 +596,28 @@ const TitleScreen: React.FC = () => {
                 curbutton.style.border = "2px double white";
                 curbutton.style.padding = "5px"; // Example padding
             } else {
+                curbutton.style.border = "2px solid white";
+            }
+        }
+    };
+
+    const checkForAllValidButtons = () => {
+        const playerid = currentPlayerId;
+        let validbuttonid = [];
+
+        if (game) {
+
+            for (let ter of game.board.territories) {
+                if (ter.owner === playerid) {
+                    validbuttonid.push(ter.name);
+                }
+            }
+        
+            setcurListOfValidReinforcements(validbuttonid);
+            setCurrentHighlightedButtons(validbuttonid);
+    
+            for (const button of validbuttonid) {
+                const curbutton = buttonRefs.current[button]
                 curbutton.style.border = "2px solid white";
             }
         }
@@ -692,6 +718,7 @@ const TitleScreen: React.FC = () => {
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
         setCurrentTroopBonus(updateGame.data.turnCycle.currentPlayer.troopBonus);
         setCardBonus(updateGame.data.turnCycle.currentPlayer.cardBonus);
+        dehighlightvalidbuttons();
     };
 
     const increaseTroops = (territory_id: string) => {
@@ -814,6 +841,13 @@ const TitleScreen: React.FC = () => {
 
     };
 
+    const dehighlightvalidbuttons = () => {
+        for (const territory of curListOfValidReinforcements) {
+            const button = buttonRefs.current[territory]
+            button.style.border = "2px solid black";
+        }
+    };
+
     const drawLine = (startId: string, endId: string) => {
         let {x: startx, y: starty} = getButtonCoordinatesById(startId);
         let {x: endx, y: endy} = getButtonCoordinatesById(endId);
@@ -821,7 +855,7 @@ const TitleScreen: React.FC = () => {
         const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
 
-// Calculate a new endpoint that is 90% of the distance from the start point to the end point
+        // Calculate a new endpoint that is 90% of the distance from the start point to the end point
         const distance = Math.sqrt(Math.pow(endx - startx, 2) + Math.pow(endy - starty, 2));
 
         let scaledPercentage = 0.8 + (0.99 - 0.8) * (distance - 50) / (200 - 50);
@@ -834,28 +868,28 @@ const TitleScreen: React.FC = () => {
         const newEndx = startx + ratio * (endx - startx);
         const newEndy = starty + ratio * (endy - starty);
 
-// Begin the path
+        // Begin the path
         ctx.beginPath();
-// Move to the start point
+        // Move to the start point
         ctx.moveTo(startx, starty);
-// Draw a line to the new endpoint
+        // Draw a line to the new endpoint
         ctx.lineTo(newEndx, newEndy);
         ctx.lineWidth = 5;
-// Set line style
+        // Set line style
         ctx.strokeStyle = 'black'; // You can set any color you want
         // Draw the line
         ctx.stroke();
 
         const angle = Math.atan2(endy - starty, endx - startx);
         ctx.beginPath();
-// Calculate arrowhead points
+        // Calculate arrowhead points
         ctx.moveTo(newEndx, newEndy);
         ctx.lineTo(newEndx - 20 * Math.cos(angle - Math.PI / 6), newEndy - 20 * Math.sin(angle - Math.PI / 6));
         ctx.moveTo(newEndx, newEndy);
         ctx.lineTo(newEndx - 20 * Math.cos(angle + Math.PI / 6), newEndy - 20 * Math.sin(angle + Math.PI / 6));
-// Set arrowhead style
+        // Set arrowhead style
         ctx.strokeStyle = 'black';
-// Draw the arrowhead
+        // Draw the arrowhead
         ctx.stroke();
 
     };
@@ -865,11 +899,11 @@ const TitleScreen: React.FC = () => {
         const ctx = canvas.getContext('2d');
         const picture1 = require('../../styles/views/Pictures/RiskMap21.png');
         const image = new Image(picture1);
-// Clear the canvas
+        // Clear the canvas
         ctx.clearRect(curx, cury, curwidth, curheight);
         ctx.drawImage(image, curx, cury, curwidth, curheight);
 
-//setReload(true);
+        //setReload(true);
     };
 
     const getButtonCoordinatesById = (id) => {
@@ -882,7 +916,7 @@ const TitleScreen: React.FC = () => {
         }
     };
 
-//const redButton = document.getElementById('redButton');
+    //const redButton = document.getElementById('redButton');
     const containerStyle: React.CSSProperties = {
         position: 'fixed',
         bottom: '10px',
@@ -920,7 +954,7 @@ const TitleScreen: React.FC = () => {
         marginRight: '5px', // Adjust the space between image
         marginLeft: '5px', // Adjust the space between images
         textAlign: 'center',
-//cursor: 'pointer'
+        //cursor: 'pointer'
     };
 
     const avatarStylePlayingSide: React.CSSProperties = {
@@ -954,11 +988,11 @@ const TitleScreen: React.FC = () => {
         }
         try {
             const config = {Authorization: localStorage.getItem("lobbyToken")};
-// get lobby info
+            // get lobby info
             const getLobbyResponse = await api.get(`/lobbies/${lobbyId}`, {headers: config});
             const lobbyData = getLobbyResponse.data;
 
-// set the userIdList to an array of longs consisting of all the user IDs in the lobby
+            // set the userIdList to an array of longs consisting of all the user IDs in the lobby
             let userIdList = lobbyData.players;
 
             let playeridwithavatar = {};
@@ -1009,7 +1043,7 @@ const TitleScreen: React.FC = () => {
     }
 
     function LeavePlayerConfirmation() {
-// Create a leave confirmation modal
+        // Create a leave confirmation modal
         const leaveModal = document.createElement('div');
         leaveModal.id = 'leave-modal';
         leaveModal.innerHTML = `
@@ -1022,11 +1056,11 @@ const TitleScreen: React.FC = () => {
         </div>
     `;
 
-// Add styles to the modal
+        // Add styles to the modal
         leaveModal.style.position = 'fixed';
         leaveModal.style.top = '0';
         leaveModal.style.left = '0';
-//leaveModal.style.transform = 'translate(-50%, -50%)';
+        //leaveModal.style.transform = 'translate(-50%, -50%)';
         leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
         leaveModal.style.padding = '20px';
         leaveModal.style.zIndex = '1000';
@@ -1039,7 +1073,7 @@ const TitleScreen: React.FC = () => {
         leaveModal.style.alignItems = 'center';
 
 
-// Style the buttons
+        // Style the buttons
         const leaveYesBtn = leaveModal.querySelector('#leave-yes') as HTMLButtonElement;
         const leaveNoBtn = leaveModal.querySelector('#leave-no') as HTMLButtonElement;
         leaveYesBtn.style.marginRight = '50px'; // Add some space between buttons
@@ -1062,9 +1096,9 @@ const TitleScreen: React.FC = () => {
         leaveNoBtn.style.display = 'flex';
         leaveNoBtn.style.justifyContent = 'center';
         leaveNoBtn.style.alignItems = 'center';
-// Add event listeners to the buttons
+        // Add event listeners to the buttons
         leaveYesBtn.addEventListener('click', () => {
-// Perform leave action here
+            // Perform leave action here
             // For now, just console log
             LeavePlayer();
             leaveModal.remove(); // Remove the modal after leaving
@@ -1074,10 +1108,10 @@ const TitleScreen: React.FC = () => {
             leaveModal.remove(); // Remove the modal if user chooses not to leave
         });
 
-// Append the modal to the body
+        // Append the modal to the body
         document.body.appendChild(leaveModal);
 
-// Style the button container if it exists
+        // Style the button container if it exists
         const buttonContainer = leaveModal.querySelector('.button-container') as HTMLButtonElement;
         if (buttonContainer) {
             buttonContainer.style.marginTop = '50px'; // Add some space between text and buttons
@@ -1103,11 +1137,11 @@ const TitleScreen: React.FC = () => {
         </div>
     `;
 
-// Add styles to the modal
+        // Add styles to the modal
         leaveModal.style.position = 'fixed';
         leaveModal.style.top = '0';
         leaveModal.style.left = '0';
-//leaveModal.style.transform = 'translate(-50%, -50%)';
+        //leaveModal.style.transform = 'translate(-50%, -50%)';
         leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
         leaveModal.style.padding = '20px';
         leaveModal.style.zIndex = '100';
@@ -1120,7 +1154,7 @@ const TitleScreen: React.FC = () => {
         leaveModal.style.alignItems = 'center';
 
 
-// Style the buttons
+        // Style the buttons
         const leaveYesBtn = leaveModal.querySelector('#leave-yes') as HTMLButtonElement;
         const leaveNoBtn = leaveModal.querySelector('#leave-no') as HTMLButtonElement;
         leaveYesBtn.style.marginRight = '50px'; // Add some space between buttons
@@ -1143,9 +1177,9 @@ const TitleScreen: React.FC = () => {
         leaveNoBtn.style.display = 'flex';
         leaveNoBtn.style.justifyContent = 'center';
         leaveNoBtn.style.alignItems = 'center';
-// Add event listeners to the buttons
+        // Add event listeners to the buttons
         leaveYesBtn.addEventListener('click', () => {
-// Perform leave action here
+        // Perform leave action here
             // For now, just console log
             LeavePlayer();
             leaveModal.remove(); // Remove the modal after leaving
@@ -1155,10 +1189,10 @@ const TitleScreen: React.FC = () => {
             leaveModal.remove(); // Remove the modal if user chooses not to leave
         });
 
-// Append the modal to the body
+        // Append the modal to the body
         document.body.appendChild(leaveModal);
 
-// Style the button container if it exists
+        // Style the button container if it exists
         const buttonContainer = leaveModal.querySelector('.button-container') as HTMLButtonElement;
         if (buttonContainer) {
             buttonContainer.style.marginTop = '50px'; // Add some space between text and buttons
@@ -1169,7 +1203,7 @@ const TitleScreen: React.FC = () => {
     }
 
     function LooseScreen() {
-// Create a leave confirmation modal
+        // Create a leave confirmation modal
         const leaveModal = document.createElement('div');
         leaveModal.id = 'leave-modal';
         leaveModal.innerHTML = `
@@ -1183,11 +1217,11 @@ const TitleScreen: React.FC = () => {
         </div>
     `;
 
-// Add styles to the modal
+        // Add styles to the modal
         leaveModal.style.position = 'fixed';
         leaveModal.style.top = '0';
         leaveModal.style.left = '0';
-//leaveModal.style.transform = 'translate(-50%, -50%)';
+        //leaveModal.style.transform = 'translate(-50%, -50%)';
         leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
         leaveModal.style.padding = '20px';
         leaveModal.style.zIndex = '100';
@@ -1200,7 +1234,7 @@ const TitleScreen: React.FC = () => {
         leaveModal.style.alignItems = 'center';
 
 
-// Style the buttons
+        // Style the buttons
         const leaveYesBtn = leaveModal.querySelector('#leave-yes') as HTMLButtonElement;
         const leaveNoBtn = leaveModal.querySelector('#leave-no') as HTMLButtonElement;
         leaveYesBtn.style.marginRight = '50px'; // Add some space between buttons
@@ -1223,9 +1257,9 @@ const TitleScreen: React.FC = () => {
         leaveNoBtn.style.display = 'flex';
         leaveNoBtn.style.justifyContent = 'center';
         leaveNoBtn.style.alignItems = 'center';
-// Add event listeners to the buttons
+        // Add event listeners to the buttons
         leaveYesBtn.addEventListener('click', () => {
-// Perform leave action here
+        // Perform leave action here
             // For now, just console log
             LeavePlayer();
             leaveModal.remove(); // Remove the modal after leaving
@@ -1235,10 +1269,10 @@ const TitleScreen: React.FC = () => {
             leaveModal.remove(); // Remove the modal if user chooses not to leave
         });
 
-// Append the modal to the body
+        // Append the modal to the body
         document.body.appendChild(leaveModal);
 
-// Style the button container if it exists
+        // Style the button container if it exists
         const buttonContainer = leaveModal.querySelector('.button-container') as HTMLButtonElement;
         if (buttonContainer) {
             buttonContainer.style.marginTop = '50px'; // Add some space between text and buttons
@@ -1250,7 +1284,7 @@ const TitleScreen: React.FC = () => {
 
 
     useEffect(() => {
-// Function to preload the image
+        // Function to preload the image
         const preloadImage = (url) => {
             return new Promise((resolve, reject) => {
                 const image = new Image();
@@ -1260,232 +1294,227 @@ const TitleScreen: React.FC = () => {
             });
         };
 
-// Preload the image
+        // Preload the image
         const imageSrc = require('../../styles/views/Pictures/RiskMap21.png');
         preloadImage(imageSrc).then((image: HTMLImageElement) => {
 
-// Once the image is fully loaded, update the canvas
+            // Once the image is fully loaded, update the canvas
             if(game === null){
                 pause(2000);
             }
-              fetchData();
-              const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-              const ctx = canvas.getContext('2d');
+            fetchData();
+            const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+            const ctx = canvas.getContext('2d');
 
-              const resizeCanvas = () => {
-                  canvas.width = canvas.parentElement.clientWidth;
-                  canvas.height = canvas.parentElement.clientHeight;
-                  let aspectRatio = 0
+            const resizeCanvas = () => {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+                let aspectRatio = 0
 
-                  aspectRatio = image.width / image.height;
+                aspectRatio = image.width / image.height;
 
-                  let drawWidth = canvas.width;
-                  let drawHeight = canvas.height;
+                let drawWidth = canvas.width;
+                let drawHeight = canvas.height;
 
-// Adjust the size of the image to maintain aspect ratio
-                  if (drawWidth / drawHeight > aspectRatio) {
-                      drawWidth = drawHeight * aspectRatio;
-                  } else {
-                      drawHeight = drawWidth / aspectRatio;
-                  }
+                // Adjust the size of the image to maintain aspect ratio
+                if (drawWidth / drawHeight > aspectRatio) {
+                    drawWidth = drawHeight * aspectRatio;
+                } else {
+                    drawHeight = drawWidth / aspectRatio;
+                }
 
-                  const x = (canvas.width - drawWidth) / 2;
-                  const y = (canvas.height - drawHeight) / 2;
+                const x = (canvas.width - drawWidth) / 2;
+                const y = (canvas.height - drawHeight) / 2;
 
-                  setCurHeight(drawHeight);
-                  setCurWidth(drawWidth);
-                  setX(x);
-                  setY(y);
+                setCurHeight(drawHeight);
+                setCurWidth(drawWidth);
+                setX(x);
+                setY(y);
 
-                  ctx.clearRect(0, 0, canvas.width, canvas.height);
-                  ctx.drawImage(image, x, y, drawWidth, drawHeight);
-                  resizeButtons(x, y, drawWidth, drawHeight);
-              };
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(image, x, y, drawWidth, drawHeight);
+                resizeButtons(x, y, drawWidth, drawHeight);
+            };
 
-              const resizeButtons = (startx: number, starty: number, drawWidth: number, drawHeight: number) => {
-                  const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
-                  const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
+            const resizeButtons = (startx: number, starty: number, drawWidth: number, drawHeight: number) => {
+                const buttonWidth = drawWidth * 0.03; // Button width as a percentage of the draw width
+                const buttonHeight = drawHeight * 0.05; // Button height as a percentage of the draw height
 
-                  Object.keys(buttonRefs.current).forEach((buttonId: string) => {
-                      const button = buttonRefs.current[buttonId];
-                      const {x, y} = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
+                Object.keys(buttonRefs.current).forEach((buttonId: string) => {
+                    const button = buttonRefs.current[buttonId];
+                    const {x, y} = calculateButtonPosition(drawWidth, drawHeight, startx, starty, buttonId);
 
-                      button.style.left = `${x}px`;
-                      button.style.top = `${y}px`;
-                      button.style.width = `${buttonWidth}px`;
-                      button.style.height = `${buttonHeight}px`;
-                      button.style.fontSize = `${buttonHeight * 0.35}px`;
-
-
-                      if (game !== null) {
-                          const territory = game.board.territories.find(territory => territory.name === buttonId);
-                          button.style.backgroundColor = PlayerColor[territory.owner];
-                      }
-
-                  });
-
-//Dynamically Adjust heigh and Widgt of the lower Textboxes
-                  //const troopAmountDiv = document.getElementById('nextState');
-                  let allbuttons = document.querySelectorAll('.dynbut');
-                  let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                  for (const but of buttonsArray) {
-                      (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                      (but as HTMLButtonElement).style.width = `${buttonWidth * 9}px`;
-                      (but as HTMLButtonElement).style.fontSize = `${buttonHeight * 0.3 * 2.5}px`;
-                  }
-
-                  allbuttons = document.querySelectorAll('.avatar');
-                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                  for (const but of buttonsArray) {
-                      if(game !== null && game.players.length < 4){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 3.5}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth *3.5}px`;
-                      }
-                      if(game !== null && game.players.length === 4){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 3}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 3}px`;
-                      }
-                      if(game !== null && game.players.length === 5){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.8}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.8}px`;
-
-                      }
-                      if(game !== null && game.players.length === 6){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
-                      }
-                  }
-
-                  allbuttons = document.querySelectorAll('.statspicture');
-                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                  for (const but of buttonsArray) {
-                      if(game !== null && game.players.length < 4){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
-                          // (but as HTMLButtonElement).style.alignItems = `left`;
-                          // (but as HTMLButtonElement).style.alignContent = `left`;
-                          (but as HTMLButtonElement).style.textAlign = `left`;
-                      }
-                      if(game !== null && game.players.length === 4){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
-                      }
-                      if(game !== null && game.players.length === 5){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * .9}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * .9}px`;
-
-                      }
-                      if(game !== null && game.players.length === 6){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * .75}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * .75}px`;
-                      }
-                  }
-
-                  allbuttons = document.querySelectorAll('.avatarfont');
-                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                  for (const but of buttonsArray) {
-                      if(game !== null && game.players.length < 4) {
-                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.6}px`;
-                      }
-                      if(game !== null && game.players.length === 4) {
-                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.6}px`;
-                      }
-                      if(game !== null && game.players.length === 5) {
-                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.55}px`;
-                      }
-                      if(game !== null && game.players.length === 6) {
-                          (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.48}px`;
-                      }
+                    button.style.left = `${x}px`;
+                    button.style.top = `${y}px`;
+                    button.style.width = `${buttonWidth}px`;
+                    button.style.height = `${buttonHeight}px`;
+                    button.style.fontSize = `${buttonHeight * 0.35}px`;
 
 
-                  }
+                    if (game !== null) {
+                        const territory = game.board.territories.find(territory => territory.name === buttonId);
+                        button.style.backgroundColor = PlayerColor[territory.owner];
+                    }
 
-                  allbuttons = document.querySelectorAll('.avatar-arrow');
-                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                  for (const but of buttonsArray) {
-                      if(game !== null && game.players.length < 4){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
-                          // (but as HTMLButtonElement).style.alignItems = `left`;
-                          // (but as HTMLButtonElement).style.alignContent = `left`;
-                          (but as HTMLButtonElement).style.left = '100%';
-                      }
-                      if(game !== null && game.players.length === 4){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
-                          (but as HTMLButtonElement).style.left = '100%';
-                      }
-                      if(game !== null && game.players.length === 5){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
-                          (but as HTMLButtonElement).style.left = '100%';
+                });
 
-                      }
-                      if(game !== null && game.players.length === 6){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
-                          (but as HTMLButtonElement).style.left = '100%';
-                      }
-                  }
+                //Dynamically Adjust heigh and Widgt of the lower Textboxes
+                //const troopAmountDiv = document.getElementById('nextState');
+                let allbuttons = document.querySelectorAll('.dynbut');
+                let buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                for (const but of buttonsArray) {
+                    (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                    (but as HTMLButtonElement).style.width = `${buttonWidth * 9}px`;
+                    (but as HTMLButtonElement).style.fontSize = `${buttonHeight * 0.3 * 2.5}px`;
+                }
 
-                  allbuttons = document.querySelectorAll('.avatar-cards');
-                  buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
-                  const totalWidth = document.documentElement.scrollWidth;
-                  const totalHeight = document.documentElement.scrollHeight;
-                  let crtratio = totalWidth/totalHeight;
-                  let normalratio = 1.553;
-                  let changetoleft = Math.abs(normalratio-crtratio);
-                  for (const but of buttonsArray) {
-                      if(game !== null && game.players.length < 4){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1.7}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1.7}px`;
-                          (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
-                          // (but as HTMLButtonElement).style.alignContent = `left`;
+                allbuttons = document.querySelectorAll('.avatar');
+                buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                for (const but of buttonsArray) {
+                    if(game !== null && game.players.length < 4){
+                        (but as HTMLButtonElement).style.height = `${buttonHeight * 3.5}px`;
+                        (but as HTMLButtonElement).style.width = `${buttonWidth *3.5}px`;
+                    }
+                    if(game !== null && game.players.length === 4){
+                        (but as HTMLButtonElement).style.height = `${buttonHeight * 3}px`;
+                        (but as HTMLButtonElement).style.width = `${buttonWidth * 3}px`;
+                    }
+                    if(game !== null && game.players.length === 5){
+                        (but as HTMLButtonElement).style.height = `${buttonHeight * 2.8}px`;
+                        (but as HTMLButtonElement).style.width = `${buttonWidth * 2.8}px`;
 
-                      }
-                      if(game !== null && game.players.length === 4){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1.4}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1.4}px`;
-                          (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
-                      }
-                      if(game !== null && game.players.length === 5){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1.4}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1.4}px`;
-                          (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
+                    }
+                    if(game !== null && game.players.length === 6){
+                        (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                        (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                    }
+                }
 
-                      }
-                      if(game !== null && game.players.length === 6){
-                          (but as HTMLButtonElement).style.height = `${buttonHeight * 1.4}px`;
-                          (but as HTMLButtonElement).style.width = `${buttonWidth * 1.4}px`;
-                          (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
-                      }
-                  }
-                  defeat.style.height = `${buttonHeight * 4}px`;
-                  defeat.style.width = `${buttonWidth * 4}px`;
+                    allbuttons = document.querySelectorAll('.statspicture');
+                    buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                    for (const but of buttonsArray) {
+                        if(game !== null && game.players.length < 4){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
+                            // (but as HTMLButtonElement).style.alignItems = `left`;
+                            // (but as HTMLButtonElement).style.alignContent = `left`;
+                            (but as HTMLButtonElement).style.textAlign = `left`;
+                        }
+                        if(game !== null && game.players.length === 4){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 1}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 1}px`;
+                        }
+                        if(game !== null && game.players.length === 5){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * .9}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * .9}px`;
 
+                        }
+                        if(game !== null && game.players.length === 6){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * .75}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * .75}px`;
+                        }
+                    }
 
-              };
+                    allbuttons = document.querySelectorAll('.avatarfont');
+                    buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                    for (const but of buttonsArray) {
+                        if(game !== null && game.players.length < 4) {
+                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.6}px`;
+                        }
+                        if(game !== null && game.players.length === 4) {
+                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.6}px`;
+                        }
+                        if(game !== null && game.players.length === 5) {
+                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.55}px`;
+                        }
+                        if(game !== null && game.players.length === 6) {
+                            (but as HTMLTitleElement).style.fontSize = `${buttonHeight * 0.48}px`;
+                        }
+                    }
 
-              const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
-                  const {xratio, yratio} = getButtonRatiosById(buttonId)
-                  let x = startx + drawWidth * xratio; // Default left position
-                  let y = starty + drawHeight * yratio; // Default top position
+                    allbuttons = document.querySelectorAll('.avatar-arrow');
+                    buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                    for (const but of buttonsArray) {
+                        if(game !== null && game.players.length < 4){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                            // (but as HTMLButtonElement).style.alignItems = `left`;
+                            // (but as HTMLButtonElement).style.alignContent = `left`;
+                            (but as HTMLButtonElement).style.left = '100%';
+                        }
+                        if(game !== null && game.players.length === 4){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                            (but as HTMLButtonElement).style.left = '100%';
+                        }
+                        if(game !== null && game.players.length === 5){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                            (but as HTMLButtonElement).style.left = '100%';
 
-                  return {x, y};
-              };
+                        }
+                        if(game !== null && game.players.length === 6){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 2.5}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 2.5}px`;
+                            (but as HTMLButtonElement).style.left = '100%';
+                        }
+                    }
 
-// Initial setup
-              resizeCanvas();
+                    allbuttons = document.querySelectorAll('.avatar-cards');
+                    buttonsArray = Array.from(allbuttons); // Convert NodeList to Array
+                    const totalWidth = document.documentElement.scrollWidth;
+                    const totalHeight = document.documentElement.scrollHeight;
+                    let crtratio = totalWidth/totalHeight;
+                    let normalratio = 1.553;
+                    let changetoleft = Math.abs(normalratio-crtratio);
+                    for (const but of buttonsArray) {
+                        if(game !== null && game.players.length < 4){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 1.7}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 1.7}px`;
+                            (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
+                            // (but as HTMLButtonElement).style.alignContent = `left`;
 
-// Handle resize event
-              window.addEventListener('resize', resizeCanvas);
+                        }
+                        if(game !== null && game.players.length === 4){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 1.4}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 1.4}px`;
+                            (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
+                        }
+                        if(game !== null && game.players.length === 5){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 1.4}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 1.4}px`;
+                            (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
 
-              return () => {
+                        }
+                        if(game !== null && game.players.length === 6){
+                            (but as HTMLButtonElement).style.height = `${buttonHeight * 1.4}px`;
+                            (but as HTMLButtonElement).style.width = `${buttonWidth * 1.4}px`;
+                            (but as HTMLButtonElement).style.left = `${60+changetoleft*5}%`;
+                        }
+                    }
+                    defeat.style.height = `${buttonHeight * 4}px`;
+                    defeat.style.width = `${buttonWidth * 4}px`;
+                };
+
+                const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
+                    const {xratio, yratio} = getButtonRatiosById(buttonId)
+                    let x = startx + drawWidth * xratio; // Default left position
+                    let y = starty + drawHeight * yratio; // Default top position
+
+                    return {x, y};
+                };
+
+                // Initial setup
+                resizeCanvas();
+
+                // Handle resize event
+                window.addEventListener('resize', resizeCanvas);
+
+                return () => {
                   window.removeEventListener('resize', resizeCanvas);
-              };
-          }
+                };
+            }
         );
-
     }, [PlayerColor, game]);
 
     let renderButtons = null; // Initialize renderButtons as null initially
@@ -1554,7 +1583,7 @@ const TitleScreen: React.FC = () => {
             avatarElement.style.cursor = 'default';
         }
     };
-//HUHHUHU
+    //HUHHUHU
     const checkforheightoftexts = () => {
         if(game !== null && game.players.length < 4){
             return 10;
