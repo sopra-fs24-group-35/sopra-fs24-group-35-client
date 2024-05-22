@@ -223,7 +223,9 @@ const LobbyScreen = () => {
         <BaseContainer className="lobby container">
           <h2>{(users !== null) ? ("Welcome to " + users[0].username + "'s lobby!") : ("The lobby is loading.")}</h2>
           <h3>The lobby code is { (lobby !== null) ? (lobby.code) : ("loading :)") }</h3>
-          {startingGame && (<h4 className="lobby-countdown">Game starts in: {startingTimer}</h4>)}
+          <div className="lobby countdown-container">
+            {startingGame && (<h4 className="lobby-countdown">Game starts in: {startingTimer}</h4>)}
+          </div>
           <p className="lobby paragraph">
             Joined players:
           </p>

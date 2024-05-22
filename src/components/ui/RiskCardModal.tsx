@@ -195,7 +195,7 @@ const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, game
     
 
     const handleCardClick = (troopNum: number, terName: string) => {
-        if ((currentPhase === "REINFORCEMENT") || (currentPhase === "ATTACK" && ((cards.length + selectedCards.length) >= 5) && isMidTurn)) {
+        if (isCurrentPlayer && (currentPhase === "REINFORCEMENT") || (currentPhase === "ATTACK" && ((cards.length + selectedCards.length) >= 5) && isMidTurn)) {
             const newCard: Card = {
                 troops: troopNum,
                 territoryName: terName
