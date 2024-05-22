@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 const Countdown = ({ onComplete, phase, currentPlayerId, userId, closeWindow1, closeWindow2, additionalTime, setAdditionalTime }) => {
   const [count, setCount] = useState(0);
   const [prevAdditionalTime, setPrevAdditionalTime] = useState(0);
-  const [max, setMax] = useState(0);
+  const [max, setMax] = useState(30);
   const [running, setRunning] = useState(false);
   const [prevPhase, setPrevPhase] = useState(null);
   const intervalRef = useRef(null);
@@ -38,7 +38,7 @@ const Countdown = ({ onComplete, phase, currentPlayerId, userId, closeWindow1, c
     if (running) {
       intervalRef.current = setInterval(() => {
         if (additionalTime > 0) {
-          setCount(count+additionalTime);
+          setCount(Math.min(count+additionalTime, max));
           setAdditionalTime(0);
         }
         setCount((prevCount) => {
