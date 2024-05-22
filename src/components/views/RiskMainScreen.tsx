@@ -252,7 +252,7 @@ const TitleScreen: React.FC = () => {
     const config = {Authorization: localStorage.getItem("lobbyToken")};
 
     useEffect(() => {
-        if (game === null){
+        if (game?.turnCycle?.currentPhase === null) {
             showLoadingScreen();
         } else {
             hideLoadingScreen();
@@ -1866,8 +1866,27 @@ const TitleScreen: React.FC = () => {
     return (
       <div className="gamescreen-container">
           <div className="gamescreen-innerupper-container">
-            <Announcer phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} game={game} />
-              <Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} additionalTime={additionalTime} setAdditionalTime={setAdditionalTime}/>
+              {(localStorage.getItem("GameHasWinner") === "false") && (
+                  <>
+                      <Announcer
+                          phase={phase}
+                          currentPlayerId={parseInt(currentPlayerId)}
+                          userId={parseInt(localStorage.getItem("user_id"))}
+                          game={game}
+                      />
+                      <Countdown
+                          onComplete={nextState}
+                          phase={phase}
+                          currentPlayerId={parseInt(currentPlayerId)}
+                          userId={parseInt(localStorage.getItem("user_id"))}
+                          closeWindow1={closeModal}
+                          closeWindow2={closeCardModal}
+                          additionalTime={additionalTime}
+                          setAdditionalTime={setAdditionalTime}
+                      />
+                  </>
+              )}
+
               {/*Attack Modal Section*/}
               <section>
                   <AttackModal
