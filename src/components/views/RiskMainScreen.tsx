@@ -188,7 +188,6 @@ const TitleScreen: React.FC = () => {
             setIsPlacing(true);
         }
 
-        setIsMidTurn(false);
         setTraded(false);
         setIsCardModalOpen(false);
     };
@@ -723,9 +722,12 @@ const TitleScreen: React.FC = () => {
         else if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId && phase === "ATTACK"){
             if ((cardBonus - selectedTroops) > 0) {
                 territory.troops = territory.troops + parseInt(selectedTroops);
+                setCardBonus(territory.troops - selectedTroops);
             }
             else {
                 territory.troops = territory.troops + parseInt(cardBonus);
+                setCardBonus(0);
+                setIsMidTurn(false);
             }
             button.troops = territory.troops; // set troop count to server troop count
 
@@ -735,6 +737,7 @@ const TitleScreen: React.FC = () => {
             }
             else {
                 setCardBonus(0);
+                setIsMidTurn(false);
             }
 
             setButtonData([...buttonData]); // Update the button data array in the state
@@ -1497,7 +1500,7 @@ const TitleScreen: React.FC = () => {
               ref={(buttonRef) => {
                   if (buttonRef) buttonRefs.current[button.refKey] = buttonRef;
               }}
-              className="button"
+              className="game-buttons"
               style={{}}
               onClick={() => handleButtonClick(button.id)}
               disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id")) || localStorage.getItem("WinLooseScreenWasShown") === "true"}
@@ -1771,79 +1774,83 @@ const TitleScreen: React.FC = () => {
         );
     };
 
+    const isButtonDisabled = parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id")) ||
+                           localStorage.getItem("WinLooseScreenWasShown") === "true" ||
+                           (currentTroopBonus > 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && isMidTurn);
+
     let lowerContent = (<div className="gamescreen-innerlower-container">
         <div className="gamescreen-bottomleft-container">
-            {localStorage.getItem("WinLooseScreenWasShown") === "false" && (
-                <div>
-                    <button
-                        id="nextState"
-                        className="dynbut gamescreen-buttons-container"
-                        style={{
-                            left: '7%',
-                            top: '50%',
-                            backgroundColor: 'red',
-                            transform: 'translateY(-50%)',
-                            cursor: 'pointer'
-                        }}
-                        onClick={() => {
-                            if (currentTroopBonus !== 0 && phase === "REINFORCEMENT") {
-                            // Handle button click logic here
-                            } else {
-                                const cur = nextState();
-                            }
-                        }}
-                        disabled={parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id")) || localStorage.getItem("WinLooseScreenWasShown") === "true"}
-                    >
-                    {CurrentText}
-                    </button>
-                    {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && isMidTurn)) && (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) && (localStorage.getItem("WinLooseScreenWasShown") === "false") &&(
-                        <div
+            {(localStorage.getItem("WinLooseScreenWasShown") === "false") && (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) && (
+                <>
+                    <div className="gamescreen-phase-container">
+                        <button
                             id="nextState"
                             className="dynbut gamescreen-buttons-container"
-                            style={{
-                                left: 'calc(55% + 25px)',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                backgroundColor: 'red',
-                            }}
                             onClick={() => {
-                                //setCurrentTroopBonus(prevState => prevState + 100);
+                                if (currentTroopBonus !== 0 && phase === "REINFORCEMENT") {
+                                // Handle button click logic here
+                                } else {
+                                    const cur = nextState();
+                                }
                             }}
-                            disabled={!isCurrentPlayer || localStorage.getItem("WinLooseScreenWasShown") === "true"}
+                            disabled={isButtonDisabled}
                         >
-                        {"Troop Amount:" + ((phase === "REINFORCEMENT") ? currentTroopBonus : (isMidTurn && cardBonus))}
+                        {CurrentText}
+                        </button>
+                    </div>
+                    <div className="gamescreen-troops-container">
+                        {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && isMidTurn)) && (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) && (localStorage.getItem("WinLooseScreenWasShown") === "false") &&(
 
-                        {(phase === "REINFORCEMENT") && (
-                            <label className="select-label">
-                                <select className="select" value={selectedTroops} onChange={e => setSelectedTroops(e.target.value)}>
-                                    <option value={1}>1</option>
-                                    <option value={5}>5</option>
-                                    <option value={10}>10</option>
-                                </select>
-                            </label>
+                            <div className="gamescreen-selection-split">
+                                <div className="dynbut game-select-label">
+                                    <button
+                                        className={`game-select ${selectedTroops === 1 ? 'highlighted' : ''}`}
+                                        onClick={() => setSelectedTroops(1)}
+                                    >
+                                        1
+                                    </button>
+                                    <button
+                                        className={`game-select ${selectedTroops === 5 ? 'highlighted' : ''}`}
+                                        onClick={() => setSelectedTroops(5)}
+                                    >
+                                        5
+                                    </button>
+                                    <button
+                                        className={`game-select ${selectedTroops === 10 ? 'highlighted' : ''}`}
+                                        onClick={() => setSelectedTroops(10)}
+                                    >
+                                        10
+                                    </button>
+                                </div>
+                                <div
+                                    id="nextState"
+                                    className="dynbut gamescreen-buttons-container-troops"
+                                    onClick={() => {
+                                        setCurrentTroopBonus(prevState => prevState + 100);
+                                    }}
+                                    disabled={!isCurrentPlayer || localStorage.getItem("WinLooseScreenWasShown") === "true"}
+                                >
+                                {"Troop Amount:" + ((phase === "REINFORCEMENT") ? currentTroopBonus : (isMidTurn && cardBonus))}
+                                </div>
+                            </div>
                         )}
-                        </div>
-                    )}
-                </div>
+                    </div>
+                </>
             )}
         </div>
         <div className="gamescreen-bottomright-container">
-            <button
-              id="nextState"
-              className="dynbut gamescreen-buttons-container"
-              style={{
-                  top: '50%',
-                  backgroundColor: 'red',
-                  transform: 'translateY(-50%)',
-                  cursor: 'pointer'
-              }}
-              onClick={() => {
-                  LeavePlayerConfirmation();
+            <div className="gamescreen-leave-container">
+                <button
+                id="nextState"
+                className="dynbut gamescreen-buttons-container"
+                onClick={() => {
+                    LeavePlayerConfirmation();
 
-              }}
-            >
-                Leave Game
-            </button>
+                }}
+                >
+                    Leave Game
+                </button>
+            </div>
         </div>
     </div>);
 
