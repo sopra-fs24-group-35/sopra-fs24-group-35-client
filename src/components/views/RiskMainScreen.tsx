@@ -868,8 +868,9 @@ const TitleScreen: React.FC = () => {
     };
 
     const dehighlightvalidbuttons = () => {
-        for (const territory of highlighted) {
-            const button = buttonRefs.current[territory]
+        console.log(game);
+        for (const territory of game.board.territories) {
+            const button = buttonRefs.current[territory.name]
             button.style.border = "2px solid black";
         }
     };
