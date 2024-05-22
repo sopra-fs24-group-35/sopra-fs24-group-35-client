@@ -174,7 +174,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, game
                 : (null)}
                 <label className="select-label">
                 {(!sameOwner) ? "Attacks:" : "Move Troops:"}
-                  <select className="select" value={selectedAttacks} onChange={e => setSelectedAttacks(e.target.value)}>
+                  <select className="modal-select" value={selectedAttacks} onChange={e => setSelectedAttacks(e.target.value)}>
                     <option value={1}>1</option>
                     <option value={5}>5</option>
                     <option value={10}>10</option>
