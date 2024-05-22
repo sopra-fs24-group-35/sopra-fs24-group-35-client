@@ -200,7 +200,7 @@
 }
 .gamescreen-bottomright-container{
   display: flex;
-  justify-content: center; /* Center buttons horizontally */
+  justify-content: flex-end; /* Center buttons horizontally */
   align-items: center;
   position: relative;
   margin: 5px;

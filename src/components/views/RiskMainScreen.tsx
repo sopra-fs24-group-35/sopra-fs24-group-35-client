@@ -257,7 +257,6 @@ const TitleScreen: React.FC = () => {
         } else {
             hideLoadingScreen();
         }
-// hello
         // Define the function to fetch game data
         async function getGame() {
             try {
@@ -294,15 +293,15 @@ const TitleScreen: React.FC = () => {
                 //});
 
                 }
-// Handle error if needed
+                // Handle error if needed
                 //if(game)
             }
         }
 
-// Call getGame initially
+        // Call getGame initially
         getGame();
 
-// Set up the interval to call getGame every 2 seconds
+        // Set up the interval to call getGame every 2 seconds
         const intervalId = setInterval(() => {
             if (game !== null) {
             }
@@ -316,7 +315,7 @@ const TitleScreen: React.FC = () => {
             }
         }, 2000);
 
-// Clean up the interval when the component unmounts or when the dependency array changes
+        // Clean up the interval when the component unmounts or when the dependency array changes
         return () => clearInterval(intervalId);
     }, [currentPlayerId]);
 
@@ -1826,7 +1825,7 @@ const TitleScreen: React.FC = () => {
                                     id="nextState"
                                     className="dynbut gamescreen-buttons-container-troops"
                                     onClick={() => {
-                                        setCurrentTroopBonus(prevState => prevState + 100);
+                                        //setCurrentTroopBonus(prevState => prevState + 100);
                                     }}
                                     disabled={!isCurrentPlayer || localStorage.getItem("WinLooseScreenWasShown") === "true"}
                                 >
