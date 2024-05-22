@@ -253,7 +253,7 @@ const TitleScreen: React.FC = () => {
     const config = {Authorization: localStorage.getItem("lobbyToken")};
 
     useEffect(() => {
-        if (game?.turnCycle?.currentPhase === null) {
+        if (game?.turnCycle?.currentPhase === null || game !== null || game?.turnCycle?.currentPlayer === null) {
             showLoadingScreen();
         } else {
             hideLoadingScreen();
@@ -266,7 +266,9 @@ const TitleScreen: React.FC = () => {
                 }
                 const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
                 setGame(gameResponse.data);
-                setPhase(gameResponse.data.turnCycle.currentPhase);
+                setPhase(gameResponse.data.turnCycle.currentPhase); //ERROR adn CurrentPlayer
+
+
                 setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
                 setCurrentTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
                 setCardBonus(gameResponse.data.turnCycle.currentPlayer.cardBonus);
@@ -322,6 +324,7 @@ const TitleScreen: React.FC = () => {
 
     useEffect(() => {
         if (game !== null) {
+            // CurrentPlayer == null
             if (phase === "REINFORCEMENT" && game.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId){
                 openCardModal();
             }
@@ -610,17 +613,25 @@ const TitleScreen: React.FC = () => {
 
             for (let ter of game.board.territories) {
                 if (ter.owner === playerid) {
-                    if (phase === "REINFORCEMENT" || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) {
+                    if (phase === "REINFORCEMENT") {
                         validbuttonid.push(ter.name);
                     }
-                    else if (ter.troops > 1) {
+                    else if ((ter.troops > 1 && phase === "ATTACK" && checkifthereareenemies(ter.name)) || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) {
+                        validbuttonid.push(ter.name);
+                    }
+                    else if(phase === "MOVE" && ter.troops > 1 && checkifthereareneighbors(ter.name)){
                         validbuttonid.push(ter.name);
                     }
                 }
             }
         
             setHighlighted(validbuttonid);
-            setCurrentHighlightedButtons(validbuttonid);
+            if (CurrentHighlightedButtons !== null && CurrentHighlightedButtons !== undefined) {
+                // Ensure validbuttonid is not null or undefined
+                let x = [...CurrentHighlightedButtons];
+                setCurrentHighlightedButtons([...x, validbuttonid]);
+            } else {
+            setCurrentHighlightedButtons(validbuttonid);}
     
             for (const button of validbuttonid) {
                 const curbutton = buttonRefs.current[button]
