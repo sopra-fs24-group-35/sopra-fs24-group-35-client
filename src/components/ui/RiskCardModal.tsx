@@ -8,7 +8,7 @@ import { Card } from "types";
 import { Button } from "../ui/Button";
 import Game from "models/Game";
 
-const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, gameId }) => {
+const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, gameId, additionalTime, setAdditionalTime }) => {
     if (!isModalOpen) {
         return null;
     }
@@ -59,6 +59,7 @@ const RiskCardModal = ({ isModalOpen, isMidTurn, onClose, onTrade, lobbyId, game
     }, [gameId, lobbyId]);
 
     const trade = async () => {
+        setAdditionalTime(3);
         const config = { Authorization: localStorage.getItem("lobbyToken") };
         const requestBody = JSON.stringify({
             "card1Name": selectedCards[0].territoryName,
@@ -280,7 +281,9 @@ RiskCardModal.propTypes = {
     onClose: PropTypes.func.isRequired,
     onTrade: PropTypes.func.isRequired,
     lobbyId: PropTypes.string.isRequired,
-    gameId: PropTypes.string.isRequired
+    gameId: PropTypes.string.isRequired,
+    additionalTime: PropTypes.number.isRequired,
+    setAdditionalTime: PropTypes.func.isRrquired
 };
 
 export default RiskCardModal;

@@ -69,6 +69,7 @@ const TitleScreen: React.FC = () => {
     const lobbyId = localStorage.getItem("lobbyId")
     const [startButton, setStartButton] = useState<string | null>(null);
     const adjDict = new AdjDict();
+    const [additionalTime, setAdditionalTime] = useState(0);
 //reload idea
 
     const [curx, setX] = useState(0);
@@ -1859,8 +1860,8 @@ const TitleScreen: React.FC = () => {
     return (
       <div className="gamescreen-container">
           <div className="gamescreen-innerupper-container">
-              <Announcer phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} />
-              <Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} />
+            <Announcer phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} game={game} />
+              <Countdown onComplete={nextState} phase={phase} currentPlayerId={parseInt(currentPlayerId)} userId={parseInt(localStorage.getItem("user_id"))} closeWindow1={closeModal} closeWindow2={closeCardModal} additionalTime={additionalTime} setAdditionalTime={setAdditionalTime}/>
               {/*Attack Modal Section*/}
               <section>
                   <AttackModal
@@ -1870,6 +1871,8 @@ const TitleScreen: React.FC = () => {
                     onMove={moving}
                     lobbyId={lobbyId}
                     gameId={gameId}
+                    additionalTime={additionalTime}
+                    setAdditionalTime={setAdditionalTime}
                   />
                   {(localStorage.getItem("GameHasWinner") === "false") && (
                   <RiskCardModal
@@ -1879,6 +1882,8 @@ const TitleScreen: React.FC = () => {
                     onTrade={trading}
                     lobbyId={lobbyId}
                     gameId={gameId}
+                    additionalTime={additionalTime}
+                    setAdditionalTime={setAdditionalTime}
                   />)}
                   <LoseModal
                     isModalOpen={isLoseModalOpen}

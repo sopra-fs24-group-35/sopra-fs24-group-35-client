@@ -7,7 +7,7 @@ import ApiStyles from "helpers/avatarApiStyles";
 import {Button} from "../ui/Button";
 import Game from "models/Game";
 
-const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, gameId }) => {
+const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, gameId, additionalTime, setAdditionalTime }) => {
   if (!isModalOpen) {
     return null;
   }
@@ -92,6 +92,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, game
   }, [game]);
 
   const attack = async() => {
+    setAdditionalTime(3);
     const config = { Authorization: localStorage.getItem("lobbyToken") };
     const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedTroops,"repeats" : selectedAttacks});
     console.log("requestBody: ", requestBody);
@@ -101,6 +102,7 @@ const AttackModal = ({ isModalOpen, modalContent, onClose, onMove, lobbyId, game
   }
 
   const move = async() => {
+    setAdditionalTime(3);
     const config = { Authorization: localStorage.getItem("lobbyToken") };
     const requestBody = JSON.stringify({"attackingTerritory" : attackTerritory.name,"defendingTerritory" : defenseTerritory.name, "troopsAmount" : selectedAttacks});
     console.log("requestBody: ", requestBody);
@@ -201,7 +203,9 @@ AttackModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onMove: PropTypes.func.isRequired,
   lobbyId: PropTypes.string.isRequired,
-  gameId: PropTypes.string.isRequired
+  gameId: PropTypes.string.isRequired,
+  additionalTime: PropTypes.number.isRequired,
+  setAdditionalTime: PropTypes.func.isRrquired
 };
 
 export default AttackModal;
