@@ -23,6 +23,7 @@
     background-color: $background;
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
+    background-image: url('../../styles/views/Pictures/CardBackground.png');
   }
   &.field {
     display: flex;
@@ -57,9 +58,11 @@
   &.avatar {
     display: flex;
     align-self: center;
+    margin-top: 10px;
     margin-bottom: 10px;
     border-radius: 50%;
     object-fit: cover;
+    filter: drop-shadow(0px 0px 20px #ffffff);
   }
   &.switch-button {
     display: flex;
