@@ -80,6 +80,7 @@ const TitleScreen: React.FC = () => {
     const [PlayerColor, setPlayerColor] = useState({});
     const colors = ["red", "blue", "purple", "green", "orange", "brown"];
     const [PlayerCycle, setPlayerCycle] = useState(null);
+    const [highlighted, setHighlighted] = useState([]);
     const [curListOfValidReinforcements, setcurListOfValidReinforcements] = useState([]);
     const [CurrentHighlightedButtons, setCurrentHighlightedButtons] = useState(null);
     const NameCycle = ["Go to Attack", "Go to Troop Movement", "End The Turn"];
@@ -329,12 +330,12 @@ const TitleScreen: React.FC = () => {
                 setIsMidTurn(true);
             }
 
-            if(phase === "REINFORCEMENT" && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId) {
-                checkForAllValidButtons();
-            }
-
             if (currentPlayerId !== null) {
                 setCurrentPlayerId(currentPlayerId);
+            }
+
+            if (parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId) {
+                highlightCurrentButtons();
             }
 
             if (CyclewithTroopsandTerritories !== null) {
@@ -601,7 +602,7 @@ const TitleScreen: React.FC = () => {
         }
     };
 
-    const checkForAllValidButtons = () => {
+    const highlightCurrentButtons = () => {
         const playerid = currentPlayerId;
         let validbuttonid = [];
 
@@ -609,11 +610,16 @@ const TitleScreen: React.FC = () => {
 
             for (let ter of game.board.territories) {
                 if (ter.owner === playerid) {
-                    validbuttonid.push(ter.name);
+                    if (phase === "REINFORCEMENT" || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) {
+                        validbuttonid.push(ter.name);
+                    }
+                    else if (ter.troops > 1) {
+                        validbuttonid.push(ter.name);
+                    }
                 }
             }
         
-            setcurListOfValidReinforcements(validbuttonid);
+            setHighlighted(validbuttonid);
             setCurrentHighlightedButtons(validbuttonid);
     
             for (const button of validbuttonid) {
@@ -664,8 +670,9 @@ const TitleScreen: React.FC = () => {
         if (startButton) {
             if (territory.owner !== currentPlayerId && adjDict.dict[startButton].includes(id)) {
                 dehighlightadjbutton(startButton);
+                dehighlightvalidbuttons();
                 drawLine(startButton, id);
-//setDrawingLine(true); // Enable drawing line mode
+                //setDrawingLine(true); // Enable drawing line mode
                 const territory_def = id;
                 const territory_atk = startButton;
                 const cont = JSON.stringify({territory_def, territory_atk});
@@ -674,15 +681,18 @@ const TitleScreen: React.FC = () => {
             } else if (startButton === id) {
                 setStartButton(null);
                 dehighlightadjbutton(startButton);
+                highlightCurrentButtons();
             } else{
                 if(territory.owner === currentPlayerId && checkifthereareenemies(id) && territory.troops > 1){
                     dehighlightadjbutton(startButton);
                     setStartButton(id);
-                    highlightadjbutton(id);}
+                    highlightadjbutton(id);
+                }
             }
         } else {
             if(territory.owner === currentPlayerId && checkifthereareenemies(id) && territory.troops > 1){
                 setStartButton(id);
+                dehighlightvalidbuttons();
                 highlightadjbutton(id);
             }}
     };
@@ -712,13 +722,13 @@ const TitleScreen: React.FC = () => {
         const requestBody = JSON.stringify({"board": game.board});
         const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}`, requestBody, {headers: config});
 
+        dehighlightvalidbuttons();
         setMoved(false);
         setGame(updateGame.data);
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
         setCurrentTroopBonus(updateGame.data.turnCycle.currentPlayer.troopBonus);
         setCardBonus(updateGame.data.turnCycle.currentPlayer.cardBonus);
-        dehighlightvalidbuttons();
     };
 
     const increaseTroops = (territory_id: string) => {
@@ -740,6 +750,7 @@ const TitleScreen: React.FC = () => {
             }
             else {
                 setCurrentTroopBonus(0);
+                dehighlightvalidbuttons();
             }
 
             setButtonData([...buttonData]); // Update the button data array in the state
@@ -763,6 +774,7 @@ const TitleScreen: React.FC = () => {
             }
             else {
                 setCardBonus(0);
+                dehighlightvalidbuttons();
                 setIsMidTurn(false);
             }
 
@@ -777,6 +789,7 @@ const TitleScreen: React.FC = () => {
         if (startButton) {
             if (currentPlayerId === territory.owner && CurrentHighlightedButtons.includes(id) && id !== startButton) {
                 dehighlightadjbutton(startButton);
+                dehighlightvalidbuttons();
                 const button_from = buttonData.find(button => button.id === startButton); // Find the button data for the startId
                 const button_to = buttonData.find(button => button.id === id);
                 if (button_from && button_to && button_from.troops > 1) {
@@ -794,16 +807,22 @@ const TitleScreen: React.FC = () => {
             else if (startButton === id && !moved) {
                 setStartButton(null);
                 dehighlightadjbutton(startButton);
+                highlightCurrentButtons();
             }
         } else if (currentPlayerId === territory.owner && checkifthereareneighbors(id) && territory.troops > 1 && !moved) {
+            dehighlightvalidbuttons();
             setStartButton(id);
             checkForAllValidReinforcements(id);
         }
     };
 
     const highlightadjbutton = (startId: string) => {
-//increaseTroops(startId);
+        //increaseTroops(startId);
         if (phase === "ATTACK") {
+            const start = buttonRefs.current[startId];
+            start.style.border = "2px double white";
+            start.style.padding = "5px"; // Example padding
+
             const adjacentTerritories = adjDict.dict[startId];
             let enemyAdjacentTerritories = [];
             for (let name of adjacentTerritories) {
@@ -817,10 +836,6 @@ const TitleScreen: React.FC = () => {
                 const button = buttonRefs.current[territory];
                 button.style.border = "2px solid white";
             }
-            const button = buttonRefs.current[startId];
-            button.style.border = "2px double white";
-            button.style.padding = "5px"; // Example padding
-
         }
     };
 
@@ -842,7 +857,7 @@ const TitleScreen: React.FC = () => {
     };
 
     const dehighlightvalidbuttons = () => {
-        for (const territory of curListOfValidReinforcements) {
+        for (const territory of highlighted) {
             const button = buttonRefs.current[territory]
             button.style.border = "2px solid black";
         }
