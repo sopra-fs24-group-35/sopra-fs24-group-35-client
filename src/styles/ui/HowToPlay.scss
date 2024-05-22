@@ -1,0 +1,62 @@
+.scrollable-box-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+  }
+  
+  .scrollable-box {
+    background: white;
+    background-image: url('../../styles/views/Pictures/CardBackground.png');
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 80vh;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  .close-button {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #1e1e1e;
+    font-size: 35px;
+    font-weight: bold;
+    border: none;
+    background: none;
+    text-align: match-parent;
+    padding: 1px;
+    padding-right: 3px;
+    width: 30px; 
+    height: 30px; 
+    line-height: 0px; 
+    &:hover {
+        color: red;
+      }
+  }
+.close:hover,
+.close:focus {
+    color: red;
+}
+  
+  .scrollable-content {
+    overflow-y: auto;
+    max-height: 60vh;
+    padding-right: 10px;
+}
+
+.scrollable-content {
+    overflow-y: auto;
+    max-height: calc(60vh - 40px); /* Adjust the height to account for padding and the close button */
+    padding: 10px;
+    margin-top: 20px; /* Add margin to push content below the close button */
+}

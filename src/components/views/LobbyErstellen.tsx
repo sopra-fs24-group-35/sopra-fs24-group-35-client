@@ -6,6 +6,7 @@ import { Button } from "components/ui/Button";
 import "styles/views/Login.scss";
 import "styles/views/LobbyErstellen.scss";
 import BaseContainer from "components/ui/BaseContainer";
+import HowToPlay from "components/ui/HowToPlay";
 import RiskCardModal from "../ui/RiskCardModal";
 import PropTypes from "prop-types";
 let riskLogo = require("./Risk.png");
@@ -38,6 +39,10 @@ FormField.propTypes = {
 
 const LobbyErstellen = () => {
   const navigate = useNavigate();
+  const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
+
+  const openManual = () => setIsHowToPlayOpen(true);
+  const closeManual = () => setIsHowToPlayOpen(false);
   
   let user_id = localStorage.getItem("user_id")
   let temp_sol:number = +user_id
@@ -100,7 +105,9 @@ const LobbyErstellen = () => {
   };
 
   return (
+    
     <div className="basescreen title-screen" style={{ position: 'relative' }}>
+      <HowToPlay isOpen={isHowToPlayOpen} onClose={closeManual}></HowToPlay>
       <div className="basescreen overlay"></div>
       <div className="basescreen title" style={{ marginBottom: '50px', opacity: '0', animation: 'fadeIn 2s forwards' }}>
         <img src={riskLogo} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', position: 'absolute', top: '0', left: '50%', transform: `translate(${-50}%, ${-10}%)` }} alt="My Image" />
@@ -120,12 +127,12 @@ const LobbyErstellen = () => {
             style={{ marginBottom: '15px' }}>
             Create Lobby
           </Button>
-          {/*<Button*/}
-          {/*  width="100%"*/}
-          {/*  onClick={() => navigate("/avatar")}*/}
-          {/*  style={{ marginBottom: '15px' }}>*/}
-          {/*  Change avatar*/}
-          {/*</Button>*/}
+          <Button
+            width="100%"
+            onClick={() => openManual()}
+            style={{ marginBottom: '15px' }}>
+            How to play
+          </Button>
           <Button
             width="100%"
             onClick={() => logout()}>
