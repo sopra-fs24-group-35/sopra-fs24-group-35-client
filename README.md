@@ -6,12 +6,16 @@ With this project we wanted to make it possible for people to play the board gam
 -  [react](https://react.dev/)
 
 ## High-level Component:
--  todo
--  todo
+We have the following main components in our project:
+-  [Login]: This component allows users to log into the game using teir username and password 
+-  [Registration]: This component allows users without an account to create a new one
+-   [LobbyErstellen]: This is the main menu, where players can choose whether they want to join or create a lobby, read the manual, or leave the game
+-   [LobbyScreen]: This component houses the lobby, where players can join and form groups to then start a game
+-   [RiskMainScreen]: This component is responsible for running the actual game with handling all the gameplay. It is by far the largest component.
 
 ## Getting started
 
-Read and go through these Tutorials. It will make your life easier:)
+Read and go through these Tutorials. It will make your life easier:
 
 - Read the React [Docs](https://react.dev/learn)
 - Do this React [Getting Started](https://react.dev/learn/tutorial-tic-tac-toe) Tutorial (it doesn't assume any existing React knowledge)
@@ -95,3 +99,13 @@ This project is licensed under the GNU License - see the [LICENSE.md] file for d
 
 [CONTRIBUTING.md]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/CONTRIBUTING.md
 [LICENSE.md]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/LICENSE
+
+[Login]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/src/components/views/Login.tsx
+
+[Registration]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/src/components/views/Registration.tsx
+
+[LobbyErstellen]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/src/components/views/LobbyErstellen.tsx
+
+[LobbyScreen]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/src/components/views/LobbyScreen.tsx
+
+[RiskMainScreen]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/src/components/views/RiskMainScreen.tsx
