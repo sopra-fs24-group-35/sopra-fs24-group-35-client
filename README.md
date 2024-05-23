@@ -1,6 +1,15 @@
-# SoPra FS24 - Client Template with build pack
+# SoPra Risk Game FS24
+With this project we wanted to make it possible for people to play the board game Risk with each other even if they can't meet in person. We all like strategy games but luck also having a deciding factor makes the game more random and fun which is why we chose to implement risk. In the end we want to have a functioning version of risk which is simple to play and can be extended on. We also want the ui to be simple but understandable.
 
-## Getting started TEST
+## Technologies:
+-  Node.js
+-  [react](https://react.dev/)
+
+## High-level Component:
+-  todo
+-  todo
+
+## Getting started
 
 Read and go through these Tutorials. It will make your life easier:)
 
@@ -61,5 +70,27 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 To learn React, check out the [React documentation](https://react.dev/).
 
+## Illustrations:
+todo
 
-> Thanks to Lucas Pelloni Kyrill Hux and Marco Leder for working on the template.
+## Contributing:
+Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Roadmap:
+-  You could add an edit page where the user could change his username and avatar. There are already some things implemented for it.
+-  You could create dices which are displayed after every attack in the bottom middle of the screen. The server already returns the dice rolls after every attack.
+-  You could create more maps to play one. There are multiple examples on the risk website.
+
+## Authors and Acknowledgement:
+-  SylverSezari - Founder
+-  roburkUZH - Founder
+-  Cross55 - Founder
+-  Eposs111 - Founder
+-  RPKosch - Founder
+
+Thanks to Lucas Pelloni Kyrill Hux and Marco Leder for working on the template.
+
+## License:
+This project is licensed under the GNU License - see the [LICENSE.md] file for details
+
+[LICENSE.md]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/LICENSE
