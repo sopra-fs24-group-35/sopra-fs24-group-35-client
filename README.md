@@ -74,7 +74,7 @@ To learn React, check out the [React documentation](https://react.dev/).
 todo
 
 ## Contributing:
-Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md] for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Roadmap:
 -  You could add an edit page where the user could change his username and avatar. There are already some things implemented for it.
@@ -93,4 +93,5 @@ Thanks to Lucas Pelloni Kyrill Hux and Marco Leder for working on the template.
 ## License:
 This project is licensed under the GNU License - see the [LICENSE.md] file for details
 
+[CONTRIBUTING.md]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/CONTRIBUTING.md
 [LICENSE.md]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/blob/main/LICENSE
