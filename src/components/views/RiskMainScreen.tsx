@@ -186,9 +186,9 @@ const TitleScreen: React.FC = () => {
         const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
 //setGame(updatedGame.data);
 
-        if (traded) {
+        if (updatedGame?.data?.turnCycle?.currentPhase !== null && traded) {
 
-            if(updatedGame.data.turnCycle.currentPhase === "ATTACK"){
+            if(updatedGame?.data?.turnCycle?.currentPhase === "ATTACK"){
                 setCardBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
             }
             else {
@@ -265,6 +265,7 @@ const TitleScreen: React.FC = () => {
         if (game?.turnCycle?.currentPhase === null || game !== null || game?.turnCycle?.currentPlayer === null) {
             showLoadingScreen();
         } else {
+            pause(1000);
             hideLoadingScreen();
         }
         // Define the function to fetch game data
@@ -274,20 +275,22 @@ const TitleScreen: React.FC = () => {
                     pause(2000);
                 }
                 const gameResponse = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
-                setGame(gameResponse.data);
-                setPhase(gameResponse.data.turnCycle.currentPhase); //ERROR adn CurrentPlayer
 
 
-                setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
-                setCurrentTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
-                setCardBonus(gameResponse.data.turnCycle.currentPlayer.cardBonus);
-                setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
+                if (game?.turnCycle?.currentPhase !== null) {
+                    setGame(gameResponse.data);
+                    setPhase(gameResponse.data.turnCycle.currentPhase); //ERROR adn CurrentPlayer
+                    setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
+                    setCurrentTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
+                    setCardBonus(gameResponse.data.turnCycle.currentPlayer.cardBonus);
+                    setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
 
-                if(game !== null && gameResponse.data.turnCycle.currentPlayer.playerId === localStorage.getItem("user_id")){
-                    setIsCurrentPlayer(true);
-                }
-                else {
-                    setIsCurrentPlayer(false);
+
+                    if (game !== null && gameResponse.data.turnCycle.currentPlayer.playerId === localStorage.getItem("user_id")) {
+                        setIsCurrentPlayer(true);
+                    } else {
+                        setIsCurrentPlayer(false);
+                    }
                 }
 
             } catch (error) {
@@ -316,9 +319,7 @@ const TitleScreen: React.FC = () => {
 
         // Set up the interval to call getGame every 2 seconds
         const intervalId = setInterval(() => {
-            if (game !== null) {
-            }
-            if (game && currentPlayerId !== null) { // Check if game is not null
+            if (game && currentPlayerId !== null && game?.turnCycle?.currentPhase !== null) { // Check if game is not null
                 if (parseInt(currentPlayerId) !== parseInt(localStorage.getItem("user_id"))) {
                     getGame();
                 } else {
@@ -333,7 +334,7 @@ const TitleScreen: React.FC = () => {
     }, [currentPlayerId]);
 
     useEffect(() => {
-        if (game !== null) {
+        if (game !== null && game?.turnCycle?.currentPhase !== null) {
             // CurrentPlayer == null
             if ((phase === "REINFORCEMENT" || phase === "ATTACK") && game.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId){
                 openCardModal();
@@ -342,11 +343,11 @@ const TitleScreen: React.FC = () => {
                 }
             }
 
-            if (currentPlayerId !== null) {
+            if (game?.turnCycle?.currentPhase !== null && currentPlayerId !== null) {
                 setCurrentPlayerId(currentPlayerId);
             }
 
-            if (parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId) {
+            if (game?.turnCycle?.currentPhase !== null && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId) {
                 highlightCurrentButtons();
             }
 
@@ -355,7 +356,7 @@ const TitleScreen: React.FC = () => {
 
             let PlayerwithColors = {};
             let x = 0;
-            if (game !== null) {
+            if (game !== null && game?.turnCycle?.currentPhase !== null) {
                 for (const player of game.players) {
                     PlayerwithColors[player.playerId] = colors[x];
                     x++;
@@ -364,53 +365,55 @@ const TitleScreen: React.FC = () => {
             setPlayerColor(PlayerwithColors);
             let buttonDatacopy = [...buttonData]; // Create a shallow copy of buttonData
 
-            for (let i = 0; i < buttonDatacopy.length; i++) {
-                const button = buttonDatacopy[i];
-                const territory1 = game.board.territories.find(territory => territory.name === buttonDatacopy[i].id);
-                const playercolor = PlayerColor[territory1.owner]
-                if(button.owner === 0){
-                    button.troops = territory1.troops;
-                    button.owner = territory1.owner;
-                }
-                else if (game !== null && territory1.troops !== button.troops || button.owner !== territory1.owner) {
-                    if(button.owner !== territory1.owner){
+            if(game?.turnCycle?.currentPhase !== null) {
+
+                for (let i = 0; i < buttonDatacopy.length; i++) {
+                    const button = buttonDatacopy[i];
+                    const territory1 = game.board.territories.find(territory => territory.name === buttonDatacopy[i].id);
+                    const playercolor = PlayerColor[territory1.owner]
+                    if (button.owner === 0) {
                         button.troops = territory1.troops;
                         button.owner = territory1.owner;
-                        showchangeofowner(button.id, "5px solid #8B0000");
-                    } else {
-                        if(button.troops < territory1.troops){
+                    } else if (game !== null && territory1.troops !== button.troops || button.owner !== territory1.owner) {
+                        if (button.owner !== territory1.owner) {
                             button.troops = territory1.troops;
                             button.owner = territory1.owner;
-                            showchangeoftroops(button.id, "5px solid lightgreen");
+                            showchangeofowner(button.id, "5px solid #8B0000");
                         } else {
-                            button.troops = territory1.troops;
-                            button.owner = territory1.owner;
-                            showchangeoftroops(button.id, "5px solid #FF7F7F");
+                            if (button.troops < territory1.troops) {
+                                button.troops = territory1.troops;
+                                button.owner = territory1.owner;
+                                showchangeoftroops(button.id, "5px solid lightgreen");
+                            } else {
+                                button.troops = territory1.troops;
+                                button.owner = territory1.owner;
+                                showchangeoftroops(button.id, "5px solid #FF7F7F");
+                            }
                         }
+
+                    } else {
+
                     }
-
-                } else {
-
                 }
-            }
 
-            setButtonData(buttonDatacopy); // Update the state with the modified copy
-            if (phase === "REINFORCEMENT") {
-                setCurrentText(NameCycle[0]);
-            } else if (phase === "ATTACK") {
-                setCurrentText(NameCycle[1]);
-            } else if (phase === "MOVE") {
-                setCurrentText(NameCycle[2]);
-                if (moved) {
-                    nextState();
+                setButtonData(buttonDatacopy); // Update the state with the modified copy
+                if (phase === "REINFORCEMENT") {
+                    setCurrentText(NameCycle[0]);
+                } else if (phase === "ATTACK") {
+                    setCurrentText(NameCycle[1]);
+                } else if (phase === "MOVE") {
+                    setCurrentText(NameCycle[2]);
+                    if (moved) {
+                        nextState();
+                    }
                 }
+
+                const sC = sideContent;
+
+                setStartTimer(prevState => prevState + 1);
+                checkifyouHaveLostOrWon();
+                setdeathsymbol()
             }
-
-            const sC = sideContent;
-
-            setStartTimer(prevState => prevState + 1);
-            checkifyouHaveLostOrWon();
-            setdeathsymbol()
         }
 
 
@@ -1810,49 +1813,42 @@ const TitleScreen: React.FC = () => {
     };
 
     const UpdateCardSizes = () => {
-        if(game !== null && game.players.length < 4){
-            return { Cardwidth: 45, Cardheight: 45};
+        if (game?.turnCycle?.currentPhase !== null) {
+        if (game !== null && game.players.length < 4) {
+            return {Cardwidth: 45, Cardheight: 45};
+        } else if (game !== null && game.players.length === 4) {
+            return {Cardwidth: 40, Cardheight: 40};
+        } else if (game !== null && game.players.length === 5) {
+            return {Cardwidth: 40, Cardheight: 40};
+        } else if (game !== null && game.players.length === 6) {
+            return {Cardwidth: 30, Cardheight: 30};
         }
-        else if(game !== null && game.players.length === 4){
-            return { Cardwidth: 40, Cardheight: 40};
-        }
-        else if(game !== null && game.players.length === 5){
-            return { Cardwidth: 40, Cardheight: 40};
-        }
-        else if(game !== null && game.players.length === 6){
-            return { Cardwidth: 30, Cardheight: 30};
-        }
+    }
     };
     const GetCorrectCard = (player) => {
-        if(game !== null && player.riskCards.length === 0){
-            return CardIcon0.src;
-        }
-        else if(game !== null && player.riskCards.length === 1){
-            return CardIcon1.src;
-        }
-        else if(game !== null && player.riskCards.length === 2){
-            return CardIcon2.src;
-        }
-        else if(game !== null && player.riskCards.length === 3){
-            return CardIcon3.src;
-        }
-        if(game !== null && player.riskCards.length === 4){
-            return CardIcon4.src;
-        }
-        else if(game !== null && player.riskCards.length === 5){
-            return CardIcon5.src;
-        }
-        else if(game !== null && player.riskCards.length === 6){
-            return CardIcon6.src;
-        }
-        else if(game !== null && player.riskCards.length === 7){
-            return CardIcon7.src;
-        }
-        else if(game !== null && player.riskCards.length === 8){
-            return CardIcon8.src;
-        }
-        else if(game !== null && player.riskCards.length === 9 || player.riskCards.length > 9){
-            return CardIcon9.src;
+        if (game?.turnCycle?.currentPhase !== null) {
+            if (game !== null && player.riskCards.length === 0) {
+                return CardIcon0.src;
+            } else if (game !== null && player.riskCards.length === 1) {
+                return CardIcon1.src;
+            } else if (game !== null && player.riskCards.length === 2) {
+                return CardIcon2.src;
+            } else if (game !== null && player.riskCards.length === 3) {
+                return CardIcon3.src;
+            }
+            if (game !== null && player.riskCards.length === 4) {
+                return CardIcon4.src;
+            } else if (game !== null && player.riskCards.length === 5) {
+                return CardIcon5.src;
+            } else if (game !== null && player.riskCards.length === 6) {
+                return CardIcon6.src;
+            } else if (game !== null && player.riskCards.length === 7) {
+                return CardIcon7.src;
+            } else if (game !== null && player.riskCards.length === 8) {
+                return CardIcon8.src;
+            } else if (game !== null && player.riskCards.length === 9 || player.riskCards.length > 9) {
+                return CardIcon9.src;
+            }
         }
     };
 
@@ -1922,7 +1918,7 @@ const TitleScreen: React.FC = () => {
                                 }}
                               />
                           </div>
-                          {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length <= 3 && (
+                          {game !== null && game?.turnCycle?.currentPlayer !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length <= 3 && (
                             <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
                                 position: 'absolute',
                                 right: '-73px',
@@ -1932,7 +1928,7 @@ const TitleScreen: React.FC = () => {
                                 height: '80px' // Adjust the height as needed
                             }}/>
                           )}
-                          {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 4 && (
+                          {game !== null && game?.turnCycle?.currentPlayer !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 4 && (
                             <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
                                 position: 'absolute',
                                 right: '-77px',
@@ -1942,7 +1938,7 @@ const TitleScreen: React.FC = () => {
                                 height: '80px' // Adjust the height as needed
                             }}/>
                           )}
-                          {game !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 5 && (
+                          {game !== null && game?.turnCycle?.currentPlayer !== null && game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 5 && (
                             <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
                                 position: 'absolute',
                                 right: '-77px',
@@ -1952,7 +1948,7 @@ const TitleScreen: React.FC = () => {
                                 height: '80px' // Adjust the height as needed
                             }}/>
                           )}
-                          {game !== null && (
+                          {game !== null && game?.turnCycle?.currentPlayer !== null &&(
                             <>
                                 {game.turnCycle.currentPlayer.playerId === player.playerId && game.players.length === 6 && (
                                   <img className="avatar-arrow" src={arrow.src} alt="overlay" style={{
