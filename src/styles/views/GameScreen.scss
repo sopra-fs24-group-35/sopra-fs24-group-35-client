@@ -261,46 +261,89 @@
   max-height: 100%; /* Set the maximum height to 80% */
 }
 
-.avatar-overlay3{
+.avatar-overlay2 {
+  position: absolute;
+  z-index: 3;
+  background-size: cover;
+  background-position: center;
+  top: 50%; /* Position the image 50% from the top of the avatar container */
+  left: 50%; /* Position the image 50% from the left of the avatar container */
+  transform: translate(-50%, -50%); /* Center the image within the avatar container */
+  width: 100%; /* Make the image occupy 50% of the avatar container's width */
+  height: auto; /* Let the height adjust automatically to maintain aspect ratio */
+  /* Add any additional styling as needed */
+}
+
+.avatar-overlay3 {
   position: absolute;
   top: -10%;
   left: -3%;
-  /* Adjust the z-index to ensure the overlay is displayed above the base image */
   z-index: 3;
-  background-size: cover; /* Scale the background image to cover the entire container */
-  background-position: center; /* Center the background image */
+  background-size: cover;
+  background-position: center;
   /* Add any additional styling as needed */
 }
-.avatar-overlay4{
+
+.avatar-overlay4 {
   position: absolute;
-  top: -20%;
-  left: -10%;
-  /* Adjust the z-index to ensure the overlay is displayed above the base image */
+  top: -10%;
+  left: -9%;
   z-index: 3;
-  background-size: cover; /* Scale the background image to cover the entire container */
-  background-position: center; /* Center the background image */
+  background-size: cover;
+  background-position: center;
   /* Add any additional styling as needed */
 }
-.avatar-overlay5{
+
+.avatar-overlay5 {
   position: absolute;
   top: -25%;
   left: -15%;
-  /* Adjust the z-index to ensure the overlay is displayed above the base image */
   z-index: 3;
-  background-size: cover; /* Scale the background image to cover the entire container */
-  background-position: center; /* Center the background image */
+  background-size: cover;
+  background-position: center;
   /* Add any additional styling as needed */
 }
-.avatar-overlay6{
+
+.avatar-overlay6 {
   position: absolute;
   top: -30%;
   left: -18%;
-  /* Adjust the z-index to ensure the overlay is displayed above the base image */
   z-index: 3;
-  background-size: cover; /* Scale the background image to cover the entire container */
-  background-position: center; /* Center the background image */
+  background-size: cover;
+  background-position: center;
   /* Add any additional styling as needed */
 }
+
+.avatar-overlay2 img {
+  width: 50%; /* Make the image fill its container */
+  height: 50%; /* Make the image fill its container */
+  position: absolute;
+  top: 50%; /* Position the image 50% from the top of the avatar container */
+  left: 50%; /* Position the image 50% from the left of the avatar container */
+  transform: translate(-50%, -50%); /* Center the image within the avatar container */
+}
+
+.avatar-overlay3 img {
+  width: 100%; /* Make the image fill its container */
+  height: 100%; /* Make the image fill its container */
+}
+
+.avatar-overlay4 img {
+  width: 100%; /* Make the image fill its container */
+  height: 100%; /* Make the image fill its container */
+}
+
+.avatar-overlay5 img {
+  width: 100%; /* Make the image fill its container */
+  height: 100%; /* Make the image fill its container */
+}
+
+.avatar-overlay6 img {
+  width: 100%; /* Make the image fill its container */
+  height: 100%; /* Make the image fill its container */
+}
+
+
 avatar-arrow{
   position: absolute;
   transform: rotate(180deg);

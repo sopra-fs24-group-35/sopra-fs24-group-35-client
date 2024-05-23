@@ -96,6 +96,15 @@ const TitleScreen: React.FC = () => {
 //ALL imagens
     const defeat = new Image();
     defeat.src = defeatIcon;
+
+    let deepCopy0 = defeat.cloneNode(true);
+    let deepCopy1 = defeat.cloneNode(true);
+    let deepCopy2 = defeat.cloneNode(true);
+    let deepCopy3 = defeat.cloneNode(true);
+    let deepCopy4 = defeat.cloneNode(true);
+    let deepCopy5 = defeat.cloneNode(true);
+
+
     const arrow = new Image();
     arrow.src = currentPlayerArrow;
     const BonusIcon = new Image();
@@ -503,6 +512,7 @@ const TitleScreen: React.FC = () => {
                             console.log("I AM HERE BEFORE !!!!!!!! : ", newList + "count: " + count + "playerid: " + x.playerId);
                             return newList;
                         });
+                        addpicturedeath(count);
                         console.log("I AM HERE!!!!!!!! : ", LoseList);
                         for(const x of LoseList){
                             console.log(x);
@@ -515,34 +525,66 @@ const TitleScreen: React.FC = () => {
     };
 
     // Use useEffect to log the updated LoseList
-    useEffect(() => {
-        console.log("LoseList has been updated:", LoseList);
-        for (const x of LoseList) {
-            console.log(x);
-            console.log(game);
-            let count1 = -1;
-            for (const y of game.players) {
-                count1 = count1+1;
-                if(x === y.playerId){
-                    console.log("After Listupdate count: " + count1 + "playerid: " + x + " y: ", y.playerId);
-                    const avatar0Button = document.getElementById(`avatar${count1}`);
-                    console.log(avatar0Button);
+    // useEffect(() => {
+    //     console.log("LoseList has been updated:", LoseList);
+    //     for (const x of LoseList) {
+    //         console.log(x);
+    //         console.log(game);
+    //         let count1 = -1;
+    //         for (const y of game.players) {
+    //             count1 = count1+1;
+    //             if(x === y.playerId){
+    //                 console.log("After Listupdate count: " + count1 + "playerid: " + x + " y: ", y.playerId);
+    //                 addpicturedeath(count1);
+    //         }
+    //     }
+    // }}, [LoseList]);
 
-                    if(game.players.length < 4){
-                        defeat.classList.add('avatar-overlay3');}
-                    if(game.players.length === 4){
-                        defeat.classList.add('avatar-overlay4');}
-                    if(game.players.length === 5){
-                        defeat.classList.add('avatar-overlay5');}
-                    if(game.players.length === 6){
-                        defeat.classList.add('avatar-overlay6');}
+    const addpicturedeath = (count1) => {
+        let cur;
+        if(count1 === 0){
+            cur = deepCopy0
+        }
+        if(count1 === 1){
+            cur = deepCopy1
+        }
+        if(count1 === 2){
+            cur = deepCopy2
+        }
+        if(count1 === 3){
+            cur = deepCopy3
+        }
+        if(count1 === 4){
+            cur = deepCopy4
+        }
+        if(count1 === 5){
+            cur = deepCopy5
+        }
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        let avatar0Button1 = document.getElementById(`avatar${count1}`);
+        let containerWidth = avatar0Button1.offsetWidth; // Get the width of the parent container
+        let containerHeight = avatar0Button1.offsetHeight; // Get the height of the parent container
+
+// Set the width and height of the image based on the parent container size
+//         cur.style.width = screenWidth/10 + 'px';
+//         cur.style.height = screenHeight/6 + 'px';
+        console.log(avatar0Button1 + "        " + cur.style.width + " " + cur.style.height);
+
+        if(game.players.length < 3){
+            cur.classList.add('avatar-overlay2');}
+        if(game.players.length === 3){
+            cur.classList.add('avatar-overlay2');}
+        if(game.players.length === 4){
+            cur.classList.add('avatar-overlay2');}
+        if(game.players.length === 5){
+            cur.classList.add('avatar-overlay2');}
+        if(game.players.length === 6){
+            cur.classList.add('avatar-overlay2');}
 
 // Append the image element to the avatar button
-                    avatar0Button.appendChild(defeat);
-                }
-            }
-        }
-    }, [LoseList]);
+        avatar0Button1.appendChild(cur);
+    };
 
     function showLoadingScreen() {
 // Create a loading screen element
@@ -1547,6 +1589,7 @@ const TitleScreen: React.FC = () => {
                     }
                     defeat.style.height = `${buttonHeight * 4}px`;
                     defeat.style.width = `${buttonWidth * 4}px`;
+
                 };
 
                 const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
@@ -1711,7 +1754,7 @@ const TitleScreen: React.FC = () => {
         else if(game !== null && player.riskCards.length === 8){
             return CardIcon8.src;
         }
-        else if(game !== null && player.riskCards.length === 9){
+        else if(game !== null && player.riskCards.length === 9 || player.riskCards.length > 9){
             return CardIcon9.src;
         }
     };
