@@ -264,9 +264,9 @@
 .avatar-overlay3{
   position: absolute;
   top: -10%;
-  left: -5%;
+  left: -3%;
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
-  z-index: 1;
+  z-index: 3;
   background-size: cover; /* Scale the background image to cover the entire container */
   background-position: center; /* Center the background image */
   /* Add any additional styling as needed */
@@ -276,7 +276,7 @@
   top: -20%;
   left: -10%;
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
-  z-index: 1;
+  z-index: 3;
   background-size: cover; /* Scale the background image to cover the entire container */
   background-position: center; /* Center the background image */
   /* Add any additional styling as needed */
@@ -286,7 +286,7 @@
   top: -25%;
   left: -15%;
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
-  z-index: 1;
+  z-index: 3;
   background-size: cover; /* Scale the background image to cover the entire container */
   background-position: center; /* Center the background image */
   /* Add any additional styling as needed */
@@ -296,7 +296,7 @@
   top: -30%;
   left: -18%;
   /* Adjust the z-index to ensure the overlay is displayed above the base image */
-  z-index: 1;
+  z-index: 3;
   background-size: cover; /* Scale the background image to cover the entire container */
   background-position: center; /* Center the background image */
   /* Add any additional styling as needed */

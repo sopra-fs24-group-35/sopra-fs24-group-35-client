@@ -90,7 +90,7 @@ const TitleScreen: React.FC = () => {
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
     const [WinLoseWasShown, setWinLoseWasShown] = useState(false)
     const [StartTimer, setStartTimer] = useState(0);
-    const [LoseList, setLoseList] = useState([0, 0, 0, 0, 0, 0]);
+    const [LoseList, setLoseList] = useState([]);
     const [CyclewithTroopsandTerritories, setCyclewithTroopsandTerritories] = useState({});
 
 //ALL imagens
@@ -491,32 +491,59 @@ const TitleScreen: React.FC = () => {
                     for (const y of game.turnCycle.playerCycle) {
                         if(x.playerId === y.playerId){
                             bool = true;
+                            break;
                         }
                     }
                     if (bool === false && !LoseList.includes(x.playerId)) {
                         setLoseList(prevList => {
+                            // Create a new list by spreading the previous list
                             const newList = [...prevList];
-                            newList[count] = x.playerId;
+                            if (!newList.includes(x.playerId)) {
+                                newList.push(x.playerId);
+                            }
+                            console.log("I AM HERE BEFORE !!!!!!!! : ", newList + "count: " + count + "playerid: " + x.playerId);
                             return newList;
                         });
-                        const avatar0Button = document.getElementById(`avatar${count}`);
+                        console.log("I AM HERE!!!!!!!! : ", LoseList);
+                        for(const x of LoseList){
+                            console.log(x);
+                        }
 
-                        if(game.players.length < 4){
-                            defeat.classList.add('avatar-overlay3');}
-                        if(game.players.length === 4){
-                            defeat.classList.add('avatar-overlay4');}
-                        if(game.players.length === 5){
-                            defeat.classList.add('avatar-overlay5');}
-                        if(game.players.length === 6){
-                            defeat.classList.add('avatar-overlay6');}
-
-// Append the image element to the avatar button
-                        avatar0Button.appendChild(defeat);
                     }
                 }
             }
         }
     };
+
+    // Use useEffect to log the updated LoseList
+    useEffect(() => {
+        console.log("LoseList has been updated:", LoseList);
+        for (const x of LoseList) {
+            console.log(x);
+            console.log(game);
+            let count1 = -1;
+            for (const y of game.players) {
+                count1 = count1+1;
+                if(x === y.playerId){
+                    console.log("After Listupdate count: " + count1 + "playerid: " + x + " y: ", y.playerId);
+                    const avatar0Button = document.getElementById(`avatar${count1}`);
+                    console.log(avatar0Button);
+
+                    if(game.players.length < 4){
+                        defeat.classList.add('avatar-overlay3');}
+                    if(game.players.length === 4){
+                        defeat.classList.add('avatar-overlay4');}
+                    if(game.players.length === 5){
+                        defeat.classList.add('avatar-overlay5');}
+                    if(game.players.length === 6){
+                        defeat.classList.add('avatar-overlay6');}
+
+// Append the image element to the avatar button
+                    avatar0Button.appendChild(defeat);
+                }
+            }
+        }
+    }, [LoseList]);
 
     function showLoadingScreen() {
 // Create a loading screen element
