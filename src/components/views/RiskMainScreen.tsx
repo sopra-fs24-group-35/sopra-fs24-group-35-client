@@ -325,12 +325,11 @@ const TitleScreen: React.FC = () => {
     useEffect(() => {
         if (game !== null) {
             // CurrentPlayer == null
-            if (phase === "REINFORCEMENT" && game.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId){
+            if ((phase === "REINFORCEMENT" || phase === "ATTACK") && game.turnCycle.currentPlayer.riskCards.length >= 5 && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId){
                 openCardModal();
-            }
-            else if (phase === "ATTACK" && game.turnCycle.currentPlayer.riskCards.length > 5 && parseInt(localStorage.getItem("user_id")) === game.turnCycle.currentPlayer.playerId){
-                openCardModal();
-                setIsMidTurn(true);
+                if (phase === "ATTACK") {
+                    setIsMidTurn(true);
+                }
             }
 
             if (currentPlayerId !== null) {
