@@ -301,6 +301,7 @@ const TitleScreen: React.FC = () => {
                     localStorage.removeItem("lobbyId");
                     localStorage.removeItem("WinLooseScreenWasShown");
                     localStorage.removeItem("GameHasWinner");
+                    localStorage.removeItem("GameHasKindaWinner");
                     navigate("/lobby");
                 //});
 
@@ -463,9 +464,6 @@ const TitleScreen: React.FC = () => {
         let won = true;
         let loose = true;
         if(game !== null) {
-            if(game.turnCycle.playerCycle.length === 1){
-                localStorage.setItem("GameHasWinner", "true");
-            }
             let dic = setupdictionayforStats();
             for (const x of game.board.territories) {
                 dic = addtroopsandterritories(dic, x);
@@ -475,19 +473,36 @@ const TitleScreen: React.FC = () => {
                     loose = false
                 }
             }
+            if(game.turnCycle.playerCycle.length === 1 && ARealWinner(game.turnCycle.currentPlayer.playerId)){
+                localStorage.setItem("GameHasWinner", "true");
+            }
             setCyclewithTroopsandTerritories(dic);
             if (won === true && localStorage.getItem("WinLooseScreenWasShown") === "false") {
                 WinScreen();
                 localStorage.setItem("WinLooseScreenWasShown", "true");
-                nextState();
+                dehighlightvalidbuttons();
 
             } else if (loose === true && localStorage.getItem("WinLooseScreenWasShown") === "false") {
                 LooseScreen();
                 localStorage.setItem("WinLooseScreenWasShown", "true");
                 setWinLoseWasShown(true);
+            } else if(game.turnCycle.playerCycle.length === 1 && !ARealWinner(game.turnCycle.currentPlayer.playerId) && localStorage.getItem("GameHasKindaWinner") === "false"){
+                KindaWinScreen();
+                localStorage.setItem("GameHasKindaWinner", "true");
             }
+
+
         }
     };
+    const ARealWinner = (Winnerid) => {
+        for(const terr of game.board.territories){
+            if (terr.owner !== Winnerid){
+                return false;
+            }
+        }
+        return true;
+
+    }
 
     const setdeathsymbol = () => {
         if(game !== null) {
@@ -1127,12 +1142,14 @@ const TitleScreen: React.FC = () => {
             localStorage.removeItem("lobbyId");
             localStorage.removeItem("WinLooseScreenWasShown");
             localStorage.removeItem("GameHasWinner");
+            localStorage.removeItem("GameHasKindaWinner");
             navigate("/lobby");
         } else {
             localStorage.removeItem("lobbyToken");
             localStorage.removeItem("lobbyId");
             localStorage.removeItem("WinLooseScreenWasShown");
             localStorage.removeItem("GameHasWinner");
+            localStorage.removeItem("GameHasKindaWinner");
             navigate("/lobby");
         }
     }
@@ -1239,7 +1256,7 @@ const TitleScreen: React.FC = () => {
         //leaveModal.style.transform = 'translate(-50%, -50%)';
         leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
         leaveModal.style.padding = '20px';
-        leaveModal.style.zIndex = '100';
+        leaveModal.style.zIndex = '1000';
         leaveModal.style.textAlign = 'center';
         leaveModal.style.width = '100%';
         leaveModal.style.height = '100%';
@@ -1319,7 +1336,7 @@ const TitleScreen: React.FC = () => {
         //leaveModal.style.transform = 'translate(-50%, -50%)';
         leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
         leaveModal.style.padding = '20px';
-        leaveModal.style.zIndex = '100';
+        leaveModal.style.zIndex = '5000';
         leaveModal.style.textAlign = 'center';
         leaveModal.style.width = '100%';
         leaveModal.style.height = '100%';
@@ -1372,6 +1389,86 @@ const TitleScreen: React.FC = () => {
         if (buttonContainer) {
             buttonContainer.style.marginTop = '50px'; // Add some space between text and buttons
             buttonContainer.style.marginLeft = '18%';
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.alignItems = 'center'; // Center buttons horizontally
+        }
+    }
+
+    function KindaWinScreen() {
+        // Create a leave confirmation modal
+        const leaveModal = document.createElement('div');
+        leaveModal.id = 'leave-modal';
+        leaveModal.innerHTML = `
+        <div className="gamescreen-container">
+            <h1 style="display: block; margin-top: -100px;">Congratulations! You have kind of won! Your opponents have rage-quit the game!</h1>
+            <h2 style="display: block; margin-top: 50px;">Do you still want to conquer the whole world, or do you want to leave? </h2>
+            <div class="button-container">
+                <button id="leave-yes">I want to leave</button>
+                <button id="leave-no">I want to continue playing</button>
+            </div>
+        </div>
+    `;
+
+        // Add styles to the modal
+        leaveModal.style.position = 'fixed';
+        leaveModal.style.top = '0';
+        leaveModal.style.left = '0';
+        //leaveModal.style.transform = 'translate(-50%, -50%)';
+        leaveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.90)'; // Darker and transparent black
+        leaveModal.style.padding = '20px';
+        leaveModal.style.zIndex = '100';
+        leaveModal.style.textAlign = 'center';
+        leaveModal.style.width = '100%';
+        leaveModal.style.height = '100%';
+        leaveModal.style.color = '#fff';
+        leaveModal.style.display = 'flex';
+        leaveModal.style.justifyContent = 'center';
+        leaveModal.style.alignItems = 'center';
+
+
+        // Style the buttons
+        const leaveYesBtn = leaveModal.querySelector('#leave-yes') as HTMLButtonElement;
+        const leaveNoBtn = leaveModal.querySelector('#leave-no') as HTMLButtonElement;
+        leaveYesBtn.style.marginRight = '50px'; // Add some space between buttons
+        leaveYesBtn.style.padding = '10px 20px'; // Adjust padding for better appearance
+        leaveYesBtn.style.backgroundColor = '#d32f2f'; // Red color for "Yes" button
+        leaveYesBtn.style.color = '#fff'; // White text color
+        leaveYesBtn.style.border = 'none'; // Remove border
+        leaveYesBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveYesBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+        leaveYesBtn.style.display = 'flex';
+        leaveYesBtn.style.justifyContent = 'center';
+        leaveYesBtn.style.alignItems = 'center';
+
+        leaveNoBtn.style.padding = '10px 20px'; // Adjust padding for better appearance
+        leaveNoBtn.style.backgroundColor = '#2196f3'; // Blue color for "No" button
+        leaveNoBtn.style.color = '#fff'; // White text color
+        leaveNoBtn.style.border = 'none'; // Remove border
+        leaveNoBtn.style.borderRadius = '5px'; // Add some border radius for rounded corners
+        leaveNoBtn.style.cursor = 'pointer'; // Show pointer cursor on hover
+        leaveNoBtn.style.display = 'flex';
+        leaveNoBtn.style.justifyContent = 'center';
+        leaveNoBtn.style.alignItems = 'center';
+        // Add event listeners to the buttons
+        leaveYesBtn.addEventListener('click', () => {
+            // Perform leave action here
+            // For now, just console log
+            LeavePlayer();
+            leaveModal.remove(); // Remove the modal after leaving
+        });
+
+        leaveNoBtn.addEventListener('click', () => {
+            leaveModal.remove(); // Remove the modal if user chooses not to leave
+        });
+
+        // Append the modal to the body
+        document.body.appendChild(leaveModal);
+
+        // Style the button container if it exists
+        const buttonContainer = leaveModal.querySelector('.button-container') as HTMLButtonElement;
+        if (buttonContainer) {
+            buttonContainer.style.marginTop = '50px'; // Add some space between text and buttons
+            buttonContainer.style.marginLeft = '33%';
             buttonContainer.style.display = 'flex';
             buttonContainer.style.alignItems = 'center'; // Center buttons horizontally
         }

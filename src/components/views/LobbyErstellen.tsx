@@ -70,6 +70,7 @@ const LobbyErstellen = () => {
       localStorage.setItem("lobbyToken", token);
       localStorage.setItem ( "WinLooseScreenWasShown" , "false" );
       localStorage.setItem ( "GameHasWinner" , "false" );
+      localStorage.setItem ( "GameHasKindaWinner" , "false" );
       navigate("/lobby/" + response.data.id)
     } catch (error) {
       alert(

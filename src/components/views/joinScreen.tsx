@@ -24,6 +24,7 @@ const joinScreen = () => {
       localStorage.setItem("lobbyToken", token);
       localStorage.setItem ( "WinLooseScreenWasShown" ,  "false" );
       localStorage.setItem ( "GameHasWinner" , "false" );
+      localStorage.setItem ( "GameHasKindaWinner" , "false" );
       navigate("/lobby/" + lobbyId);
 
     } catch (error) {
