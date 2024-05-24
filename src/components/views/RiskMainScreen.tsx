@@ -853,12 +853,18 @@ const TitleScreen: React.FC = () => {
                 setIsMidTurn(false);
                 dehighlightvalidbuttons();
 
-                const requestBody = JSON.stringify({"board": game.board});
-                const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}/Board`, requestBody, {headers: config});
+                if (phase === "ATTACK") {
+                    const requestBody = JSON.stringify({"board": game.board});
+                    const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}/Board`, requestBody, {headers: config}); 
+                    //console.log("UPDATE", updateGame);
+                    setButtonData([...buttonData]); // Update the button data array in the state
+                    setGame(updateGame.data);
+                }
+                else {
+                    setButtonData([...buttonData]); // Update the button data array in the state
+                    setGame(game);
+                }
                 
-                console.log("UPDATE", updateGame);
-                setButtonData([...buttonData]); // Update the button data array in the state
-                setGame(updateGame.data);
             }
         }
     };
@@ -1733,8 +1739,8 @@ const TitleScreen: React.FC = () => {
 
 
     function getAvatarSrc(x: number) {
-        console.log("PLAYERS", game);
-        if (game !== null && game.players !== null && game?.players?.length !== undefined && game.players.length > x && AllIDwithAvatar.length !== 0) {
+        //console.log("PLAYERS", game);
+        if (game !== null && game.players !== null && game.players.length > x && AllIDwithAvatar.length !== 0) {
             return AllIDwithAvatar[game.players[x].playerId];
         } else {
             return null;
