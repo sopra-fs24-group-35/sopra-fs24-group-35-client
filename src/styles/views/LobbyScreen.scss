@@ -16,8 +16,9 @@
     flex-direction: column;
     align-items: center;
     box-shadow: $dropShadow;
-    max-width: 40%;
+    max-width: 400px;
     background-image: url('../../styles/views/Pictures/CardBackground.png');
+    background-size: 400px;
   }
   &.user-list {
     list-style: none;

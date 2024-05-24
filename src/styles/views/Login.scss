@@ -24,6 +24,7 @@
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
     background-image: url('../../styles/views/Pictures/CardBackground.png');
+    background-size: 30em;
   }
   &.field {
     display: flex;

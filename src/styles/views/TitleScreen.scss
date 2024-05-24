@@ -40,6 +40,7 @@
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
     background-image: url('../../styles/views/Pictures/CardBackground.png');
+    background-size: 50em;
   }
 
   &.title {
