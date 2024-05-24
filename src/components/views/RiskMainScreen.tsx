@@ -193,8 +193,8 @@ const TitleScreen: React.FC = () => {
                 setCurrentTroopBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
             }
             else {
-                //let troops = currentTroopBonus;
-                setCurrentTroopBonus(updatedGame.data.turnCycle.currentPlayer.troopBonus);
+                let troops = currentTroopBonus;
+                setCurrentTroopBonus(troops + updatedGame.data.turnCycle.currentPlayer.cardBonus);
             }
             setIsPlacing(true);
         }
@@ -2055,7 +2055,7 @@ const TitleScreen: React.FC = () => {
                                     }}
                                     disabled={!isCurrentPlayer || localStorage.getItem("WinLooseScreenWasShown") === "true"}
                                 >
-                                {"Troop Amount:" + ((phase === "REINFORCEMENT") ? currentTroopBonus : (isMidTurn && currentTroopBonus))}
+                                {"Troops Amount: " + ((phase === "REINFORCEMENT") ? currentTroopBonus : (isMidTurn && currentTroopBonus))}
                                 </div>
                             </div>
                         )}
@@ -2100,7 +2100,7 @@ const TitleScreen: React.FC = () => {
                           userId={parseInt(localStorage.getItem("user_id"))}
                           game={game}
                       />
-                      <Countdown
+                      {/*<Countdown
                           onComplete={nextState}
                           phase={phase}
                           currentPlayerId={parseInt(currentPlayerId)}
@@ -2109,7 +2109,7 @@ const TitleScreen: React.FC = () => {
                           closeWindow2={closeCardModal}
                           additionalTime={additionalTime}
                           setAdditionalTime={setAdditionalTime}
-                      />
+              />*/}
                   </>
               )}
 

@@ -26,16 +26,16 @@ const RiskCard = ({ troop, territoryName, isOwned}) => {
     if (territoryName === "Joker1" || territoryName === "Joker2") {
         color = "linear-gradient(in hsl longer hue 45deg, red 0 0)";
     }
-    else if (['Alaska', 'Northwest Territory', 'Greenland', 'Quebec', 'Ontario', 'Alberta', 'Western US', 'Eastern US', 'Central America'].includes(territoryName)) {
+    else if (['Alaska', 'Northwest Territory', 'Greenland', 'Quebec', 'Ontario', 'Alberta', 'Western United States', 'Eastern United States', 'Central America'].includes(territoryName)) {
         color = "rgba(171, 209, 0, 1)";
     }
     else if (['Venezuela','Brazil', 'Peru', 'Argentina'].includes(territoryName)) {
         color = "rgba(224, 124, 47, 1)";
     }
-    else if (['Ukraine','Northern Europe','Southern Europe', 'Western Europe', 'Scandinavia', 'Great Britain'].includes(territoryName)) {
+    else if (['Ukraine','Northern Europe','Southern Europe', 'Western Europe', 'Scandinavia', 'Great Britain', 'Iceland'].includes(territoryName)) {
         color = "rgba(37, 101, 219, 1)";
     }
-    else if (['Egypt','Eastern Africa','North Africa', 'Congo', 'Madagascar', 'South Africa'].includes(territoryName)) {
+    else if (['Egypt','East Africa','North Africa', 'Central Africa', 'Madagascar', 'South Africa'].includes(territoryName)) {
         color = "rgba(166, 39, 0, 1)";
     }
     else if (['Indonesia','New Guinea','Western Australia', 'Eastern Australia'].includes(territoryName)) {

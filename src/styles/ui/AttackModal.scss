@@ -49,7 +49,7 @@
 .modal-title {
     display: flex;
     justify-content: center;
-    color: $textColor;
+    color: $textColorModal;
     font-weight: 800;
     font-family: $fontDefault;
     line-height: 28px;
@@ -67,7 +67,7 @@
 }
 .vs-text{
     font-family: $fontDefault;
-    color: $textColor;
+    color: $textColorModal;
     font-weight: 800;
 }
 .defender-info,
@@ -118,7 +118,7 @@
     font-family: $fontDefault;
     font-size: medium;
     font-weight: 600;
-    color: $textColor
+    color: $textColorModal;
 }
 .select-label {
     display: flex;
@@ -126,7 +126,7 @@
     font-family: $fontDefault;
     font-size: small;
     font-weight: 600;
-    color: $textColor
+    color: $textColorModal;
 }
 .hr {
     clear: both;
@@ -146,7 +146,7 @@
     }
     &.username {
         font-weight: 500;
-        color: $textColor;
+        color: $textColorModal;
     }
     &.avatar {
         border-radius: 50%; // Make the avatar round

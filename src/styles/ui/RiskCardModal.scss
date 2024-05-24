@@ -19,8 +19,10 @@
 }
 .modal-contentCards {
     border: 1px solid rgb(152, 105, 105);
-    min-width: 920px;
+    min-width: 800px;
     min-height: 400px;
+    max-height: 700px;
+    max-width: 900px;
     background-color: rgba(152, 105, 105, 0.929);
     border-radius: $borderRadius;
     position: absolute;
@@ -49,7 +51,7 @@
 .modal-title {
     display: flex;
     justify-content: center;
-    color: $textColor;
+    color: $textColorModal;
     font-weight: 800;
     font-family: $fontDefault;
     line-height: 28px;
@@ -94,7 +96,7 @@
 .modal-explain {
     display: flex;
     justify-content: center;
-    color: $textColor;
+    color: $textColorModal;
     font-weight: 500;
     font-family: $fontDefault;
     line-height: 10px;
@@ -105,7 +107,7 @@
     display: flex;
     justify-content: center;
     min-height: 12px;
-    color: $textColor;
+    color: $textColorModal;
     font-weight: 500;
     font-family: $fontDefault;
     line-height: 10px;
