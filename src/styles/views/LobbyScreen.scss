@@ -16,7 +16,7 @@
     flex-direction: column;
     align-items: center;
     box-shadow: $dropShadow;
-    width: 40%;
+    max-width: 40%;
     background-image: url('../../styles/views/Pictures/CardBackground.png');
   }
   &.user-list {
