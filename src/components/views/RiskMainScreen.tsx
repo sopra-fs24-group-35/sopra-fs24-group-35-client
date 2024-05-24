@@ -184,16 +184,16 @@ const TitleScreen: React.FC = () => {
 
     const closeCardModal = async () => {
         const updatedGame = await api.get(`/lobbies/${lobbyId}/game/${gameId}`, {headers: config});
-//setGame(updatedGame.data);
+        //setGame(updatedGame.data);
 
         if (updatedGame?.data?.turnCycle?.currentPhase !== null && traded) {
 
             if(updatedGame?.data?.turnCycle?.currentPhase === "ATTACK"){
-                setCardBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
+                setCurrentTroopBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
             }
             else {
-                let troops = currentTroopBonus;
-                setCurrentTroopBonus(troops + updatedGame.data.turnCycle.currentPlayer.cardBonus);
+                //let troops = currentTroopBonus;
+                setCurrentTroopBonus(updatedGame.data.turnCycle.currentPlayer.troopBonus);
             }
             setIsPlacing(true);
         }
@@ -282,7 +282,7 @@ const TitleScreen: React.FC = () => {
                     setPhase(gameResponse.data.turnCycle.currentPhase); //ERROR adn CurrentPlayer
                     setCurrentPlayerId(gameResponse.data.turnCycle.currentPlayer.playerId);
                     setCurrentTroopBonus(gameResponse.data.turnCycle.currentPlayer.troopBonus);
-                    setCardBonus(gameResponse.data.turnCycle.currentPlayer.cardBonus);
+                    //setCardBonus(gameResponse.data.turnCycle.currentPlayer.cardBonus);
                     setPlayerCycle(gameResponse.data.turnCycle.playerCycle);
 
 
@@ -702,7 +702,7 @@ const TitleScreen: React.FC = () => {
                     if (phase === "REINFORCEMENT") {
                         validbuttonid.push(ter.name);
                     }
-                    else if ((ter.troops > 1 && phase === "ATTACK" && checkifthereareenemies(ter.name)) || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) {
+                    else if ((ter.troops > 1 && phase === "ATTACK" && checkifthereareenemies(ter.name)) || (phase === "ATTACK" && isMidTurn)) {
                         validbuttonid.push(ter.name);
                     }
                     else if(phase === "MOVE" && ter.troops > 1 && checkifthereareneighbors(ter.name)){
@@ -748,7 +748,7 @@ const TitleScreen: React.FC = () => {
 
     const handleButtonClick = (id: string) => {
         const territory = game.board.territories.find(territory => territory.name === id);
-        if (phase === "REINFORCEMENT" || (phase === "ATTACK" && cardBonus && cardBonus !== 0)) {
+        if (phase === "REINFORCEMENT" || (phase === "ATTACK" && isMidTurn)) {
             deploytroops(id);
         }
         else if (phase === "ATTACK") {
@@ -825,60 +825,41 @@ const TitleScreen: React.FC = () => {
         setPhase(updateGame.data.turnCycle.currentPhase);
         setCurrentPlayerId(updateGame.data.turnCycle.currentPlayer.playerId);
         setCurrentTroopBonus(updateGame.data.turnCycle.currentPlayer.troopBonus);
-        setCardBonus(updateGame.data.turnCycle.currentPlayer.cardBonus);
+        //setCardBonus(updateGame.data.turnCycle.currentPlayer.cardBonus);
     };
 
-    const increaseTroops = (territory_id: string) => {
+    const increaseTroops = async (territory_id: string) => {
         const territory = game.board.territories.find(territory => territory.name === territory_id);
         const button = buttonData.find(button => button.id === territory_id); // Find the button data for the startId
 
-        if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId && phase === "REINFORCEMENT") {
+        if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId && (phase === "REINFORCEMENT" || (phase === "ATTACK" && isMidTurn))) {
             if ((currentTroopBonus - selectedTroops) > 0) {
                 territory.troops = territory.troops + parseInt(selectedTroops);
             }
             else {
                 territory.troops = territory.troops + parseInt(currentTroopBonus);
             }
+
             button.troops = territory.troops; // set troop count to server troop count
 
             let troops = currentTroopBonus;
             if ((troops - selectedTroops) > 0) {
                 setCurrentTroopBonus(troops - selectedTroops);
+                setButtonData([...buttonData]); // Update the button data array in the state
+                setGame(game);
             }
             else {
                 setCurrentTroopBonus(0);
-                dehighlightvalidbuttons();
-            }
-
-            setButtonData([...buttonData]); // Update the button data array in the state
-            setGame(game);
-        }
-        else if (button && currentTroopBonus !== 0 &&  territory.owner === currentPlayerId && phase === "ATTACK"){
-            if ((cardBonus - selectedTroops) > 0) {
-                territory.troops = territory.troops + parseInt(selectedTroops);
-                setCardBonus(territory.troops - selectedTroops);
-            }
-            else {
-                territory.troops = territory.troops + parseInt(cardBonus);
-                setCardBonus(0);
                 setIsMidTurn(false);
-            }
-            button.troops = territory.troops; // set troop count to server troop count
-
-            let troops = cardBonus;
-            if ((troops - selectedTroops) > 0) {
-                setCardBonus(troops - selectedTroops);
-            }
-            else {
-                setCardBonus(0);
                 dehighlightvalidbuttons();
-                setIsMidTurn(false);
+
+                const requestBody = JSON.stringify({"board": game.board});
+                const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}/Board`, requestBody, {headers: config});
+
+                setButtonData([...buttonData]); // Update the button data array in the state
+                setGame(updateGame);
             }
-
-            setButtonData([...buttonData]); // Update the button data array in the state
-            setGame(game);
         }
-
     };
 
     const redirectTroops = (id: string) => {
@@ -1737,6 +1718,7 @@ const TitleScreen: React.FC = () => {
 
 
     function getAvatarSrc(x: number) {
+        console.log("PLAYERS", game);
         if (game !== null && game.players !== null && game.players.length > x && AllIDwithAvatar.length !== 0) {
             return AllIDwithAvatar[game.players[x].playerId];
         } else {
@@ -2047,7 +2029,7 @@ const TitleScreen: React.FC = () => {
                                     }}
                                     disabled={!isCurrentPlayer || localStorage.getItem("WinLooseScreenWasShown") === "true"}
                                 >
-                                {"Troop Amount:" + ((phase === "REINFORCEMENT") ? currentTroopBonus : (isMidTurn && cardBonus))}
+                                {"Troop Amount:" + ((phase === "REINFORCEMENT") ? currentTroopBonus : (isMidTurn && currentTroopBonus))}
                                 </div>
                             </div>
                         )}
