@@ -1113,31 +1113,45 @@ const TitleScreen: React.FC = () => {
 
     const LeavePlayer = async () => {
         let bool = false;
-        for(const x of game.turnCycle.playerCycle){
-            if (x.playerId === parseInt(localStorage.getItem("user_id"), 10)){
+        const userIdString = localStorage.getItem("user_id");
+        const userId = userIdString ? parseInt(userIdString, 10) : NaN;
+
+        if (isNaN(userId)) {
+            console.error("Invalid user_id from localStorage");
+            // Handle error or exit early if user_id is invalid
+            return;
+        }
+
+        for (const x of game.turnCycle.playerCycle) {
+            const playerIdString = x.playerId;
+            const playerId = playerIdString ? parseInt(playerIdString, 10) : NaN;
+
+            console.log(`Checking playerId: ${playerId} against userId: ${userId}`);
+            if (playerId === userId) {
                 bool = true;
+                break; // Exit loop early since we found a match
             }
         }
-        const config1 = {Authorization: localStorage.getItem("lobbyToken")};
-        const userId = localStorage.getItem("user_id");
 
-        if(bool){
-            const gameResponse = await api.put(`lobbies/${lobbyId}/game/${gameId}/user/${userId}`, {},  {headers: config1});
-            localStorage.removeItem("lobbyToken");
-            localStorage.removeItem("lobbyId");
-            localStorage.removeItem("WinLooseScreenWasShown");
-            localStorage.removeItem("GameHasWinner");
-            localStorage.removeItem("GameHasKindaWinner");
-            navigate("/lobby");
-        } else {
-            localStorage.removeItem("lobbyToken");
-            localStorage.removeItem("lobbyId");
-            localStorage.removeItem("WinLooseScreenWasShown");
-            localStorage.removeItem("GameHasWinner");
-            localStorage.removeItem("GameHasKindaWinner");
-            navigate("/lobby");
+        const config1 = { Authorization: localStorage.getItem("lobbyToken") };
+
+        if (bool) {
+            try {
+                const gameResponse = await api.put(`lobbies/${lobbyId}/game/${gameId}/user/${userId}`, {}, { headers: config1 });
+                console.log("User successfully left the game:", gameResponse);
+            } catch (error) {
+                console.error("Error leaving the game:", error);
+            }
         }
-    }
+
+        localStorage.removeItem("lobbyToken");
+        localStorage.removeItem("lobbyId");
+        localStorage.removeItem("WinLooseScreenWasShown");
+        localStorage.removeItem("GameHasWinner");
+        localStorage.removeItem("GameHasKindaWinner");
+        navigate("/lobby");
+    };
+
 
     function LeavePlayerConfirmation() {
         // Create a leave confirmation modal
@@ -1720,7 +1734,7 @@ const TitleScreen: React.FC = () => {
 
     function getAvatarSrc(x: number) {
         console.log("PLAYERS", game);
-        if (game !== null && game.players !== null && game.players.length > x && AllIDwithAvatar.length !== 0) {
+        if (game !== null && game.players !== null && game?.players?.length !== undefined && game.players.length > x && AllIDwithAvatar.length !== 0) {
             return AllIDwithAvatar[game.players[x].playerId];
         } else {
             return null;
