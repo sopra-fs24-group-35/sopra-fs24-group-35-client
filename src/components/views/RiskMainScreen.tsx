@@ -2090,9 +2090,9 @@ const TitleScreen: React.FC = () => {
     );
 
     return (
-      <div className="gamescreen-container">
-          <div className="gamescreen-innerupper-container">
-              {(localStorage.getItem("GameHasWinner") === "false") && (
+        <div className="gamescreen-container">
+            <div className="gamescreen-innerupper-container">
+                {(localStorage.getItem("GameHasWinner") === "false") && (
                     <>
                         <Announcer
                           phase={phase}
@@ -2111,53 +2111,53 @@ const TitleScreen: React.FC = () => {
                           setAdditionalTime={setAdditionalTime}
                         />
                     </>
-              )}
+                )}
 
-              {/*Attack Modal Section*/}
-              <section>
-                  <AttackModal
-                    isModalOpen={isModalOpen}
-                    modalContent={modalContent}
-                    onClose={closeModal}
-                    onMove={moving}
-                    lobbyId={lobbyId}
-                    gameId={gameId}
-                    additionalTime={additionalTime}
-                    setAdditionalTime={setAdditionalTime}
-                  />
-                  {(localStorage.getItem("GameHasWinner") === "false") && (
-                  <RiskCardModal
-                    isModalOpen={isCardModalOpen}
-                    isMidTurn={isMidTurn}
-                    onClose={closeCardModal}
-                    onTrade={trading}
-                    lobbyId={lobbyId}
-                    gameId={gameId}
-                    additionalTime={additionalTime}
-                    setAdditionalTime={setAdditionalTime}
-                  />)}
-                  <LoseModal
-                    isModalOpen={isLoseModalOpen}
-                    onClose={closeModal}
-                  />
-                  <ModalWin
-                    isModalOpen={isWinModalOpen}
-                    onClose={closeModal}
-                  />
-                  <LeaveModal
-                    isModalOpen={isLeaveModalOpen}
-                    onClose={closeModal}
-                  />
+                {/*Attack Modal Section*/}
+                <section>
+                    <AttackModal
+                        isModalOpen={isModalOpen}
+                        modalContent={modalContent}
+                        onClose={closeModal}
+                        onMove={moving}
+                        lobbyId={lobbyId}
+                        gameId={gameId}
+                        additionalTime={additionalTime}
+                        setAdditionalTime={setAdditionalTime}
+                    />
+                    {(localStorage.getItem("GameHasWinner") === "false") && (
+                    <RiskCardModal
+                        isModalOpen={isCardModalOpen}
+                        isMidTurn={isMidTurn}
+                        onClose={closeCardModal}
+                        onTrade={trading}
+                        lobbyId={lobbyId}
+                        gameId={gameId}
+                        additionalTime={additionalTime}
+                        setAdditionalTime={setAdditionalTime}
+                    />)}
+                    <LoseModal
+                        isModalOpen={isLoseModalOpen}
+                        onClose={closeModal}
+                    />
+                    <ModalWin
+                        isModalOpen={isWinModalOpen}
+                        onClose={closeModal}
+                    />
+                    <LeaveModal
+                        isModalOpen={isLeaveModalOpen}
+                        onClose={closeModal}
+                    />
 
-              </section>
-              <canvas id="myCanvas"></canvas>
-              {renderButtons}
-          </div>
-          {lowerContent}
-          <div className="container-80-20">
-              {sideContent}
-          </div>
-      </div>
+                </section>
+                <canvas id="myCanvas"></canvas>
+                {renderButtons}
+            </div>
+            {lowerContent}
+            <div className="container-80-20">
+                {sideContent}
+            </div>
+        </div>
     );
 }
 
