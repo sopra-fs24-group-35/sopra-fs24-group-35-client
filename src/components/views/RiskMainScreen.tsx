@@ -2055,7 +2055,7 @@ const TitleScreen: React.FC = () => {
                                     }}
                                     disabled={!isCurrentPlayer || localStorage.getItem("WinLooseScreenWasShown") === "true"}
                                 >
-                                {"Troops Amount: " + ((phase === "REINFORCEMENT") ? currentTroopBonus : (isMidTurn ? currentTroopBonus : "00"))}
+                                {"Troops Amount: " + currentTroopBonus}
                                 </div>
                             </div>
                         )}
