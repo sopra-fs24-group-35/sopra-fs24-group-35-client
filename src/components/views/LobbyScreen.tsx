@@ -201,7 +201,7 @@ const LobbyScreen = () => {
                 </ul>
                 {(lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && !startingGame) ? 
                 (
-                <Button width="100%" style={{ marginBottom: '10px' }} disabled={users.length === 1}  onClick={gameStart}>
+                <Button width="100%" style={{ marginBottom: '10px' }} disabled={users.length === 1 || users.length > 6}  onClick={gameStart}>
                     Start Game
                 </Button>
                 ) : ((lobbyOwnerId === parseInt(localStorage.getItem("user_id")) && startingGame) &&

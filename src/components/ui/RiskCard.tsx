@@ -35,7 +35,7 @@ const RiskCard = ({ troop, territoryName, isOwned}) => {
     else if (['Ukraine','Northern Europe','Southern Europe', 'Western Europe', 'Scandinavia', 'Great Britain'].includes(territoryName)) {
         color = "rgba(37, 101, 219, 1)";
     }
-    else if (['Egypt','East Africa','North Africa', 'Madagascar', 'South Africa'].includes(territoryName)) {
+    else if (['Egypt','Eastern Africa','North Africa', 'Congo', 'Madagascar', 'South Africa'].includes(territoryName)) {
         color = "rgba(166, 39, 0, 1)";
     }
     else if (['Indonesia','New Guinea','Western Australia', 'Eastern Australia'].includes(territoryName)) {
