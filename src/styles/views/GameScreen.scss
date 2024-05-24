@@ -51,7 +51,6 @@
 
 
 .gamescreen-buttons-container-troops {
-  margin-top: 5px;
   cursor: default;
 }
 
@@ -68,9 +67,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-direction: row;
   gap: 10px; /* Adds space between buttons */
+  max-height: 30%;
   width: 100%; /* Ensure the label takes full width of its container */
   box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.gamescreen-selection-split {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -0.5%;
+  max-height: 90%;
 }
 
 /* Base styles for the selection buttons */
@@ -80,15 +90,15 @@
   align-items: center;
   border: 2px solid #ccc;
   border-radius: 8px;
-  min-width: 10px;
-  max-width: 100%; /* Prevent button from exceeding container width */
+  max-width: 30%;
+  //max-width: 100%; /* Prevent button from exceeding container width */
   font-size: 1rem;
   font-weight: bold;
   background-color: $accent;
   color: #333;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s, transform 0.3s;
-  margin-bottom: -15%;
+  margin-bottom: -5%;
   flex-grow: 1; /* Allow button to grow within flex container */
   padding: 5px 0px; /* Add padding for better button size adjustment */
   box-sizing: border-box; /* Include padding and border in the element's total width and height */
