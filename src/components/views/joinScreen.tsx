@@ -19,13 +19,21 @@ const joinScreen = () => {
       const players = [localStorage.getItem("user_id")];
       const requestBody = JSON.stringify({ code, players });
       const response = await api.put("/lobbies", requestBody);
-      const lobbyId = response.data.id;
-      const token = response.headers["authorization"];
-      localStorage.setItem("lobbyToken", token);
-      localStorage.setItem ( "WinLooseScreenWasShown" ,  "false" );
-      localStorage.setItem ( "GameHasWinner" , "false" );
-      localStorage.setItem ( "GameHasKindaWinner" , "false" );
-      navigate("/lobby/" + lobbyId);
+      
+      if (parseInt(response.data.players.length) === 6) {
+        alert(
+          `There are too many players in the lobby, please wait for someone to leave!`
+        );
+      }
+      else {
+        const lobbyId = response.data.id;
+        const token = response.headers["authorization"];
+        localStorage.setItem("lobbyToken", token);
+        localStorage.setItem ( "WinLooseScreenWasShown" ,  "false" );
+        localStorage.setItem ( "GameHasWinner" , "false" );
+        localStorage.setItem ( "GameHasKindaWinner" , "false" );
+        navigate("/lobby/" + lobbyId);
+      }
 
     } catch (error) {
       alert(
