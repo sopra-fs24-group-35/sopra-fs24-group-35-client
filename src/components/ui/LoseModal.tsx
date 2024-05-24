@@ -30,9 +30,7 @@ const LoseModal = ({ isModalOpen, onClose}) => {
 
 LoseModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  lobbyId: PropTypes.number.isRequired,
-  gameId: PropTypes.number.isRequired
+  onClose: PropTypes.func.isRequired
 };
 
 export default LoseModal;
