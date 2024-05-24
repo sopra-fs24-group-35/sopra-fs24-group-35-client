@@ -352,7 +352,12 @@
   height: 100%; /* Make the image fill its container */
 }
 
-
+.avatarfont {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffffff;
+}
 avatar-arrow{
   position: absolute;
   transform: rotate(180deg);
