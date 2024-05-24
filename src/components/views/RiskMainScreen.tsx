@@ -694,7 +694,23 @@ const TitleScreen: React.FC = () => {
                 curbutton.style.border = "2px solid white";
             }
         }
+        updateScreen();
     };
+
+    const updateScreen = () => {
+        // Create a deep copy of PlayerColor and modify it
+        let x = JSON.parse(JSON.stringify(PlayerColor));
+        x["XY"] = 99;
+        setPlayerColor(x);
+
+        // Ensure the state change by using a timeout or callback
+        setTimeout(() => {
+            let y = JSON.parse(JSON.stringify(PlayerColor));
+            delete y["XY"];
+            setPlayerColor(y);
+        }, 0);
+    };
+
 
     const highlightCurrentButtons = () => {
         const playerid = currentPlayerId;
@@ -1697,6 +1713,8 @@ const TitleScreen: React.FC = () => {
                     defeat.style.height = `${buttonHeight * 4}px`;
                     defeat.style.width = `${buttonWidth * 4}px`;
 
+                    // const avatarElement = document.getElementById(avatar);
+
                 };
 
                 const calculateButtonPosition = (drawWidth: number, drawHeight: number, startx: number, starty: number, buttonId: string) => {
@@ -2027,7 +2045,7 @@ const TitleScreen: React.FC = () => {
                         {((currentTroopBonus !== 0 && phase === "REINFORCEMENT") || (phase === "ATTACK" && isMidTurn && cardBonus > 0)) && (parseInt(currentPlayerId) === parseInt(localStorage.getItem("user_id"))) && (localStorage.getItem("WinLooseScreenWasShown") === "false") &&(
 
                             <div className="gamescreen-selection-split">
-                                <div className="dynbut game-select-label">
+                                <div className="game-select-label">
                                     <button
                                         className={`game-select ${selectedTroops === 1 ? 'highlighted' : ''}`}
                                         onClick={() => setSelectedTroops(1)}
@@ -2049,7 +2067,7 @@ const TitleScreen: React.FC = () => {
                                 </div>
                                 <div
                                     id="nextState"
-                                    className="dynbut gamescreen-buttons-container-troops"
+                                    className="gamescreen-buttons-container-troops"
                                     onClick={() => {
                                         //setCurrentTroopBonus(prevState => prevState + 100);
                                     }}

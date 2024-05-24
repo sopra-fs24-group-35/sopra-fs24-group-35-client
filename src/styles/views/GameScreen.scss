@@ -13,6 +13,7 @@
   display: flex;
   margin: 5%;
   max-height: 100%;
+  margin-left: 20%;
 }
 .gamescreen-leave-container {
   display: flex;
@@ -30,10 +31,11 @@
   background-color: #e60000;
   cursor: pointer;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 1.5rem;
+  font-size: 0.8rem;
   font-weight: bold;
   color: white;
   text-transform: uppercase;
+  left: 60%;
   letter-spacing: 1px;
   box-sizing: border-box;
   transition: transform 0.2s, background-color 0.2s;
@@ -48,10 +50,15 @@
   text-shadow: none;
 }
 
-
 .gamescreen-buttons-container-troops {
+
   cursor: default;
-  padding: 25px;
+  padding: 20px;
+  height: 60%;
+  font-size: 3vh;
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .gamescreen-buttons-container:hover {
@@ -91,7 +98,7 @@
   align-items: center;
   border: 2px solid #ccc;
   border-radius: 8px;
-  min-height: 80%;
+  min-height: 40%;
   max-width: 30%;
   //max-width: 100%; /* Prevent button from exceeding container width */
   font-size: 1rem;
