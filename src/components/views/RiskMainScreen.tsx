@@ -191,10 +191,12 @@ const TitleScreen: React.FC = () => {
             if(updatedGame?.data?.turnCycle?.currentPhase === "ATTACK"){
                 setCardBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
                 setCurrentTroopBonus(updatedGame.data.turnCycle.currentPlayer.cardBonus);
+                highlightCurrentButtons();
             }
             else {
                 let troops = currentTroopBonus;
                 setCurrentTroopBonus(troops + updatedGame.data.turnCycle.currentPlayer.cardBonus);
+                highlightCurrentButtons();
             }
             setIsPlacing(true);
         }
