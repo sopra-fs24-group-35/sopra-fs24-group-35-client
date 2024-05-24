@@ -855,9 +855,10 @@ const TitleScreen: React.FC = () => {
 
                 const requestBody = JSON.stringify({"board": game.board});
                 const updateGame = await api.put(`/lobbies/${lobbyId}/game/${gameId}/Board`, requestBody, {headers: config});
-
+                
+                console.log("UPDATE", updateGame);
                 setButtonData([...buttonData]); // Update the button data array in the state
-                setGame(updateGame);
+                setGame(updateGame.data);
             }
         }
     };
