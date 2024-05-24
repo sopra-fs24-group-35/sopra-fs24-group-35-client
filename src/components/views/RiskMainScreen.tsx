@@ -698,7 +698,7 @@ const TitleScreen: React.FC = () => {
         if (game) {
 
             for (let ter of game.board.territories) {
-                if (ter.owner === playerid) {
+                if (ter.owner === playerid && currentTroopBonus !== 0) {
                     if (phase === "REINFORCEMENT") {
                         validbuttonid.push(ter.name);
                     }
