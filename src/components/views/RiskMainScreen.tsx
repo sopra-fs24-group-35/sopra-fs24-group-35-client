@@ -2093,14 +2093,14 @@ const TitleScreen: React.FC = () => {
       <div className="gamescreen-container">
           <div className="gamescreen-innerupper-container">
               {(localStorage.getItem("GameHasWinner") === "false") && (
-                  <>
-                      <Announcer
+                    <>
+                        <Announcer
                           phase={phase}
                           currentPlayerId={parseInt(currentPlayerId)}
                           userId={parseInt(localStorage.getItem("user_id"))}
                           game={game}
-                      />
-                      {/*<Countdown
+                        />
+                        <Countdown
                           onComplete={nextState}
                           phase={phase}
                           currentPlayerId={parseInt(currentPlayerId)}
@@ -2109,8 +2109,8 @@ const TitleScreen: React.FC = () => {
                           closeWindow2={closeCardModal}
                           additionalTime={additionalTime}
                           setAdditionalTime={setAdditionalTime}
-              />*/}
-                  </>
+                        />
+                    </>
               )}
 
               {/*Attack Modal Section*/}
