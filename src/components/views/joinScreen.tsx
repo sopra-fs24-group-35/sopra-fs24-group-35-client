@@ -20,6 +20,7 @@ const joinScreen = () => {
       const requestBody = JSON.stringify({ code, players });
       const response = await api.put("/lobbies", requestBody);
       
+      //no more than 6 players in lobby
       if (parseInt(response.data.players.length) >= 6) {
         alert(
           `There are too many players in the lobby, please wait for someone to leave!`
